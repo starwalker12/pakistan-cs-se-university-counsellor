@@ -23,6 +23,9 @@ const quickBtns = document.querySelectorAll('.quick-btn');
 // FAQ data will be loaded from data/faq.json
 let faqData = [];
 
+// Prevents multiple rapid sends (race condition guard)
+let isProcessing = false;
+
 // =============================================
 // Load FAQ data from JSON file on page load
 // =============================================
@@ -200,6 +203,10 @@ async function handleSend() {
   // Do not process empty messages
   if (message === '') return;
 
+  // Prevent sending a new message while another is still processing
+  if (isProcessing) return;
+  isProcessing = true;
+
   // Clear input field
   userInput.value = '';
 
@@ -232,6 +239,9 @@ async function handleSend() {
   // Remove typing indicator and show bot response
   removeTypingIndicator();
   addMessage(botReply, 'bot');
+
+  // Allow sending new messages again
+  isProcessing = false;
 }
 
 // =============================================

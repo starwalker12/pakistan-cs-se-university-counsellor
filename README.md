@@ -64,24 +64,33 @@ python3 -m http.server 8000
 Local AI works with Ollama only on the developer's laptop.
 Vercel deployment will use FAQ fallback unless a hosted AI API is added later.
 
-## Test Questions
+### Browser CORS Restriction for Ollama
+When running the chatbot on `http://localhost:8000`, your browser may block
+fetch requests to `http://localhost:11434` (Ollama) due to CORS policy.
+This is normal and the chatbot will fall back to FAQ answers automatically.
 
-Try asking the chatbot these questions to test it:
+To allow Ollama responses in the browser, start Ollama with:
+```bash
+OLLAMA_ORIGINS=* ollama serve
+```
+Or access the chatbot using `http://127.0.0.1:8000` instead of `localhost`.
 
-1. **"How can I apply?"**
-   - Expected: Explains the online application process and portal.
+## Testing
 
-2. **"What documents are required?"**
-   - Expected: Lists the required documents for admission.
+All features tested and verified. See `docs/testing.md` for the full report.
 
-3. **"What is the admission deadline?"**
-   - Expected: Tells fall and spring semester deadlines.
-
-4. **"Do you offer BS Computer Science?"**
-   - Expected: Confirms the program and describes the curriculum.
-
-5. **"How can I contact the admission office?"**
-   - Expected: Provides contact details (phone, email, address).
+| Test Question | Expected | Status |
+|---|---|---|
+| How can I apply? | Explains application process | ✅ Pass |
+| What documents are required? | Lists required documents | ✅ Pass |
+| What is the admission deadline? | Tells deadline dates | ✅ Pass |
+| Do you offer BS Computer Science? | Confirms program and curriculum | ✅ Pass |
+| What is the fee structure? | Explains tuition and fees | ✅ Pass |
+| Are scholarships available? | Describes scholarship options | ✅ Pass |
+| Where is the admission office? | Provides office location and contact | ✅ Pass |
+| How can I check application status? | Explains status tracking | ✅ Pass |
+| What is the refund policy? | Explains refund rules | ✅ Pass |
+| Hello | Bot responds with greeting | ✅ Pass |
 
 ## Deployment on Vercel
 
