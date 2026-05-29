@@ -1,0 +1,42 @@
+[
+  {
+    "question": "What is the application deadline?",
+    "answer": "The application deadline for the fall semester is August 15. For spring semester, the deadline is January 10. Late applications may be considered on a case-by-case basis."
+  },
+  {
+    "question": "What documents do I need to apply?",
+    "answer": "You need to submit: 1) Completed application form, 2) Academic transcripts, 3) Letters of recommendation (2), 4) Statement of purpose, 5) Valid ID proof, and 6) Application fee receipt."
+  },
+  {
+    "question": "What programs are available?",
+    "answer": "We offer undergraduate programs in Computer Science, Business Administration, Engineering, Psychology, and Biology. Graduate programs include MBA, MS in Data Science, MA in Education, and PhD programs."
+  },
+  {
+    "question": "What are the tuition fees?",
+    "answer": "Undergraduate tuition is approximately $12,000 per year for in-state students and $24,000 for out-of-state students. Graduate programs vary between $15,000 and $30,000 per year."
+  },
+  {
+    "question": "Is financial aid available?",
+    "answer": "Yes, we offer need-based scholarships, merit-based scholarships, work-study programs, and student loans. You can apply through the financial aid office after submitting your application."
+  },
+  {
+    "question": "What are the admission requirements?",
+    "answer": "Admission requirements include a minimum GPA of 3.0, SAT/ACT scores (optional for 2025), English proficiency test scores for international students (TOEFL 80+ or IELTS 6.5+), and a completed application."
+  },
+  {
+    "question": "Can international students apply?",
+    "answer": "Yes, we welcome international students. You need to submit additional documents including a valid passport, student visa, English proficiency test scores, and proof of financial support."
+  },
+  {
+    "question": "How long does it take to get a decision?",
+    "answer": "Admission decisions are typically sent out within 4 to 6 weeks after the application deadline. You will be notified via email."
+  },
+  {
+    "question": "Is there an application fee?",
+    "answer": "Yes, the application fee is $50 for domestic students and $75 for international students. Fee waivers are available for eligible students."
+  },
+  {
+    "question": "Can I transfer credits from another university?",
+    "answer": "Yes, we accept transfer credits from accredited institutions. You need to submit official transcripts and course syllabi for evaluation. A maximum of 60 transfer credits can be applied."
+  }
+]

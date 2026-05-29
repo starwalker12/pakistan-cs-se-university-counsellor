@@ -1,0 +1,137 @@
+/* Reset default browser styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Body styling - centers the chatbot on the page */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Main container */
+.container {
+  width: 90%;
+  max-width: 600px;
+  height: 90vh;
+  max-height: 700px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Header section */
+.chat-header {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+
+.chat-header h1 {
+  font-size: 1.5rem;
+  margin-bottom: 4px;
+}
+
+.chat-header p {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+/* Chat messages area */
+.chat-box {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  background: #f8f9fa;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Shared message styles */
+.message {
+  max-width: 80%;
+  padding: 12px 16px;
+  border-radius: 18px;
+  line-height: 1.4;
+  font-size: 0.95rem;
+  word-wrap: break-word;
+}
+
+/* User message style - aligned right */
+.message.user {
+  background: #667eea;
+  color: white;
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+}
+
+/* Bot message style - aligned left */
+.message.bot {
+  background: white;
+  color: #333;
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Typing indicator animation */
+.message.bot.typing {
+  background: #e9ecef;
+  color: #666;
+  font-style: italic;
+}
+
+/* Input area at the bottom */
+.input-area {
+  display: flex;
+  padding: 12px 16px;
+  background: white;
+  border-top: 1px solid #e0e0e0;
+  gap: 8px;
+}
+
+/* Text input field */
+#userInput {
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 24px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+#userInput:focus {
+  border-color: #667eea;
+}
+
+/* Send button */
+#sendBtn {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  border-radius: 24px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+#sendBtn:hover {
+  opacity: 0.9;
+}
+
+#sendBtn:active {
+  opacity: 0.8;
+}
