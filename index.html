@@ -9,23 +9,40 @@
 </head>
 <body>
 
-  <!-- Main container for the chatbot -->
+  <!-- Main wrapper that centers the chatbot on the page -->
   <div class="container">
+
+    <!-- ===== Header Section ===== -->
+    <!-- Displays the chatbot name, university crest icon, and a short subtitle -->
     <header class="chat-header">
-      <h1>🎓 Admission Helper</h1>
-      <p>Ask me anything about university admissions</p>
+      <div class="header-icon">🎓</div>
+      <h1>Admission Helper</h1>
+      <p class="subtitle">Ask questions about admissions, fees, deadlines, and programs.</p>
     </header>
 
-    <!-- Chat messages area -->
+    <!-- ===== Chat Messages Area ===== -->
+    <!-- All user and bot messages will appear here, inserted by JavaScript -->
     <div class="chat-box" id="chatBox">
       <!-- Messages will be inserted here by JavaScript -->
     </div>
 
-    <!-- Input area -->
+    <!-- ===== Quick Question Buttons ===== -->
+    <!-- Predefined buttons that users can click to ask common questions -->
+    <div class="quick-questions" id="quickQuestions">
+      <button class="quick-btn" data-question="How can I apply?">How can I apply?</button>
+      <button class="quick-btn" data-question="What documents are required?">What documents are required?</button>
+      <button class="quick-btn" data-question="What is the admission deadline?">What is the admission deadline?</button>
+      <button class="quick-btn" data-question="What programs are offered?">What programs are offered?</button>
+      <button class="quick-btn" data-question="What is the fee structure?">What is the fee structure?</button>
+    </div>
+
+    <!-- ===== Input Area ===== -->
+    <!-- Text input box and send button for typing custom questions -->
     <div class="input-area">
       <input type="text" id="userInput" placeholder="Type your question here..." autofocus>
       <button id="sendBtn">Send</button>
     </div>
+
   </div>
 
   <!-- Link to external JavaScript file -->

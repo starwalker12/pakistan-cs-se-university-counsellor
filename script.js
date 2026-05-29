@@ -13,6 +13,7 @@
 const chatBox = document.getElementById('chatBox');
 const userInput = document.getElementById('userInput');
 const sendBtn = document.getElementById('sendBtn');
+const quickBtns = document.querySelectorAll('.quick-btn');
 
 // FAQ data will be loaded from data/faq.json
 let faqData = [];
@@ -172,6 +173,17 @@ userInput.addEventListener('keypress', function (event) {
   if (event.key === 'Enter') {
     handleSend();
   }
+});
+
+// =============================================
+// Quick question buttons - click sends that question
+// =============================================
+quickBtns.forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    const question = btn.getAttribute('data-question');
+    userInput.value = question;
+    handleSend();
+  });
 });
 
 // =============================================
