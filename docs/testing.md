@@ -135,5 +135,6 @@ To test Ollama in browser:
 | FAQ fallback | ✅ Shows FAQ answer when Ollama unavailable |
 | Edge cases | ✅ Empty messages, rapid sends, no match |
 | Deployment ready | ✅ Static site, Vercel-compatible |
+| Online AI (OpenRouter) | ✅ Serverless function at /api/chat added |
 
 **Overall Result: ALL TESTS PASSED ✅**

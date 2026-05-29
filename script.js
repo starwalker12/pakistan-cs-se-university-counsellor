@@ -11,7 +11,11 @@
  * 4. If a good FAQ match is found, its answer is used as context
  * 5. JavaScript tries to connect to local Ollama (Gemma model) for an AI response
  * 6. If Ollama is not available, it falls back to the FAQ answer directly
- * 7. If no FAQ match exists and Ollama fails, a default fallback message is shown
+ * 7. If on localhost, calls local Ollama (gemma4:latest) for AI response
+ 8. If on Vercel (or any other domain), calls /api/chat serverless function
+ 9. The /api/chat function uses OpenRouter API to get an AI response
+10. If AI fails for any reason, falls back to FAQ answer
+11. If no FAQ match exists and AI fails, a default fallback message is shown
  */
 
 // DOM element references
@@ -195,6 +199,51 @@ async function callOllama(prompt) {
 }
 
 // =============================================
+// Call online AI via Vercel serverless function
+// =============================================
+// This function sends the prompt to our own /api/chat endpoint.
+// The /api/chat endpoint (running on Vercel's server) then calls OpenRouter.
+// This way the API key stays on the server and never reaches the browser.
+// If the serverless function is not available, returns null for FAQ fallback.
+// =============================================
+async function callOnlineAI(userMessage, faqContext) {
+  try {
+    // Send a POST request to our serverless API endpoint
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userMessage: userMessage,
+        faqContext: faqContext
+      })
+    });
+
+    // If the server returned an error, throw to trigger fallback
+    if (!response.ok) throw new Error('Serverless function returned error');
+
+    // Parse the JSON response and return the AI's reply
+    const data = await response.json();
+    return data.reply.trim();
+  } catch (error) {
+    // Log the error, then return null to trigger FAQ fallback
+    console.warn('Online AI not available, using FAQ fallback:', error.message);
+    return null;
+  }
+}
+
+// =============================================
+// Check if the website is running on localhost
+// =============================================
+// This determines which AI to use:
+// - Localhost: use Ollama (local model)
+// - Any other domain (Vercel, etc.): use /api/chat (online AI)
+// =============================================
+function isLocalhost() {
+  const host = window.location.hostname;
+  return host === 'localhost' || host === '127.0.0.1';
+}
+
+// =============================================
 // Handle sending a message
 // =============================================
 async function handleSend() {
@@ -220,11 +269,20 @@ async function handleSend() {
   // This finds the FAQ entry whose question/keywords best match the user's message
   const faqMatch = searchFAQ(message);
 
-  // Step 2: Build the prompt and try to get AI response from local Ollama
-  const prompt = buildPrompt(message, faqMatch);
-  let botReply = await callOllama(prompt);
+  // Step 2: Try to get AI response
+  // If running on localhost, use local Ollama (Gemma model)
+  // If running on Vercel or any other domain, use /api/chat (online AI via OpenRouter)
+  let botReply;
+  if (isLocalhost()) {
+    // Running locally - build prompt and send to Ollama
+    const prompt = buildPrompt(message, faqMatch);
+    botReply = await callOllama(prompt);
+  } else {
+    // Running on Vercel (or other domain) - call serverless API
+    botReply = await callOnlineAI(message, faqMatch);
+  }
 
-  // Step 3: FAQ fallback - if Ollama is not available or fails
+  // Step 3: FAQ fallback - if AI is not available or fails
   if (!botReply) {
     if (faqMatch) {
       // Ollama was not available but we have a FAQ match
