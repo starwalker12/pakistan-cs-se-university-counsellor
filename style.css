@@ -73,10 +73,13 @@ body {
   flex: 1;
   padding: 20px;
   overflow-y: auto;
+  overflow-x: hidden;
   background: #f0f2f8;
   display: flex;
   flex-direction: column;
   gap: 14px;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Custom scrollbar for chat box */
@@ -220,9 +223,9 @@ body {
   opacity: 0.85;
 }
 
-/* ===== Responsive design for smaller screens ===== */
+/* ===== Responsive design for all screen sizes ===== */
 
-/* Tablet and smaller */
+/* Tablet and smaller screens */
 @media (max-width: 768px) {
   body {
     padding: 0;
@@ -236,24 +239,31 @@ body {
   }
 
   .chat-header {
-    padding: 18px 16px 14px;
+    padding: 16px 14px 12px;
   }
 
   .header-icon {
-    font-size: 2rem;
+    font-size: 1.8rem;
+    margin-bottom: 2px;
   }
 
   .chat-header h1 {
-    font-size: 1.3rem;
+    font-size: 1.25rem;
+  }
+
+  .chat-header .subtitle {
+    font-size: 0.8rem;
   }
 
   .chat-box {
-    padding: 14px;
+    padding: 12px;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
   }
 
   .message {
-    max-width: 88%;
-    padding: 12px 14px;
+    max-width: 90%;
+    padding: 11px 14px;
     font-size: 0.9rem;
   }
 
@@ -264,27 +274,92 @@ body {
 
   .quick-btn {
     font-size: 0.75rem;
-    padding: 6px 12px;
+    padding: 7px 12px;
+    white-space: normal;
   }
 
   .input-area {
     padding: 10px 12px;
+    gap: 8px;
   }
-}
 
-/* Small phones */
-@media (max-width: 400px) {
-  .quick-btn {
-    font-size: 0.7rem;
-    padding: 5px 10px;
+  #userInput {
+    font-size: 16px;
+    padding: 11px 16px;
   }
 
   #sendBtn {
-    padding: 12px 20px;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
+    padding: 11px 22px;
+  }
+}
+
+/* Small phones (480px and below) */
+@media (max-width: 480px) {
+  .chat-header {
+    padding: 12px 10px 10px;
+  }
+
+  .header-icon {
+    font-size: 1.5rem;
   }
 
   .chat-header h1 {
     font-size: 1.1rem;
+    letter-spacing: 0.5px;
+  }
+
+  .chat-header .subtitle {
+    font-size: 0.75rem;
+  }
+
+  .chat-box {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .message {
+    max-width: 92%;
+    padding: 10px 12px;
+    font-size: 0.85rem;
+    border-radius: 14px;
+  }
+
+  .message.user {
+    border-bottom-right-radius: 3px;
+  }
+
+  .message.bot {
+    border-bottom-left-radius: 3px;
+    border-left-width: 3px;
+  }
+
+  .quick-questions {
+    padding: 8px 8px;
+    gap: 5px;
+  }
+
+  .quick-btn {
+    font-size: 0.7rem;
+    padding: 6px 10px;
+    border-radius: 16px;
+    border-width: 1px;
+  }
+
+  .input-area {
+    padding: 8px 10px;
+    gap: 6px;
+  }
+
+  #userInput {
+    font-size: 16px;
+    padding: 10px 14px;
+    border-radius: 20px;
+  }
+
+  #sendBtn {
+    font-size: 0.85rem;
+    padding: 10px 18px;
+    border-radius: 20px;
   }
 }
