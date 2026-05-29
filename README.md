@@ -52,13 +52,17 @@ python3 -m http.server 8000
 1. Install Ollama from https://ollama.ai
 2. Pull the Gemma model:
    ```bash
-   ollama pull gemma:2b
+   ollama pull gemma4:latest
    ```
 3. Make sure Ollama is running:
    ```bash
    ollama serve
    ```
 4. The chatbot will automatically use Ollama for AI responses
+
+### Important Note on Local AI
+Local AI works with Ollama only on the developer's laptop.
+Vercel deployment will use FAQ fallback unless a hosted AI API is added later.
 
 ## Test Questions
 

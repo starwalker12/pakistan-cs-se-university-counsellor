@@ -126,34 +126,68 @@ function searchFAQ(userMessage) {
 }
 
 // =============================================
-// Get AI response from local Ollama (Gemma model)
+// Build prompt for the AI model
 // =============================================
-async function getOllamaResponse(userMessage, faqContext) {
-  // Build prompt with FAQ context if available
-  let prompt = `You are a university admission assistant. Answer the following question helpfully and concisely.`;
-  if (faqContext) {
-    prompt += `\n\nUse this information to help answer:\nQ: ${faqContext.question}\nA: ${faqContext.answer}`;
-  }
-  prompt += `\n\nUser question: ${userMessage}`;
+// Takes the user's question and any FAQ context we found.
+// Creates a clear instruction for the AI model to follow.
+// The prompt tells the model to:
+//   - Act as a university admission assistant
+//   - Use FAQ context if available
+//   - Give a general helpful answer if FAQ context is not enough
+//   - Keep answers short and simple
+// =============================================
+function buildPrompt(userMessage, faqContext) {
+  // Start with the system instruction
+  let prompt = "You are a helpful university admission assistant.\n";
+  prompt += "Answer in simple and clear English.\n";
+  prompt += "Keep answers short.\n";
 
+  // If we found a matching FAQ entry, include it as context
+  // This helps the AI give a more accurate answer
+  if (faqContext) {
+    prompt += "Use the following FAQ information if it is useful:\n";
+    prompt += "Question: " + faqContext.question + "\n";
+    prompt += "Answer: " + faqContext.answer + "\n";
+    prompt += "If the FAQ context does not fully answer the question, give a general helpful answer.\n";
+  }
+
+  // Add the user's actual question at the end
+  prompt += "\nUser question: " + userMessage;
+
+  return prompt;
+}
+
+// =============================================
+// Call Ollama API with a prompt
+// =============================================
+// Sends the prompt to the local Ollama server running on the same machine.
+// Uses the Gemma model (gemma4:latest) which must be installed locally.
+// If Ollama is not running or returns an error, returns null so the
+// code can fall back to FAQ answers.
+// =============================================
+async function callOllama(prompt) {
   try {
+    // Send POST request to Ollama's API endpoint
     const response = await fetch('http://localhost:11434/api/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma:2b',
+        model: 'gemma4:latest',
         prompt: prompt,
         stream: false
       })
     });
 
-    if (!response.ok) throw new Error('Ollama response error');
+    // If the server returned an error, throw to trigger fallback
+    if (!response.ok) throw new Error('Ollama server returned error');
 
+    // Parse the JSON response and return the generated text
     const data = await response.json();
     return data.response.trim();
   } catch (error) {
+    // Log the error for debugging, then return null to trigger FAQ fallback
     console.warn('Ollama not available, using FAQ fallback:', error.message);
-    return null; // Signal fallback to FAQ
+    return null;
   }
 }
 
@@ -179,20 +213,19 @@ async function handleSend() {
   // This finds the FAQ entry whose question/keywords best match the user's message
   const faqMatch = searchFAQ(message);
 
-  // Step 2: Try to get AI response from local Ollama (Gemma model)
-  // The FAQ match is passed as context so Ollama can give a better answer
-  let botReply = await getOllamaResponse(message, faqMatch);
+  // Step 2: Build the prompt and try to get AI response from local Ollama
+  const prompt = buildPrompt(message, faqMatch);
+  let botReply = await callOllama(prompt);
 
   // Step 3: FAQ fallback - if Ollama is not available or fails
-  // If a FAQ match was found, show that answer directly
-  // If no match was found, show a default fallback message
   if (!botReply) {
     if (faqMatch) {
-      // Use the FAQ answer as the bot reply (Ollama was not available)
-      botReply = faqMatch.answer;
+      // Ollama was not available but we have a FAQ match
+      // Show the FAQ answer with a clear label
+      botReply = "I found this from our FAQ:\n" + faqMatch.answer;
     } else {
       // No FAQ match and Ollama not available - show fallback
-      botReply = "I'm sorry, I don't have an answer for that right now. Please contact the admissions office directly for more details.";
+      botReply = "Sorry, I could not find an answer. Please contact the admission office.";
     }
   }
 
