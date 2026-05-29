@@ -148,6 +148,8 @@ function buildPrompt(userMessage, faqContext) {
   let prompt = "You are a helpful university admission assistant.\n";
   prompt += "Answer in simple and clear English.\n";
   prompt += "Keep answers short.\n";
+  prompt += "Do not use markdown. Do not use bold text. Do not use asterisks or stars.\n";
+  prompt += "Use simple numbered steps if needed.\n";
 
   // If we found a matching FAQ entry, include it as context
   // This helps the AI give a more accurate answer
@@ -244,6 +246,27 @@ function isLocalhost() {
 }
 
 // =============================================
+// Clean up AI reply text
+// =============================================
+// Removes any leftover markdown symbols like **bold** or *italic*
+// that the AI might still output despite the prompt instructions.
+// This ensures the chat bubble shows clean plain text only.
+// =============================================
+function cleanReply(text) {
+  // Remove markdown bold (**text**)
+  text = text.replace(/\*\*(.*?)\*\*/g, '$1');
+  // Remove markdown italic (*text*)
+  text = text.replace(/\*(.*?)\*/g, '$1');
+  // Remove markdown bold (__text__)
+  text = text.replace(/__(.*?)__/g, '$1');
+  // Remove inline code (`text`)
+  text = text.replace(/`([^`]*)`/g, '$1');
+  // Remove markdown headings (# text)
+  text = text.replace(/#{1,6}\s+/g, '');
+  return text.trim();
+}
+
+// =============================================
 // Handle sending a message
 // =============================================
 async function handleSend() {
@@ -294,8 +317,9 @@ async function handleSend() {
     }
   }
 
-  // Remove typing indicator and show bot response
+  // Remove typing indicator, clean the reply, and show it
   removeTypingIndicator();
+  botReply = cleanReply(botReply);
   addMessage(botReply, 'bot');
 
   // Allow sending new messages again

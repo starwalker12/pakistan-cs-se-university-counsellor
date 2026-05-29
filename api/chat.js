@@ -47,6 +47,8 @@ module.exports = async (req, res) => {
   let systemPrompt = 'You are a helpful university admission assistant.';
   systemPrompt += ' Answer in simple and clear English.';
   systemPrompt += ' Keep the answer short.';
+  systemPrompt += ' Do not use markdown. Do not use bold text. Do not use asterisks or stars.';
+  systemPrompt += ' Use simple numbered steps if needed.';
 
   // If FAQ context is available, include it in the system prompt
   let userPrompt = '';
