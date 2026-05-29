@@ -3,10 +3,15 @@
  * 
  * How it works:
  * 1. User types a message and clicks Send (or presses Enter)
- * 2. JavaScript searches FAQ data (data/faq.json) for keyword matches
- * 3. If match found, uses it as context for the AI response
- * 4. Tries to connect to local Ollama (Gemma model) for a natural response
- * 5. If Ollama is not available, falls back to FAQ answer
+ * 2. JavaScript loads FAQ data from data/faq.json
+ * 3. The searchFAQ function does simple keyword matching:
+ *    - Splits user message into individual words
+ *    - Counts how many words match each FAQ's question and keywords array
+ *    - Returns the best matching FAQ entry
+ * 4. If a good FAQ match is found, its answer is used as context
+ * 5. JavaScript tries to connect to local Ollama (Gemma model) for an AI response
+ * 6. If Ollama is not available, it falls back to the FAQ answer directly
+ * 7. If no FAQ match exists and Ollama fails, a default fallback message is shown
  */
 
 // DOM element references
@@ -64,30 +69,59 @@ function removeTypingIndicator() {
 }
 
 // =============================================
-// Search FAQ for matching questions by keywords
+// Simple keyword matching search (Light RAG)
+// =============================================
+// How it works:
+// 1. Take the user's message and split it into individual words
+// 2. For each FAQ in faqDataset, check how many user words match
+//    - The FAQ question text
+//    - Any keyword in the FAQ's keywords array
+// 3. The FAQ with the highest match score is returned
+// 4. This is simple counting - no AI, no embeddings, no training needed
 // =============================================
 function searchFAQ(userMessage) {
-  const lowerMessage = userMessage.toLowerCase();
-  const keywords = lowerMessage.split(' ').filter(word => word.length > 2);
+  // Convert user message to lowercase and split into words
+  // Filter out very short words (like "is", "am", "to") that aren't useful for matching
+  const userWords = userMessage.toLowerCase().split(' ').filter(word => word.length > 2);
 
   let bestMatch = null;
   let bestScore = 0;
 
+  // Loop through each FAQ entry in the dataset
   for (const item of faqData) {
     let score = 0;
-    const question = item.question.toLowerCase();
-    const keywords = lowerMessage.split(' ').filter(word => word.length > 2);
-    for (const keyword of keywords) {
-      if (question.includes(keyword)) {
+
+    // Convert the FAQ question to lowercase for case-insensitive matching
+    const questionText = item.question.toLowerCase();
+
+    // Check if any user word appears in the question text
+    for (const word of userWords) {
+      if (questionText.includes(word)) {
         score++;
       }
     }
+
+    // Also check if any user word matches the predefined keywords array
+    // The keywords array contains the most important search terms for this FAQ
+    if (item.keywords) {
+      for (const keyword of item.keywords) {
+        const lowerKeyword = keyword.toLowerCase();
+        for (const word of userWords) {
+          if (word === lowerKeyword || lowerKeyword.includes(word)) {
+            score++;
+          }
+        }
+      }
+    }
+
+    // Keep track of the FAQ with the highest score
     if (score > bestScore) {
       bestScore = score;
       bestMatch = item;
     }
   }
 
+  // Return the best matching FAQ (or null if no match found)
   return bestMatch;
 }
 
@@ -141,17 +175,23 @@ async function handleSend() {
   // Show typing indicator
   showTypingIndicator();
 
-  // Search FAQ for matching content
+  // Step 1: Search FAQ using simple keyword matching (Light RAG)
+  // This finds the FAQ entry whose question/keywords best match the user's message
   const faqMatch = searchFAQ(message);
 
-  // Try to get AI response from Ollama
+  // Step 2: Try to get AI response from local Ollama (Gemma model)
+  // The FAQ match is passed as context so Ollama can give a better answer
   let botReply = await getOllamaResponse(message, faqMatch);
 
-  // If Ollama fails, use FAQ fallback
+  // Step 3: FAQ fallback - if Ollama is not available or fails
+  // If a FAQ match was found, show that answer directly
+  // If no match was found, show a default fallback message
   if (!botReply) {
     if (faqMatch) {
+      // Use the FAQ answer as the bot reply (Ollama was not available)
       botReply = faqMatch.answer;
     } else {
+      // No FAQ match and Ollama not available - show fallback
       botReply = "I'm sorry, I don't have an answer for that right now. Please contact the admissions office directly for more details.";
     }
   }
