@@ -292,28 +292,38 @@ async function handleSend() {
   // This finds the FAQ entry whose question/keywords best match the user's message
   const faqMatch = searchFAQ(message);
 
-  // Step 2: Try to get AI response
-  // If running on localhost, use local Ollama (Gemma model)
-  // If running on Vercel or any other domain, use /api/chat (online AI via OpenRouter)
-  let botReply;
-  if (isLocalhost()) {
-    // Running locally - build prompt and send to Ollama
-    const prompt = buildPrompt(message, faqMatch);
-    botReply = await callOllama(prompt);
-  } else {
-    // Running on Vercel (or other domain) - call serverless API
-    botReply = await callOnlineAI(message, faqMatch);
+  // Step 2: Check if the user message is a simple greeting
+  // If so, reply directly without calling any AI (saves API usage and works offline)
+  const greetingWords = ['hello', 'hi', 'hey', 'salam', 'assalamualaikum', 'good morning', 'good evening'];
+  const isGreeting = greetingWords.some(function (word) {
+    return message.toLowerCase().trim() === word || message.toLowerCase().trim().startsWith(word + ' ');
+  });
+
+  if (isGreeting) {
+    botReply = "Hello! I am your university admission assistant. You can ask me about admissions, fees, deadlines, programs, or required documents.";
   }
 
-  // Step 3: FAQ fallback - if AI is not available or fails
+  // Step 3: If not a greeting, try to get AI response
+  if (!botReply) {
+    if (isLocalhost()) {
+      // Running locally - build prompt and send to Ollama
+      const prompt = buildPrompt(message, faqMatch);
+      botReply = await callOllama(prompt);
+    } else {
+      // Running on Vercel (or other domain) - call serverless API
+      botReply = await callOnlineAI(message, faqMatch);
+    }
+  }
+
+  // Step 4: FAQ fallback - if AI is not available or fails
   if (!botReply) {
     if (faqMatch) {
-      // Ollama was not available but we have a FAQ match
+      // AI was not available but we have a FAQ match
       // Show the FAQ answer with a clear label
       botReply = "I found this from our FAQ:\n" + faqMatch.answer;
     } else {
-      // No FAQ match and Ollama not available - show fallback
-      botReply = "Sorry, I could not find an answer. Please contact the admission office.";
+      // No FAQ match and AI not available - show helpful fallback
+      botReply = "The AI service is temporarily unavailable. You can still ask me admission questions from the FAQ, like fees, deadlines, programs, or documents.";
     }
   }
 

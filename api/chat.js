@@ -59,11 +59,19 @@ module.exports = async (req, res) => {
   }
   userPrompt += 'User question: ' + userMessage;
 
+  // Set a timeout so the function does not hang if OpenRouter is slow
+  const controller = new AbortController();
+  const timeoutId = setTimeout(function () {
+    controller.abort();
+  }, 8000);
+
   try {
+
     // Call OpenRouter chat completions API
     // OpenRouter uses the same format as OpenAI's API
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
+      signal: controller.signal,
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + apiKey,
@@ -78,6 +86,9 @@ module.exports = async (req, res) => {
         ]
       })
     });
+
+    // Clear the timeout since the fetch completed
+    clearTimeout(timeoutId);
 
     // If OpenRouter returned an error, log it and return fallback
     if (!response.ok) {
@@ -96,6 +107,8 @@ module.exports = async (req, res) => {
     return res.status(200).json({ reply: reply });
 
   } catch (error) {
+    // Clear the timeout since the request completed (or was aborted)
+    clearTimeout(timeoutId);
     // If any error occurs (network, timeout, etc.), log and return fallback
     console.error('OpenRouter request failed:', error.message);
     return res.status(200).json({
