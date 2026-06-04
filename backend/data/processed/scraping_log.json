@@ -1,0 +1,154 @@
+{
+  "started_at": "2026-06-04T17:41:57.093856",
+  "results": [
+    {
+      "university_id": "nuces-fast",
+      "university_name": "FAST NUCES (National University of Computer and Emerging Sciences)",
+      "pages_ok": 5,
+      "pages_fail": 0,
+      "status": "fetched"
+    },
+    {
+      "university_id": "nust",
+      "university_name": "National University of Sciences and Technology (NUST)",
+      "pages_ok": 0,
+      "pages_fail": 2,
+      "status": "needs_manual_check"
+    },
+    {
+      "university_id": "comsats",
+      "university_name": "COMSATS University Islamabad (CUI)",
+      "pages_ok": 2,
+      "pages_fail": 0,
+      "status": "fetched"
+    },
+    {
+      "university_id": "lums",
+      "university_name": "Lahore University of Management Sciences (LUMS)",
+      "pages_ok": 1,
+      "pages_fail": 1,
+      "status": "fetched"
+    },
+    {
+      "university_id": "giki",
+      "university_name": "Ghulam Ishaq Khan Institute of Engineering Sciences and Technology (GIKI)",
+      "pages_ok": 0,
+      "pages_fail": 1,
+      "status": "needs_manual_check"
+    },
+    {
+      "university_id": "pieas",
+      "university_name": "Pakistan Institute of Engineering and Applied Sciences (PIEAS)",
+      "pages_ok": 1,
+      "pages_fail": 1,
+      "status": "fetched"
+    },
+    {
+      "university_id": "uet-lahore",
+      "university_name": "University of Engineering and Technology (UET) Lahore",
+      "pages_ok": 0,
+      "pages_fail": 2,
+      "status": "needs_manual_check"
+    },
+    {
+      "university_id": "itu-lahore",
+      "university_name": "Information Technology University (ITU) Lahore",
+      "pages_ok": 2,
+      "pages_fail": 0,
+      "status": "fetched"
+    },
+    {
+      "university_id": "air-university",
+      "university_name": "Air University",
+      "pages_ok": 4,
+      "pages_fail": 0,
+      "status": "fetched"
+    },
+    {
+      "university_id": "bahria-university",
+      "university_name": "Bahria University",
+      "pages_ok": 1,
+      "pages_fail": 1,
+      "status": "fetched"
+    },
+    {
+      "university_id": "punjab-university",
+      "university_name": "University of the Punjab (PU)",
+      "pages_ok": 3,
+      "pages_fail": 0,
+      "status": "fetched"
+    },
+    {
+      "university_id": "qau",
+      "university_name": "Quaid-i-Azam University (QAU)",
+      "pages_ok": 3,
+      "pages_fail": 0,
+      "status": "fetched"
+    },
+    {
+      "university_id": "ned-university",
+      "university_name": "NED University of Engineering and Technology",
+      "pages_ok": 0,
+      "pages_fail": 0,
+      "status": "needs_manual_check"
+    },
+    {
+      "university_id": "uet-taxila",
+      "university_name": "University of Engineering and Technology (UET) Taxila",
+      "pages_ok": 0,
+      "pages_fail": 0,
+      "status": "needs_manual_check"
+    },
+    {
+      "university_id": "university-of-karachi",
+      "university_name": "University of Karachi (UoK)",
+      "pages_ok": 1,
+      "pages_fail": 0,
+      "status": "fetched"
+    },
+    {
+      "university_id": "ucp",
+      "university_name": "University of Central Punjab (UCP)",
+      "pages_ok": 2,
+      "pages_fail": 0,
+      "status": "fetched"
+    },
+    {
+      "university_id": "virtual-university",
+      "university_name": "Virtual University of Pakistan (VU)",
+      "pages_ok": 0,
+      "pages_fail": 0,
+      "status": "needs_manual_check"
+    },
+    {
+      "university_id": "szabist",
+      "university_name": "Shaheed Zulfikar Ali Bhutto Institute of Science and Technology (SZABIST)",
+      "pages_ok": 0,
+      "pages_fail": 0,
+      "status": "needs_manual_check"
+    },
+    {
+      "university_id": "iba-karachi",
+      "university_name": "Institute of Business Administration (IBA) Karachi",
+      "pages_ok": 2,
+      "pages_fail": 0,
+      "status": "fetched"
+    },
+    {
+      "university_id": "ist",
+      "university_name": "Institute of Space Technology (IST)",
+      "pages_ok": 0,
+      "pages_fail": 0,
+      "status": "needs_manual_check"
+    }
+  ],
+  "summary": {
+    "total_universities": 20,
+    "pages_attempted": 35,
+    "pages_successful": 27,
+    "pages_failed": 8,
+    "universities_with_data": 12,
+    "universities_needing_manual_check": 8
+  },
+  "finished_at": "2026-06-04T17:42:53.132713"
+}

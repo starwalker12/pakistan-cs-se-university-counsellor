@@ -1,0 +1,675 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="icon" href="/admissions/assets/images/aulogo.png" type="image/png" />
+
+    <link href="/admissions/assets/plugins/simplebar/css/simplebar.css" rel="stylesheet" />
+    <link href="/admissions/assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css" rel="stylesheet" />
+    <link href="/admissions/assets/plugins/metismenu/css/metisMenu.min.css" rel="stylesheet" />
+
+
+
+    <link href="/admissions/assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/admissions/assets/css/bootstrap-extended.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link href="/admissions/assets/css/app.css" rel="stylesheet">
+    <link href="/admissions/assets/css/icons.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="/admissions/assets/css/dark-theme.css" />
+    <link rel="stylesheet" href="/admissions/assets/css/semi-dark.css" />
+    <link rel="stylesheet" href="/admissions/assets/css/header-colors.css" />
+    <link rel="stylesheet" href="/admissions/assets/css/customstylesheet.css" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.13.0/css/all.css" integrity="sha384-Bfad6CLCknfcloXFOyFnlgtENryhrpZCe29RTifKEixXQZ38WheV+i/6YWSzkz3V" crossorigin="anonymous" />
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.31/dist/sweetalert2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+
+    <title>AU Online Admission Portal</title>
+    <style>
+        .bg-custom {
+            background-color: #013172;
+        }
+    </style>
+
+
+    <style>
+
+        .footer {
+            position: relative;
+            bottom: 0;
+            width: 100%;
+            height: 60px; /* Height of the footer */
+            background: #6cf;
+        }
+
+        .row {
+            --bs-gutter-x: 0.5rem !important;
+        }
+
+        .coverlay {
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            background: #22222270;
+            z-index: 9999 !important;
+        }
+
+        .overlay__inner {
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+        }
+
+        .overlay__content {
+            left: 50%;
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .spinner {
+            width: 75px;
+            height: 75px;
+            display: inline-block;
+            border-width: 2px;
+            border-color: rgba(255, 255, 255, 0.05);
+            border-top-color: #fff;
+            animation: spin 1s infinite linear;
+            border-radius: 100%;
+            border-style: solid;
+        }
+
+
+        .lbg {
+            background: #f7f7f7 !important;
+        }
+
+        .ro {
+            background: #f7f7f7 !important;
+        }
+    </style>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6KCLFT2VGP"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-6KCLFT2VGP');
+    </script>
+
+</head>
+<body>
+    <!--Loader-->
+
+
+    <div b-ej09y5io1b class="wrapper">
+        <div b-ej09y5io1b class="page-wrapper" style="padding:0px;margin-top:50px">
+            <div b-ej09y5io1b class="page-content">
+
+
+                
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+<style>
+    .modal-dialog {
+        max-width: 1200px;
+        margin: 1.75rem auto;
+    }
+</style>
+
+
+
+<body class="bg-login signinimage">
+    <div class="row">
+
+
+        <div class="col-md-8 vcenter-item mt-3 mx-auto d-none d-md-block">
+            <div class="container-fluid" style="color:#fff">
+                <small style="font-size:25px"><b>Federally Chartered Public Sector University</b></small><br />
+                <label style="font-size:40px"><b>AU - Admission Portal - Air University Islamabad</b></label>
+            </div>
+
+            <div class="container-fluid mt-4">
+                <ul class="list-group" style="list-style-type:ethiopic-numeric">
+                    <li class="list-group-item" style="background-color:transparent"><h6 style="color:#fff">For any further information and queries, applicants may email at <span class="text-primary"><b><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1f7e7b72766c6c7670716c5f7e6a317a7b6a316f74">[email&#160;protected]</a></b></span></h6></li>
+                </ul>
+            </div>
+        </div>
+        <div class='col-md-4 vcenter-item mt-3'>
+            <div class="card border-primary card text-left" style="box-shadow: 0 0 0.5cm rgba(0,0,0,0.5);width:100%">
+                <div class="card-header  _cardheader">
+                    <label style="font-size:25px"><b>Login Account</b></label><br />
+                    <small style="font-size:13px"><b>Admission Portal - Air University Islamabad</b></small>
+                </div>
+
+                <div class="card-body" id='Signin' tabindex='1'>
+                    <div class="tab-content" id="nav-tabContent">
+                        <div class="tab-pane fade show active" id="nav-signin" role="tabpanel" aria-labelledby="nav-home-tab">
+
+                            <form method="post" data-ajax="true" data-ajax-method="post" data-ajax-success="OnSuccess" data-ajax-begin="ShowloaderImage" data-ajax-loading="ShowloaderImage" data-ajax-complete="HideloaderImage" data-ajax-failure="HideloaderImage" action="/admissions/Accounts/SignIn">
+                                
+                                
+                                <div class="form-group mt-1">
+                                    <label class="control-label heading" for="LoginName">Email Address</label> <sub><span class="text-danger field-validation-valid" data-valmsg-for="LoginName" data-valmsg-replace="true"></span></sub>
+                                    <input class="form-control" placeholder="Please Enter Email Address" type="email" data-val="true" data-val-email="Invalid Email Address" data-val-maxlength="Maximum 40 Digits Required" data-val-maxlength-max="40" data-val-required="Required" id="LoginName" maxlength="40" name="LoginName" value="" />
+                                </div>
+
+                                <div class="form-group mt-1">
+                                    <label for="Password" class="form-label">Enter Password</label><sup class="text-danger"><b>*</b></sup> <sub><span class="text-danger field-validation-valid" data-valmsg-for="Password" data-valmsg-replace="true"></span></sub>
+                                    <div class="input-group" id="show_hide_password_login">
+                                        <input type="password" class="form-control border-end-0" id="Password" placeholder="Enter Password" data-val="true" data-val-maxlength="Maximum 100 Digits Required" data-val-maxlength-max="100" data-val-required="Required" maxlength="100" name="Password"> <a href="javascript:;" class="input-group-text bg-transparent"><i class='bx bx-hide'></i></a>
+                                    </div>
+                                </div>
+
+                                <div class="form-group mt-4">
+                                    <button type='submit' id="btnSubmit" name="btnSubmit" style="width:100%" class='btn btn-primary _btn float-start'><b>Login</b></button>
+                                </div>
+                            <input name="__RequestVerificationToken" type="hidden" value="CfDJ8HveEBgvCVpKkY3Mxwu0ezE4mFt6OmiZ1mWTp3m3G40DuZKxVAi5JXuOMauZfCVZJOnSf2JrlXhpVokkHbK2IIECxZ7W_2GO9OztoSh2zvyoWU9oeEYQwE8YuzGezHYg6w08-P3mmjT9a8YZFlgThWw" /></form>
+                            <div class="form-group mt-4">
+                                <a class="float-start" style="color:steelblue;text-decoration:none" href="/admissions/Accounts/ActivateAccount"> Account Activation </a>
+                                <a class="float-end" style="color:steelblue;text-decoration:none" href="/admissions/Accounts/Forget_Password"> Forgot Password </a>
+                            </div>
+
+                            <br /><hr /><hr />
+                            <div class="text-center">
+                                <label class="mt-2"><b>Don't Have An Account Yet ? </b>( <a title="Create New Account" href="/admissions/Accounts/SignUp"><i class='fas fa-add' style="font-size:25px"></i>New Registration</a> )</label>
+                                <br />
+                                <label class="mt-2">
+                                    <a href="#" style="color:steelblue" data-bs-toggle="modal" data-bs-target="#FAQContentModal" id="nav-contact-tab" aria-selected="false"><b>Frequent Ask Questions :</b> ( FAQ's )</a>
+                                </label>
+                                <br />
+
+                                <label class="mt-2">
+                                    <a href="#" style="color:steelblue" data-bs-toggle="modal" data-bs-target="#LoginContentModal" id="nav-contact-tab" aria-selected="false"><b>( Important Information )</b></a>
+                                </label>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a0670483683c99ec',t:'MTc4MDU3Njk0Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+
+<div class="modal fade" id="LoginContentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" style="background: linear-gradient(-60deg,#fff,#e7feff);">
+            <div class="modal-header" style="padding: 10px">
+                <img src="/admissions/assets/images/aulogo.png" class="logo-icon" alt="logo icon">  <h5 class="modal-title">AU Admissions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body" style="padding:8px">
+                <div class="row" style="padding:0px">
+    <div class="col-md-12 vcenter-item mt-1 mx-auto">
+        <div class="card border-primary card" style="box-shadow: 0 0 0.5cm rgba(0,0,0,0.5);width:100%">
+            <div class="card-header _cardheader">
+                <center>
+                    <label style="font-size:25px">
+                        <img src="/admissions/assets/images/aulogo.png" style="height:50px;width:70px"> <b style="color:#fff">Welcome to Air University Online Admission System</b>
+                    </label>
+                </center>
+            </div>
+
+            <div class="card-body" id='Signin' tabindex='1'>
+                <center><label style="font-size:20px"><b>ADMISSIONS OPEN (Fall-2026)</b></label></center>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 vcenter-item mt-1 mx-auto">
+        <div class="card border-primary card text-left" style="box-shadow: 0 0 0.5cm rgba(0,0,0,0.5);width:100%">
+            <div class="card-header _cardheader">
+                <label style="font-size:25px"><b>Important Information</b></label><br />
+            </div>
+
+            <div class="card-body" id='Signin' tabindex='1'>
+                <div class="row">
+                    <div class="col-md-4">
+                        <h6 class="text-primary" style="text-align:justify;line-height:25px">
+                            <b>Important Documents</b>
+                        </h6>
+                        <hr />
+                        <h6 class="text-primary bg-light p-2">You need following documents to fill this application.</h6>
+
+                        <hr />
+                        <ul class="list-group" style="list-style-type:ethiopic-numeric">
+                            <li class="list-group-item" style="background-color:transparent">
+                                <b class="text-primary"> All Academic Certificates</b>
+                            </li>
+                            <li class="list-group-item" style="background-color:transparent">
+                                <b class="text-primary"> CNIC/ B Form and Father's CNIC</b>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="col-md-8">
+                        <h6 class="text-primary" style="text-align:justify;line-height:25px">
+                            <b>Important Links</b>
+                        </h6>
+                        <ul class="list-group" style="list-style-type:ethiopic-numeric">
+
+                            <li class="list-group-item" style="background-color:transparent">
+                                <a href="/admissions/Accounts/DownloadImportantDocuments?selectedfilename=Admission_Ad.jpg">
+                                    <b class="text-primary"><i class="fa fa-download" aria-hidden="true"></i> Admission Advertisement</b>
+                                </a>
+                            </li>
+
+
+                            <li class="list-group-item" style="background-color:transparent"><a href="/admissions/Accounts/DownloadImportantDocuments?selectedfilename=Instructions.png"><b class="text-primary"><i class="fa fa-download" aria-hidden="true"></i> Important Instructions</b></a></li>
+
+                            <li class="list-group-item" style="background-color:transparent">
+                                <a target="_blank" href="/admissions/Accounts/AdmissionProcess_Video">
+                                    <b class="text-danger"><i class="fa fa-link" aria-hidden="true"></i> How to fill online Application Form</b>
+                                    <span>
+                                        <img src="/admissions/assets/images/new.gif" />
+                                    </span>
+                                </a>
+                            </li>
+
+                            <li class="list-group-item" style="background-color:transparent"><b class="text-primary"> <a href="https://au.edu.pk/Pages/Admission/eligibility_criteria.aspx" target="_blank"> <i class="fa fa-link"></i> Eligibility Criteria </a></b></li>
+                            <li class="list-group-item" style="background-color:transparent"><b class="text-primary"> <a href="https://au.edu.pk/Pages/Admission/required_documents.aspx" target="_blank"> <i class="fa fa-link"></i> Required Documents for Under Graduate Students </a></b></li>
+                            <li class="list-group-item" style="background-color:transparent"><b class="text-primary"> <a href="https://au.edu.pk/Pages/Admission/required_documents.aspx" target="_blank"> <i class="fa fa-link"></i> Required Documents for Graduate & Post Graduate Students (At the time of Interview) </a></b></li>
+                            <li class="list-group-item" style="background-color:transparent"><b class="text-primary"> <a href="https://portals.au.edu.pk/ico/About" target="_blank"> <i class="fa fa-link"></i> Admission Process For International Students </a></b></li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 vcenter-item mt-1 mx-auto">
+        <div class="card border-primary card text-left" style="box-shadow: 0 0 0.5cm rgba(0,0,0,0.5);width:100%">
+            <div class="card-header _cardheader">
+                <label style="font-size:25px"><b>Payment Information</b></label><br />
+            </div>
+
+            <div class="card-body" id='Signin' tabindex='1'>
+                <ul class="list-group" style="list-style-type:ethiopic-numeric">
+                    <li class="list-group-item" style="background-color:transparent">Online admission charges are payable at any branch of Bank AlHabib Ltd.</li>
+                    <li class="list-group-item" style="background-color:transparent">Fee Challan would be available on submission of this application.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    var OnSuccess = function (response) {
+        if (response.success == true) {
+            window.location.href = response.redirectToUrl;
+        }
+        else
+        {
+            Swal.fire({
+                position: 'top',
+                icon: 'error',
+                text: response.message,
+                showConfirmButton: false,
+                timer: 2500
+            });
+
+            $('#Password').val('');
+        }
+    };
+
+    var ShowloaderImage = function () {
+         $('.spinner').show();
+    };
+
+    var HideloaderImage = function () {
+         $('.spinner').hide();
+    };
+
+
+    // $(function () {
+    //      $("#LoginContentModal").modal('show');
+    // });
+</script>
+            </div>
+        </div>
+
+        <div b-ej09y5io1b class="spinner loaderdiv" style="display:none">
+            <div b-ej09y5io1b class="d-flex align-items-center justify-content-center" style="margin-top:10px">
+                <img src="/admissions/assets/images/loading2.gif" style="width:100px;height:100px" class="img-responsive" style="wid" />
+            </div>
+        </div>
+
+        <a b-ej09y5io1b href="javaScript:;" class="back-to-top"><i b-ej09y5io1b class='bx bxs-up-arrow-alt'></i></a>
+
+        <footer b-ej09y5io1b class="page-footer">
+            <p b-ej09y5io1b class="mb-0">
+                © Copyright All Rights Reserved 2025
+            </p>
+        </footer>
+    </div>
+
+    <div b-ej09y5io1b class="modal fade" id="logoutmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div b-ej09y5io1b class="modal-dialog">
+            <div b-ej09y5io1b class="modal-content">
+                <div b-ej09y5io1b class="modal-header text-danger">
+                    <h5 b-ej09y5io1b class="modal-title text-uppercase" id="staticBackdropLabel">Confirmation Message</h5>
+                    <button b-ej09y5io1b type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div b-ej09y5io1b class="modal-body text-black">
+                    Are you sure, you want to logout the system ?
+                </div>
+                <div b-ej09y5io1b class="modal-footer">
+                    <button b-ej09y5io1b type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button b-ej09y5io1b type="button" onclick="Logout()" class="btn btn-primary" data-bs-dismiss="modal">Logout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="/admissions/assets/js/jquery.min.js"></script>
+    <script src="/admissions/assets/js/bootstrap.bundle.min.js"></script>
+    <script src="/admissions/assets/plugins/simplebar/js/simplebar.min.js"></script>
+    <script src="/admissions/assets/plugins/metismenu/js/metisMenu.min.js"></script>
+    <script src="/admissions/assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js"></script>
+    <script src="/admissions/assets/js/app.js"></script>
+
+    <script src="/admissions/assets/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="/admissions/assets/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+    <script src="https://ajax.aspnetcdn.com/ajax/jquery.unobtrusive-ajax/3.2.5/jquery.unobtrusive-ajax.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+
+        function showLoader() {
+            // $('#overlay').fadeIn();
+            $('#overlay').show();
+        }
+        function hideLoader() {
+            //$('#overlay').fadeOut();
+            $('#overlay').hide();
+        }
+
+    </script>
+
+    <!---Validation--->
+    <script>
+                $(document).on('keypress', '.number-only', function (e) {
+            // Allow only digits (0–9)
+            if (e.which < 48 || e.which > 57) {
+                e.preventDefault();
+            }
+        });
+
+         $(document).on('input', '.number-decimal-only', function () {
+            // Replace anything that's not a digit or a dot
+        this.value = this.value.replace(/[^0-9.]/g, '');
+
+            // Allow only one dot
+            if ((this.value.match(/\./g) || []).length > 1) {
+                this.value = this.value.substring(0, this.value.length - 1);
+            }
+        });
+
+    </script>
+    <script>
+
+        $(document).ready(function () {
+                $(".coverlay").hide();
+                   // Attach change event handlers after the DOM is fully loaded
+                    $('#tb_obtained, #tb_totalmarks').on('change', function ()
+                    {
+                       let obtained = parseFloat($('#tb_obtained').val());
+                       let total = parseFloat($('#tb_totalmarks').val());
+                       if (!isNaN(obtained) && !isNaN(total)) {
+                           if (obtained > total) {
+                               swal.fire('Obtained marks must be less than or equal to total marks.');
+                               $('#tb_obtained').val(''); // Clear the invalid input
+                           }
+                       }
+                   });
+                   $('#tb_cgpa_obtained, #ddl_cgpa_total').on('change', function () {
+                       let obtained = parseFloat($('#tb_cgpa_obtained').val());
+                       let total = parseFloat($('#ddl_cgpa_total').val());
+
+                       if (!isNaN(obtained) && !isNaN(total)) {
+                           if (obtained > total) {
+                               swal.fire('Obtained marks must be less than or equal to total marks.');
+                               $('#tb_cgpa_obtained').val(''); // Clear the invalid input
+                           }
+                       }
+                   });
+                   
+               
+               });
+    </script>
+
+
+
+
+    <script>
+        function Logout()
+        {
+          $('.spinner').show();
+          window.location.href = '/admissions/Accounts/SignOut';
+          $('.spinner').hide();
+        }
+
+        $(document).ready(function ()
+        {
+            hideLoader();
+
+
+            $("#show_hide_password_login a").on('click', function (event)
+                {
+                event.preventDefault();
+                if ($('#show_hide_password_login input').attr("type") == "text") {
+                $('#show_hide_password_login input').attr('type', 'password');
+                $('#show_hide_password_login i').addClass("bx-hide");
+                $('#show_hide_password_login i').removeClass("bx-show");
+                } else if ($('#show_hide_password_login input').attr("type") == "password") {
+                $('#show_hide_password_login input').attr('type', 'text');
+                $('#show_hide_password_login i').removeClass("bx-hide");
+                $('#show_hide_password_login i').addClass("bx-show");
+                }
+            });
+
+            $("#show_hide_password a").on('click', function (event)
+                {
+                event.preventDefault();
+                if ($('#show_hide_password input').attr("type") == "text") {
+                $('#show_hide_password input').attr('type', 'password');
+                $('#show_hide_password i').addClass("bx-hide");
+                $('#show_hide_password i').removeClass("bx-show");
+                } else if ($('#show_hide_password input').attr("type") == "password") {
+                $('#show_hide_password input').attr('type', 'text');
+                $('#show_hide_password i').removeClass("bx-hide");
+                $('#show_hide_password i').addClass("bx-show");
+                }
+            });
+
+            $("#show_hide_confirmpassword a").on('click', function (event)
+                {
+                event.preventDefault();
+                if ($('#show_hide_confirmpassword input').attr("type") == "text") {
+                $('#show_hide_confirmpassword input').attr('type', 'password');
+                $('#show_hide_confirmpassword i').addClass("bx-hide");
+                $('#show_hide_confirmpassword i').removeClass("bx-show");
+                } else if ($('#show_hide_confirmpassword input').attr("type") == "password") {
+                $('#show_hide_confirmpassword input').attr('type', 'text');
+                $('#show_hide_confirmpassword i').removeClass("bx-hide");
+                $('#show_hide_confirmpassword i').addClass("bx-show");
+                }
+            });
+        });
+
+        function ViewCommonModal_Function(Application_no) {
+            try {
+                $('.spinner').show();
+                $("#headervalue").text("AUAP/" + "Applicant Information");
+                let ajaxData = {
+                    type: "GET",
+                    url: '/admissions/Home/ViewApplicationReport_Action',
+
+                    dataType: "html",
+
+                    success: function (result) {
+                        try
+                        {
+                            $("#CommonModal_divcontent").html(result);
+                            $("#commonmodal").modal('show');
+                        } catch (innerError)
+                        {
+                            alert('An unexpected error occurred. Please try again. ' + innerError);
+                            window.location.href = '/admissions/Accounts/SignOut';
+                        } finally
+                        {
+                            $('.spinner').hide();
+                        }
+                    },
+                    error: function (xhr, status, error)
+                    {
+                        alert("An unexpected error occurred. Please try again. " + error);
+                        $('.spinner').hide();
+                        window.location.href = '/admissions/Accounts/SignOut';
+                    }
+                };
+
+                // Only add 'data' property if Parameter is not null or undefined
+                if (Application_no != null) {
+                    ajaxData.data = { Application_no: Application_no };
+                }
+
+                $.ajax(ajaxData);
+
+            } catch (outerError) {
+                console.error("An unexpected error occurred: ", outerError);
+                alert("Session has expired. Please login again. " + outerError);
+                $('.spinner').hide();
+                window.location.href = '/admissions/Accounts/SignOut'; // Redirect on unexpected errors
+            }
+        }
+
+        $(document).ready(function ()
+        {hideLoader();
+            $('.reqtable').DataTable({
+              ordering: false,
+              lengthMenu: [[-1, 10, 25, 50], ["All", 10, 25, 50]],
+              pageLength: -1
+            });
+
+        });
+
+                document.addEventListener("DOMContentLoaded", function () {
+            const input = document.getElementById("StMobile");
+
+            const fixedPrefix = "92 ";
+
+            // Set prefix on focus if not present
+            input.addEventListener("focus", function () {
+                if (!input.value.startsWith(fixedPrefix)) {
+                    input.value = fixedPrefix;
+                }
+            });
+
+            // Prevent deleting the prefix
+            input.addEventListener("keydown", function (e) {
+                const cursorPos = input.selectionStart;
+                if (cursorPos <= fixedPrefix.length && (e.key === "Backspace" || e.key === "Delete")) {
+                    e.preventDefault();
+                }
+            });
+
+            // Allow only digits after the prefix, auto-add dash
+            input.addEventListener("input", function (e) {
+                let value = input.value;
+
+                // Always preserve fixed prefix
+                if (!value.startsWith(fixedPrefix)) {
+                    value = fixedPrefix + value.replace(/\D/g, "");
+                }
+
+                // Remove all non-digit chars after prefix
+                let rest = value.substring(fixedPrefix.length).replace(/\D/g, "");
+
+                // Insert dash after 3 digits
+                if (rest.length > 3) {
+                    rest = rest.substring(0, 3) + "-" + rest.substring(3);
+                }
+
+                // Trim to 3 + 7 digits max
+                if (rest.length > 11) {
+                    rest = rest.substring(0, 11);
+                }
+
+                input.value = fixedPrefix + rest;
+            });
+        });
+
+            $(document).ready(function () {
+            $('#Nic').on('input', function () {
+                // Remove any non-digit characters
+                this.value = this.value.replace(/\D/g, '');
+
+                // Enforce max 13 digits
+                if (this.value.length > 13) {
+                    this.value = this.value.slice(0, 13);
+                }
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function ()
+        {
+
+        let currentYear = new Date().getFullYear();
+        let tenYearsBack = new Date(currentYear - 15); // January 1st, 10 years ago
+
+            flatpickr("#Std_Dob", {
+            dateFormat: "m/d/Y",    // Example date format
+                maxDate: new Date(tenYearsBack, 11, 31),  // Max date is the last day of the current year
+            });
+        });
+
+        $(document).bind("contextmenu", function (e) {
+            e.preventDefault();
+        });
+        // $(document).keydown(function (e) {
+        //     if (e.which === 123) {
+        //         return false;
+        //     }
+        // });
+    </script>
+    
+
+</body>
+</html>

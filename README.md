@@ -119,6 +119,40 @@ The RAG system answers admission questions using data that ultimately comes from
 | `backend/data/university_rankings.json` | Approximate ranking tiers and scores for 20 universities |
 | `backend/data/eligibility_rules.json` | Placeholder eligibility rules (minimum marks, entry test requirements) |
 | `backend/data/processed/sample_admission_data.json` | Sample admission records (FAST NUCES, NUST, COMSATS) — clearly marked as sample, not final |
+| `backend/data/processed/university_admission_data.json` | Scraped admission data from official university websites (12 of 20 universities) |
+| `backend/data/processed/scraping_log.json` | Scraping run log with status per university |
+| `backend/data/raw/` | Raw HTML files fetched from university pages |
+
+## Phase 5 Official Data Collection
+
+Admission data comes from official university `.edu.pk` websites where available. The scraper (`scrape_universities.py`) reads `universities.json` and `source_links.json`, then fetches each page using httpx and extracts text with BeautifulSoup.
+
+### Summary (latest run)
+
+| Metric | Count |
+|---|---|
+| Universities processed | 20 |
+| Pages attempted | 35 |
+| Pages successfully fetched | 27 |
+| Pages failed | 8 |
+| Universities with data | 12 |
+| Universities needing manual check | 8 |
+
+### Universities with scraped data
+
+FAST NUCES, COMSATS, LUMS, PIEAS, ITU Lahore, Air University, Bahria University, Punjab University, QAU, University of Karachi, UCP, IBA Karachi
+
+### Universities needing manual check
+
+NUST (403 blocked), GIKI (SSL error), UET Lahore (503), NED (DNS), UET Taxila (timeout), Virtual University (SSL error), SZABIST (SSL error), IST (no page found)
+
+### Notes
+
+1. Data comes from official university pages where available
+2. Missing data is marked as "Needs official verification" or "needs_manual_check"
+3. This data will later be chunked and stored in Chroma for RAG retrieval
+4. The system is for counselling help, not final admission confirmation
+5. Students should verify all details from official university admission pages before applying
 
 ### Ranking Plan
 

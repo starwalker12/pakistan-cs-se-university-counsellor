@@ -1,0 +1,950 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">  <html xmlns="http://www.w3.org/1999/xhtml">    <head>  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>  
+
+<title>Admissions Page</title>  <!-- // Stylesheets // -->  
+<link href="/css/style.css" rel="stylesheet" type="text/css"/>  
+<!-- // JavaScript // -->  
+<script type="text/javascript" src="/js/jquery.js"></script>  
+<script type="text/javascript" src="/js/cufon-yui.js"></script>  
+<script type="text/javascript" src="/js/arial.js"></script>  
+<script type="text/javascript" src="/js/chilli.js"></script>  
+<script type="text/javascript" src="/js/cycle.js"></script>  
+<script type="text/javascript" src="/js/functions.js"></script>  
+<script type="text/javascript" src="/js/fancybox.js"></script>
+<!--
+<script type="text/javascript">
+function MM_preloadImages() { //v3.0
+  var d=document; if(d.images){ if(!d.MM_p) d.MM_p=new Array();
+    var i,j=d.MM_p.length,a=MM_preloadImages.arguments; for(i=0; i<a.length; i++)
+    if (a[i].indexOf("#")!=0){ d.MM_p[j]=new Image; d.MM_p[j++].src=a[i];}}
+}
+
+function MM_swapImgRestore() { //v3.0
+  var i,x,a=document.MM_sr; for(i=0;a&&i<a.length&&(x=a[i])&&x.oSrc;i++) x.src=x.oSrc;
+}
+
+function MM_findObj(n, d) { //v4.01
+  var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+    d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+  if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+  for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document);
+  if(!x && d.getElementById) x=d.getElementById(n); return x;
+}
+
+function MM_swapImage() { //v3.0
+  var i,j=0,x,a=MM_swapImage.arguments; document.MM_sr=new Array; for(i=0;i<(a.length-2);i+=3)
+   if ((x=MM_findObj(a[i]))!=null){document.MM_sr[j++]=x; if(!x.oSrc) x.oSrc=x.src; x.src=a[i+2];}
+}
+
+</script>  -->
+<style>
+.button {
+  border: none;
+  color: white;
+  padding: 05px 16px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  transition-duration: 0.4s;
+  cursor: pointer;
+}
+
+.button1 {
+  background-color: white; 
+  color: black; 
+  border: 2px solid #04AA6D;
+}
+
+.button1:hover {
+  background-color: #CCC;
+  color: black;
+}
+</style>
+</head><body>  <html>
+<div id="outer_header">
+  <div id="header"> <a href="/"><img src="/images/logo.png" alt="" id="logo" /></a>
+    <div id="right_header">
+      <div class="top_nav">
+        <ul>
+          <li><a href="https://www.google.com/a/uok.edu.pk/ServiceLogin?service=mail&amp;passive=true&amp;rm=false&amp;continue=http%3A//mail.google.com/a/uok.edu.pk/&amp;bsv=1k96igf4806cy&amp;ltmpl=default&amp;ltmplcache=2" target="_blank" class="active"><span>Email</span></a></li>
+          <li><a href="https://www.facebook.com/uoktimes/" target="_blank"><span>Facebook</span></a></li>
+          <li><a href="/credits.php"><span>MCN</span></a></li>
+          <li><a href="/sitemap.php"><span>Sitemap</span></a></li>
+          <li><a href="/contacts.php"><span>Directory</span></a></li>
+        </ul>
+      </div>
+      <h2>Call: (9221) 9926 1300-7</h2>
+      <div class="search"> <span>
+        <input type="text" onBlur="if(this.value == 'Enter text to search') { this.value = ''; }" onFocus="if(this.value == 'Enter text to search') { this.value = ''; }" value="Enter text to search" />
+      <a href="/search.php">Search</a></span></div>
+    </div>
+    <div id="nav">
+      <ul>
+        <li><a href="/"><span>Home</span></a>
+          <ul>
+            <li><a href="/welcome-address.php">About Us</a></li>
+            <li><a href="/news.php">Campus News </a></li>
+           <!-- <li><a href="/adv/index.php"> Vacancy</a></li>-->
+            <li><a href="/policies/index.php">Policies HEC / Sindh HEC</a></li>
+            <li><a href="/conv/index.php"> Convocation</a></li>
+            <li><a href="/downloads/index.php">Downloads</a></li>
+            <li><a href="/our-history.php">Our history</a></li>
+	        <li><a href="https://kurecruits.com/">KURECRUITS</a></li>
+	        <li><a href="https://surveyofpakistan.gov.pk/Download">Map of Pakistan</a></li>
+          </ul>
+        </li>
+        <li><a href="/admissions/index.php"><span>Admissions</span></a>
+          <ul>
+           <!-- <li><a href="/admissions/indexeve.php#eve2020">Morning Test based</a></li>
+            <li><a href="/admissions/indexbmeve.php#bmeve2019">Bachelors/Masters Evening</a></li>
+	    <li><a href="/admissions/indexbmeve.php#eve2021">Evening Program 2021</a></li> -->            
+            <li><a href="/admissions/index.php#adm2026">Admissions Program 2026</a></li>
+	    <li> <a href="/admissions/pg-index.php">M.Phil./Ph.D. &amp; M.S./M.D.</a></li>
+            <li><a href="/fsa/index.php">Foreign Students' Policy</a></li>
+          </ul>
+        </li>
+        <li><a href="/faculties/"><span>Faculties</span></a>
+          <ul>
+            <li><a href="/faculties/index.php#educ">Education</a></li>
+            <li><a href="/faculties/index.php#engg">Engineering</a></li>
+            <li> <a href="/faculties/index.php#isl">Islamic Studies</a></li>
+            <li><a href="/faculties/index.php#law">Law</a></li>
+            <li> <a href="/faculties/index.php#mas">Management Sciences</a></li>
+            <li><a href="/faculties/index.php#med">Medicine</a></li>
+            <li> <a href="/faculties/index.php#phm">Pharmacy</a></li>
+            <li><a href="/faculties/index.php#sc">Science</a></li>
+            <li><a href="/faculties/index.php#arts">Arts & Social Sciences</a></li>
+            <li><a href="/research_institutes/index.php">Institutes / Centers</a></li>
+          </ul>
+        <a href="/research_institutes/index.php"></a></li>
+        <li><a href="/library/index.php"><span>Library</span></a>
+          <ul>
+            <li><a href="/library/index.php">Home</a></li>
+            <li><a href="/library/dlib.php">Digital Library</a></li>
+            <li><a target="_blank" href="https://ebookcentral.proquest.com/lib/hec-ebooks/home.action">Ebrary</a></li>
+          </ul>
+        </li>
+        <li><a href="/administration/"><span>Administration</span></a>
+         <ul>
+            <li><a href="/administration/vc.php">Vice Chancellor</a></li>
+            <li><a href="/administration/registrar.php">Registrar</a></li>
+            <li><a href="/administration/syndicate.php">Syndicate Members</a></li>
+            <li><a href="/administration/pvcs.php">Former Vice Chancellors</a></li>
+            <li><a href="/administration/index.php#off">Directorates &amp; Offices</a> </li>
+         </ul>
+        </li>
+         <li><a href="/ann_results/index.php"><span>Examination</span></a>
+        <ul>
+            <li><a href="/ann_results/results.php">Annual System</a></li>
+            <li><a href="/downloads/index.php">Downloadable Forms </a></li>
+            <li><a href="/ann_results/faqs.php">Common Questions</a></li>
+            <li><a href="/oe/index.php">Overseas Examination</a></li>
+            <li><a href="/sem_results/index.php">Semester System</a></li>
+            <li><a href="/sem_results/rules.php">Semester Rules Book</a></li>
+            <li><a href="/semesterfees/instructions.php">Semester Fee</a></li>
+	</ul>
+    </li>
+          <li><a href="/alumni/index.php"><span>Alumni</span></a>
+        </li>
+      
+	</li>
+          <li><a href="/Journal/index.php"><span>Journals</span></a>
+        
+  </li>
+
+</ul>
+</div>
+  </div>
+  <br class="clear" />
+</div>
+</html>
+
+<!--<body onload="MM_preloadImages('ap_t.jpg')"> -->
+
+<script type="text/javascript">
+        window.setInterval (BlinkIt, 600);
+        var color = "#CC0000";
+        function BlinkIt () {
+            var blink = document.getElementById ("blink");
+            color = (color == "#CC0000")? "#447E36" : "#CC0000";
+            blink.style.color = color;
+        }
+</script>
+
+
+<!--
+<script>
+var blink_speed = 650; var t = setInterval(function () { var ele = document.getElementById('blinker'); ele.style.visibility = (ele.style.visibility == 'hidden' ? '' : 'hidden'); }, blink_speed);
+</script>
+
+<script>
+var blink_speed = 650; var t = setInterval(function () { var ele = document.getElementById('blinker1'); ele.style.visibility = (ele.style.visibility == 'hidden' ? '' : 'hidden'); }, blink_speed);
+</script>
+
+<script>
+var blink_speed = 650; var t = setInterval(function () { var ele = document.getElementById('blinker2'); ele.style.visibility = (ele.style.visibility == 'hidden' ? '' : 'hidden'); }, blink_speed);
+</script>
+
+<script>
+var blink_speed = 650; var t = setInterval(function () { var ele = document.getElementById('blinker3'); ele.style.visibility = (ele.style.visibility == 'hidden' ? '' : 'hidden'); }, blink_speed);
+</script>
+<script>
+var blink_speed = 650; var t = setInterval(function () { var ele = document.getElementById('blinker4'); ele.style.visibility = (ele.style.visibility == 'hidden' ? '' : 'hidden'); }, blink_speed);
+</script>
+<script>
+var blink_speed = 650; var t = setInterval(function () { var ele = document.getElementById('blinker5'); ele.style.visibility = (ele.style.visibility == 'hidden' ? '' : 'hidden'); }, blink_speed);
+</script>
+<script>
+var blink_speed = 650; var t = setInterval(function () { var ele = document.getElementById('blinker6'); ele.style.visibility = (ele.style.visibility == 'hidden' ? '' : 'hidden'); }, blink_speed);
+</script>
+<script>
+var blink_speed = 650; var t = setInterval(function () { var ele = document.getElementById('blinker7'); ele.style.visibility = (ele.style.visibility == 'hidden' ? '' : 'hidden'); }, blink_speed);
+</script>
+<script>
+var blink_speed = 650; var t = setInterval(function () { var ele = document.getElementById('blinker8'); ele.style.visibility = (ele.style.visibility == 'hidden' ? '' : 'hidden'); }, blink_speed);
+</script>
+<script>
+var blink_speed = 650; var t = setInterval(function () { var ele = document.getElementById('blinker9'); ele.style.visibility = (ele.style.visibility == 'hidden' ? '' : 'hidden'); }, blink_speed);
+</script>
+<script>
+var blink_speed = 650; var t = setInterval(function () { var ele = document.getElementById('blinker10'); ele.style.visibility = (ele.style.visibility == 'hidden' ? '' : 'hidden'); }, blink_speed);
+</script>
+<script>
+var blink_speed = 650; var t = setInterval(function () { var ele = document.getElementById('blinker11'); ele.style.visibility = (ele.style.visibility == 'hidden' ? '' : 'hidden'); }, blink_speed);
+</script> -->
+
+
+<div id="outer_content">  
+<div id="content">  
+<div id="breadcrumb">  
+<ul>  
+<li><a href="/">Home</a></li>  
+<li><a href="#">Admissions </a></li>  
+<li><a href="#" class="active">Main Page</a></li>  
+</ul>  
+</div>    
+<div id="banner_inner">  
+<div id="banner_inner_wrapp">  
+<img src="/images/banner-blog.jpg" alt="" />  
+<h1>Admissions Page</h1>  
+</div>  
+</div>  
+<div id="courses_sec">  
+<div class="heading_content">  
+<h2>Main Page</h2> 
+  
+          
+
+  </div>  <div class="course_content">    <div class="left_course">    <h2>&nbsp;</h2>  <div class="course_menu">  <ul>
+          <li><a href="#">Admissions Program 2026</a></li><!-- <li><a href="indexbmeve.php">Evening Program 2021</a></li> -->    <li><a href="pg-index.php">M.Phil. / Ph.D. &amp; M.S. / M.D.</a></li>  <li><a href="intlstudents.php">International Students</a></li>  <li><a href="contactus.php">Contact us</a></li>  <li></li>  <li></li></ul>  </div>  </div>  
+
+<div class="right_course">
+   <p align="right"><a href="https://www.facebook.com/Directorate-of-Admissions-Committee-934475679902928/?fref=ts " target="_blank"></a></p>
+
+<p>&nbsp;</p> 
+ <h2>Dr. Saima Akhter</h2> 
+ <strong>In-charge, Directorate of Admissions</strong>     
+ <p>Email: <a href="mailto:admissions@uok.edu.pk">admissions@uok.edu.pk</a></p>
+ 
+
+ <h4>&nbsp;</h4>
+ <table width="100%" border="0">
+    <tbody>
+		<tr>
+			<td>
+			  <div align="center"><img src="/admissions/2018/images/oap.jpg" height="250" width="675"></div>
+			
+			</td>
+		</tr>
+    </tbody>
+</table>
+<marquee>
+<font size="+1" color="#336600"> </font> </marquee>
+
+<!--
+<table width="100%" border="0">
+    <tbody>
+		<tr>
+			<td>
+			  <div align="center"><img src="/admissions/2018/images/oap.jpg" height="250" width="675"></div>
+			
+			</td>
+		</tr>
+    </tbody>
+</table>
+-->
+<table width="100%" border="0">
+		<tr>
+			<td width="14%">
+</td>
+
+            <td width="75%">
+<div align="center"> <img src="/admissions/2018/images/seafs.jpg" height="417" width="635"><br /></div>
+<!--<div align="left"><strong><font size="+1"><span id="blink">Video Tutorials :: <a href="https://www.youtube.com/watch?v=1RpEXrqWiNU" target="_blank"> Admission Information </a> | <a href="https://www.youtube.com/watch?v=pzu_51xpxO4" target="_blank"> Form Filling Procedure </a></span></font></strong></div>--><br />
+<div><a href="https://uokadmission.edu.pk" target="_blank"><img src="/admissions/2018/images/ao-img1.jpg" width="165" height="35"></a></div>
+</td>
+<td width="10%">
+</td>
+
+<td width="1%"></td></tr></table>
+
+
+
+<p>&nbsp;</p>
+
+<h3><a href="" name="adm2026" id="adm2026" target="_blank"><strong>&nbsp;&nbsp;<font size="+1.5" color="#990000"> Admissions 2026</font></strong> </a></h3>
+<ul>
+
+
+<ul><ul><ul>
+<h3><font size="+1">Important information</font></h3>
+
+
+<!--<li><font  size="+0.5">Extension in the Schedule for Submission of Evening Admission Fee :: <a href="/admissions/2025/deeve.jpg" target="_blank"> Click here</a></font></li>
+<li><font  size="+0.5">BS (A.I) & Evening Program Form Submission Date Extended :: <a href="/admissions/2025/evedef.pdf" target="_blank"> Click here</a></font></li>
+
+<li><font  size="+0.5">Turkish Language Form Submission Date Extended :: <a href="/admissions/2025/truklde.pdf" target="_blank"> Click here</a></font></li>
+
+<li><font  size="+0.5">Important Note ::Form Submission Date has been Extended to 8th Nov, 2024</font></li>
+<li><font  size="+0.5">Open House :: <a href="/news/2024/ohdop.jpg" target="_blank">Pharm-D</a> | <a href="/news/2024/ohdcs.jpg" target="_blank">UBIT</a></font></li>
+
+<li><font  size="+0.5">Instruction for Portal Creation :: <a href="/admissions/2025/instpc.jpg" target="_blank"> Click here</a></font></li>
+<li><font  size="+0.5">Admission Form Submission Guideline :: <a href="/admissions/2025/adguide.jpg" target="_blaevedefnk"> Click here</a></font></li>
+<li><font  size="+0.5">Admission and Tuition Fee for Session 2025 :: <a href="/admissions/2025/feeinfo.jpg" target="_blank"> Click here</a></font></li>-->
+<li><font  size="+0.5">Test Score Instruction :: <a href="/admissions/2026/tsinfo.jpg" target="_blank"> Click here</a></font></li>
+<li><font  size="+0.5">Important Instruction :: <a href="/admissions/2026/inst.jpg" target="_blank"> Click here</a></font></li>
+<li><font  size="+0.5">Admission  Schedule 2026 :: <a href="/admissions/2026/asiikvi.jpg" target="_blank"> Click here</a></font></li>
+</ul></ul></ul>
+<p></p>
+<!--<h3><font size="+1">Evening Program Admissions 2025<br/>
+  KUBS (Specialized Degree Program)</font></h3>
+  <li><font size="+0.5">Extension in the Schedule for Submission of Admission Fee :: <a href="/admissions/2025/kubdex.jpg" target="_blank"> Click here </a></font></li>
+  <li><font size="+0.5">Instruction for Admitted Candidates :: <a href="/admissions/2025/iac.jpg" target="_blank"> English </a> | <a href="/admissions/2025/iacu.jpg" target="_blank"> Urdu</a></font></li>
+  <li><font size="+0.5">Provisional List of Selected Candidates :: <a href="/admissions/2025/palkub.pdf" target="_blank"> Click here</a> | Selected Candidates :: <a href="/admissions/2025/isc.jpg" target="_blank"> Instructions</a></font></li>
+  <li><font size="+0.5">Submission of Form :: <a href="/admissions/2025/kubextd.jpg" target="_blank"> Date Extended</a></font></li>
+  <li><font  size="+0.5">Admission Schedule-2025 :: <a href="/admissions/2025/aschkubs.jpg" target="_blank"> Click here</a></font></li>
+  <li><font  size="+0.5">Eligibility & Fee Structure for MBA / EMBA :: <a href="/admissions/2025/kubeg-fes.jpg" target="_blank"> Click here</a></font></li>
+  <li><font  size="+0.5">Admissions Prospectus 2025 :: <a href="/admissions/2025/eveprokubs.pdf" target="_blank"> Click here</a></font></li>
+  <li><font  size="+0.5">MBA (1.5) / MBA(Executive) :: <a href="/admissions/2025/eveflykubs.jpg" target="_blank"> Advertisement</a></font></li>
+  
+<!--
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p> 
+
+
+<p>&nbsp;</p>
+
+<h3><font size="+1">Reserved Seats</font></h3>
+
+<li><font  size="+0.5">List of Selected Candidates (Sports) :: <a href="/admissions/2023/rssport.pdf" target="_blank"> Click here</a></font></li>
+
+<li><font  size="+0.5">List of Selected Candidates (Special Persons) :: <a href="/admissions/2023/rssp.pdf" target="_blank"> Click here</a></font></li>
+<li><font  size="+0.5">List of Selected Candidates (Employees) :: <a href="/admissions/2023/rse.pdf" target="_blank"> Click here</a></font></li>
+<li><font  size="+0.5">List of Selected Candidates (Advocate Children) :: <a href="/admissions/2023/rsac.pdf" target="_blank"> Click here</a></font></li>
+<li><font  size="+0.5">List of Selected Candidates (Sindh) :: <a href="/admissions/2023/rss.pdf" target="_blank"> Click here</a> | <a href="/admissions/2023/sclosrs.pdf" target="_blank"> Closing %</a></font></li>
+<li><font  size="+0.5">List of Selected Candidates (Balochistan) :: <a href="/admissions/2023/rsb.pdf" target="_blank"> Click here</a> | <a href="/admissions/2023/bclosrs.pdf" target="_blank"> Closing %</a></font></li>
+
+
+-->
+
+
+<!--
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<h3>Evening Program Admissions (BS Ist & 3rd <font  size="+0.25">Year</font>s / Diploma & Certificate Courses)</h3>
+
+<li><font  size="+0.5">Provisional List of Selected Candidates for Self-Finance Reserved Seats :: <a href="/admissions/2023/epsflxxiii.pdf" target="_blank"> Click here</a></font></li>
+
+<li><font  size="+0.5">List of Valid Claim :: <a href="/admissions/2023/epclxxiii.pdf" target="_blank"> Click here</a></font></li>
+
+<li><font  size="+0.5">Evening Donor's Seats Admissions 2023:: <a href="/admissions/2023/dseats.jpg" target="_blank"> Click here</a></font></li>
+<li><font  size="+0.5">Submission of Claim Form :: <a href="/admissions/2023/eveclaim.jpg" target="_blank"> Click here</a></font></li>
+
+<li><font  size="+0.25">List of Selected Candidates (BS 3rd Year)
+ :: <a href="/admissions/2023/epsclbsiiiy.pdf" target="_blank"> Click here </a> | <a href="/admissions/2023/epclosiiiy.pdf" target="_blank"> Closing% </a> | <a href="/admissions/2023/eveadinst.jpg" target="_blank"> Instructions</a></font></li>
+
+
+<li><font  size="+0.25">List of Selected Candidates (BS 1st Year)
+ :: <a href="/admissions/2023/epsclbsiy.pdf" target="_blank"> Click here </a> | <a href="/admissions/2023/epclosiy.pdf" target="_blank"> Closing% </a> | <a href="/admissions/2023/eveadinst.jpg" target="_blank"> Instructions</a></font></li>
+ 
+<li><font  size="+0.5">Press Release :: <a href="/admissions/2023/eveprxxiii.jpg" target="_blank"> Click here</a></font></li>
+<li><font  size="+0.5">Evening Admissions Prospectus 2023 :: <a href="/admissions/2023/eveap.pdf" target="_blank"> Click here</a></font></li>	
+ <li><font  size="+0.5">Evening Admissions :: <a href="/admissions/2023/eveadd.jpg" target="_blank"> Advertisement</a></font></li>
+-->
+
+<!-- 
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+<h3><font size="+1">DONORS' (Self-Finance) Admissions</font></h3>
+
+
+<li><font  size="+0.5">DONORS' (Self-Finance) Online Admissions  :: <a href="/admissions/2023/donselfadd.jpg" target="_blank"> Click here</a> | <a href="/admissions/2023/donorinst.jpg" target="_blank"> Instructions</a></font></li>-->
+
+<!--
+<h3><font size="+1">Turkish Language</font></h3>
+
+ 
+<li><font  size="+0.5">Provisional List of Selected Candidates :: <a href="/admissions/2024/tlscl.pdf" target="_blank"> Click here</a></font></li>
+<li><font  size="+0.5">Advertisement :: <a href="/admissions/2024/tladfly.jpg" target="_blank"> Click here</a></font></li>
+
+
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+<h3><font size="+1">Evening Program Admission 2024</font></h3>
+
+<li><font  size="+0.5">List of Selected Candidate (BS 3rd Year Programs) :: <a href="/admissions/2024/sclbsiiiep.pdf" target="_blank"> Click here</a> | <a href="/admissions/2024/epbsiiiyclos.pdf" target="_blank"> Closing %</a> | <a href="/admissions/2024/epinst.jpg" target="_blank"> Instructions</a></font></li>
+
+
+<li><font  size="+0.5">List of Selected Candidate (BS 1st Year Programs) :: <a href="/admissions/2024/sclbsiep.pdf" target="_blank"> Click here</a> | <a href="/admissions/2024/epbsiyclos.pdf" target="_blank"> Closing %</a> | <a href="/admissions/2024/epinst.jpg" target="_blank"> Instructions</a></font></li>
+
+<li><font  size="+0.5">Evening Program Prospectus :: <a href="/admissions/2024/eveapxxiv.pdf" target="_blank"> Click here</a></font></li>	
+ <li><font  size="+0.5">Evening Program Admission :: <a href="/admissions/2024/eveaddxxiv.jpg" target="_blank"> Advertisement</a></font></li>	
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+<hr / color="#FF0000">
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+<h3><font size="+1">Donors' Seats</font></h3>
+
+ 
+<li><font  size="+0.5">Advertisement :: <a href="/admissions/2024/dsfly.jpg" target="_blank"> Click here</a></font></li>
+
+
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+<h3><font size="+1">Chinese Language</font></h3>
+
+ 
+<li><font  size="+0.5">Provisional List of Selected Candidates (SPRING SESSION) :: <a href="/admissions/2024/plscchin.pdf" target="_blank"> Click here</a></font></li>
+<li><font  size="+0.5">Advertisement :: <a href="/admissions/2024/chinfly.jpg" target="_blank"> Click here</a></font></li>
+
+
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+<h3><font size="+1">Reserved Seats</font></h3>
+
+<li><font  size="+0.5"> List of Selected Candidates (Sports) :: <a href="/admissions/2024/resport.pdf" target="_blank"> Click here</a></font></li>
+
+<li><font  size="+0.5"> List of Selected Candidates (KU-Employees) :: <a href="/admissions/2024/rskuemp.pdf" target="_blank"> Click here</a></font></li>
+
+<li><font  size="+0.5"> List of Selected Candidates (Province of Sindh / Balochistan / Special Person) :: <a href="/admissions/2024/rssbsp.pdf" target="_blank"> Click here</a></font></li>
+ 
+<li><font  size="+0.5">List of Selected Candidates for Self-Finance Reserved Seats :: <a href="/admissions/2024/sfrs.pdf" target="_blank"> Click here</a></font></li>
+
+<li><font  size="+0.5">Submission of Reserved Admissions Form :: <a href="/admissions/2024/rsamadd.jpg" target="_blank"> Click here</a></font></li>
+
+
+
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<h3><font size="+1">Open Merit Admissions</font></h3>
+
+<li><font  size="+0.5">Submission of Claim Form :: <a href="/admissions/2024/omclaimf.jpg" target="_blank"> Click here</a></font></li> 
+
+<li><font  size="+0.5">List of Selected Candidate (BS 3rd Year Programs) :: <a href="/admissions/2024/omplscbsiiiy.pdf" target="_blank"> Click here</a> | <a href="/admissions/2024/ombsiiiyclos.pdf" target="_blank"> Closing %</a> | <a href="/admissions/2024/ombsinst.jpg" target="_blank"> Instructions</a></font></li>
+
+<li><font  size="+0.5">List of Selected Candidate (BS 1st Year Programs) :: <a href="/admissions/2024/omplscbsiy.pdf" target="_blank"> Click here</a> | <a href="/admissions/2024/ombsiyclos.pdf" target="_blank"> Closing %</a> | <a href="/admissions/2024/ombsinst.jpg" target="_blank"> Instructions</a></font></li>
+
+<li><font  size="+0.5">Admissions Prospectus 2024 :: <a href="/admissions/2024/apxxiv.pdf" target="_blank"> Click here</a></font></li> 
+<li><font  size="+0.5">Open Merit Admissions :: <a href="/admissions/2024/omamadd.jpg" target="_blank"> Advertisement</a> | <a href="/admissions/2024/ombsdmm.jpg" target="_blank">Advertisement for Digital Media Marketing</a></font></li>
+<li><font  size="+0.5">Open Merit Departments :: <a href="/admissions/2024/romproglist.jpg" target="_blank"> Click here</a></font></li>
+
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+<!--
+<h3><font size="+1">Master of Laws (LL.M)</font></h3>
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+
+
+
+<h3>Evening Program Admissions 2020 (Bachelors / Masters / Diploma & Certificate Courses)</h3>
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+<h3><font size="+1">Self Finance</font></h3>
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+
+<h3><font size="+1">School of Law</font></h3>
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>     -->
+<!--<h2><font size="+1">Evening Program Admission 2022 </font></h2>
+<h3><font size="+1">KUBS (Specialied Degree Program)</font></h3>
+
+<li><font  size="+0.5">List of Selected Candidates :: <a href="/admissions/2022/plsckubs.pdf" target="_blank"> Click here</a> | <a href="/admissions/2022/feeinst.jpg" target="_blank"> Instructios</a></font></li>
+
+<li><font  size="+0.5">Guidelines for Online Admission Form Submission :: <a href="/admissions/2022/adglbs.jpg" target="_blank">Click here</a></font></li>
+<li><font  size="+0.5">Admissions Prospectus 2022 :: <a href="/admissions/2022/kubspro.pdf" target="_blank"> Click here</a></font></li>	
+ <li><font  size="+0.5">MBA (1.5/2.5) / MBA(Executive) :: <a href="/admissions/2022/asskubs.jpg" target="_blank"> Advertisement</a></font></li>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<h3><font size="+1">BS (1st Year) & BS (3rd Year), Diploma & Certificate Programs</font></h3>  
+
+<li><font  size="+0.5">Help Line Counter :: <a href="/admissions/2022/epnotice.gif" target="_blank"> Click here</a></font></li>
+<li><font  size="+0.5">Evening Donors Seats :: <a href="/admissions/2022/epsffsins.gif" target="_blank"> Click here</a></font></li>
+<li><font  size="+0.5">Fee Structure :: <a href="/admissions/2022/epfs.pdf" target="_blank"> Click here</a> | <a href="/admissions/2022/epinst.gif" target="_blank"> Instructions</a></font></li>
+<li><font  size="+0.5">Submission of Claim Form:: <a href="/admissions/2022/epclaiminst.gif" target="_blank"> Click here</a></font></li>
+<li><font  size="+0.5">Instruction for Admitted Students :: <a href="/admissions/2022/epgymfeesint.jpg" target="_blank"> Click here</a></font></li>
+  <li><font  size="+0.5">List of Selected Candidate (BS 3rd Year) :: <a href="/admissions/2022/epbsiiilist.pdf" target="_blank"> Click here</a> | <a href="/admissions/2022/epts.pdf" target="_blank"> Test Score </a> | <a href="/admissions/2022/epbsiiiclos.pdf" target="_blank"> Closing%</a> | <a href="/admissions/2022/epinst.gif" target="_blank"> Instructions</a></font></li>
+ 
+ <li><font  size="+0.5">List of Selected Candidate (BS 1st Year) :: <a href="/admissions/2022/epbsilist.pdf" target="_blank"> Click here</a> | <a href="/admissions/2022/epts.pdf" target="_blank"> Test Score </a> | <a href="/admissions/2022/epbsiclos.pdf" target="_blank"> Closing%</a> | <a href="/admissions/2022/epinst.gif" target="_blank"> Instructions</a></font></li>
+
+
+
+
+<li><font  size="+0.5">Evening Program Prospectus 2022 :: <a href="/admissions/2022/eveap.pdf" target="_blank"> Click here</a></font></li>	
+ <li><font  size="+0.5">Evening Program Admission 2022 :: <a href="/admissions/2022/eveadad.jpg" target="_blank"> Advertisement</a></font></li>	
+ 
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+
+<hr / color="#FF0000">
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<h3><font size="+1">Donors Seats</font></h3>
+  
+ <li><font  size="+0.5">Submission of Admission Form :: <a href="/admissions/2022/dosfinst.jpg" target="_blank"> Instruction</a></font></li>	
+ 
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+
+
+<h3><font size="+1">Open Merit Admissions</font></h3>
+  
+  <li><font  size="+0.5">List of Valid Claim :: <a href="/admissions/2022/vclbsi.iii.pdf" target="_blank"> Click here</a></font></li>
+  <li><font  size="+0.5">List of Selected Candidate (BS 3rd Year Programs) :: <a href="/admissions/2022/plscbsiiiom.pdf" target="_blank"> Click here</a> | <a href="/admissions/2022/clobsiiiom.pdf" target="_blank"> Closing%</a> | <a href="/admissions/2022/ominst.pdf" target="_blank"> Instructions</a></font></li>
+ 
+ <li><font  size="+0.5">List of Selected Candidate (BS 1st Year Programs) :: <a href="/admissions/2022/plscbsiom.pdf" target="_blank"> Click here</a> | <a href="/admissions/2022/clobsiom.pdf" target="_blank"> Closing%</a> | <a href="/admissions/2022/ominst.pdf" target="_blank"> Instructions</a></font></li>
+  
+ <li><font  size="+0.5">Admissions Prospectus 2022 :: <a href="/admissions/2022/ap.pdf" target="_blank"> Click here</a></font></li>	
+ <li><font  size="+0.5">Open Merit :: <a href="/admissions/2022/opad.jpg" target="_blank"> Advertisement</a></font></li>
+ 
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+
+<h3><font size="+1">Reserved Seats</font> </h3>
+<li><font  size="+0.5">List of Selected Candidates for Self-Finance Reserved Seats  :: <a href="/admissions/2022/sfrs.pdf" target="_blank"> Click here</a></font></li>
+<li><font  size="+0.5">Karachi University Employees Reserved Seats  :: <a href="/admissions/2022/kuemprs.pdf" target="_blank"> Click here</a></font></li>
+<li><font  size="+0.5">Province of Sindh Reserved Seats  :: <a href="/admissions/2022/sindhrs.pdf" target="_blank"> Click here</a></font></li>
+<li><font  size="+0.5">Special Persons Reserved Seats  :: <a href="/admissions/2022/spprs.pdf" target="_blank"> Click here</a></font></li>
+<li><font  size="+0.5">Sports Reserved Seats :: <a href="/admissions/2022/srs.pdf" target="_blank"> Click here</a></font></li>
+<li><font  size="+0.5">Province of Balochistan Reserved Seats :: <a href="/admissions/2022/brs.pdf" target="_blank"> Click here</a></font></li>
+<li><font  size="+0.5">Advocate Children’s Reserved Seats  :: <a href="/admissions/2022/ars.pdf" target="_blank"> Click here</a></font></li>
+<li><font  size="+0.5">Submission of Reserved Admissions Form  :: <a href="/admissions/2022/rsa.jpg" target="_blank"> Click here</a></font></li>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+
+<h3><font size="+1">Chinese (BS Program)</font> </h3>
+<li><font  size="+0.5">Advertisement :: <a href="/admissions/2022/cad.jpg" target="_blank"> Click here</a></font></li>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>  -->
+
+<!--
+<h3><font size="+1">KUBS (BBA 4 Years Specialized Degree Program) </font></h3>
+
+<li><font size="+0.5" color="#990000">Provisional List of Selected Candidates :: <a href="/admissions/2021/plscbbasdp.pdf" target="_blank"> Click here</a></font></li>
+<li>Prospectus  :: <a href="/admissions/2021/kubspro.pdf" target="_blank"> Click here</a></li>
+<li>Advertisement :: <a href="/admissions/2021/kubsadv.jpg" target="_blank"> Click here</a></li>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+<h3><font size="+1">Donors Seats</font></h3>
+
+<li><font  size="+0.5">Submission of Admission Form :: <a href="/admissions/2021/dspr.pdf" target="_blank"> Instruction</a></font></li>
+
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<h3><font size="+1">Reserved Seats</font></h3>
+
+<li><font  size="+0.5" color="#990000">List of Selected Candidates for Sport :: <a href="/admissions/2021/resport.pdf" target="_blank"> Click here</a> | Instruction: <a href="/admissions/2021/engfinst.pdf" target="_blank"> English</a> | <a href="/admissions/2021/urdfinst.pdf" target="_blank"> Urdu</a></font></li>
+<li><font  size="+0.5" color="#990000">List of Selected Candidates for Sindh :: <a href="/admissions/2021/rssind_bmxxi.pdf" target="_blank"> Click here</a> | Instruction: <a href="/admissions/2021/engfinst.pdf" target="_blank"> English</a> | <a href="/admissions/2021/urdfinst.pdf" target="_blank"> Urdu</a></font></li>
+<li><font  size="+0.5" color="#990000">List of Selected Candidates for Balochistan :: <a href="/admissions/2021/rsbalo_bmxxi.pdf" target="_blank"> Click here</a> | Instruction: <a href="/admissions/2021/engfinst.pdf" target="_blank"> English</a> | <a href="/admissions/2021/urdfinst.pdf" target="_blank"> Urdu</a></font></li>
+<li><font  size="+0.5" color="#990000">List of Selected Candidates for Employees :: <a href="/admissions/2021/rsemp_bmxxi.pdf" target="_blank"> Click here</a> | Instruction: <a href="/admissions/2021/engfinst.pdf" target="_blank"> English</a> | <a href="/admissions/2021/urdfinst.pdf" target="_blank"> Urdu</a></font></li>
+<li><font  size="+0.5">Submission of Admission Form :: <a href="/admissions/2021/rsinst.jpg" target="_blank"> Instruction</a></font></li>
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<h3><font size="+1">Chinese Language (Fall Session 2025)</font> </h3>
+ 
+<li><font size="+0.5">Submission of Form :: <a href="/admissions/2025/cde.jpg" target="_blank"> Date Extended</a></font></li>
+ <li><font size="+0.5">Confucius Chinese Language :: <a href="/admissions/2025/cfalls.jpg" target="_blank"> Advertisement</a></font></li>
+
+-->
+
+<!--
+<h3><font size="+1">Chinese Language</font> (Fall Session 2025)</h3>
+ 
+ <li><font size="+0.5">Provisional List of Selected Candidates :: <a href="/admissions/2025/sclchina.pdf" target="_blank"> Click here</a></font></li>
+ <li><font size="+0.5">Confucius Chinese Language :: <a href="/admissions/2025/cci.jpg" target="_blank"> Advertisement</a></font></li>
+
+
+<p>&nbsp;</p>
+
+ <h3><font size="+1">Evening Program</font></h3>
+ 
+ <li><font size="+0.5">List of Valid Claim :: <a href="/admissions/2025/epclim.pdf" target="_blank"> Click here</a></font></li>
+ <li><font size="+0.5">Fee Submission Procedure / Required Documents :: <a href="/admissions/2025/eveaproc.jpg" target="_blank"> Click here</a></font></li>
+ <li><font size="+0.5">Admissions’ List Announcement :: <a href="/admissions/2025/eveailann.jpg" target="_blank">Click here</a></font></li>
+ 
+<li><font size="+0.5">List of Selected Candidates (BS 3rd Year) :: <a href="/admissions/2025/sclbsiiieve.pdf" target="_blank">Click here</a> | <a href="/admissions/2025/evebsiiiclosp.pdf" target="_blank"> Closing %</a></font></li>
+<li><font size="+0.5">List of Selected Candidates (BS 1st Year) :: <a href="/admissions/2025/sclbsieve.pdf" target="_blank">Click here</a> | <a href="/admissions/2025/evebsiclosp.pdf" target="_blank"> Closing %</a></font></li>
+ 
+ <li><font  size="+0.5">BS(CS) & BS(SE) List of Test Score :: <a href="/admissions/2025/bsaits.pdf" target="_blank"> Click here</a></font></li>
+
+<li><font  size="+0.5">Admissions Prospectus 2025 :: <a href="/admissions/2025/proeve.pdf" target="_blank"> Click here</a></font></li>	
+
+<li><font  size="+0.5">Evening Program Admissions :: <a href="/admissions/2025/flyeve.jpg" target="_blank"> Advertisement</a></font></li>
+
+
+
+<p>&nbsp;</p>
+
+ <h3><font size="+1">Turkish Language</font></h3>
+ 
+<li><font size="+0.5">List of Selected Candidates :: <a href="/admissions/2025/truklist.pdf" target="_blank"> Click here</a></font></li>
+<li><font size="+0.5">Turkish Language Admissions :: <a href="/admissions/2025/tlfly.jpg" target="_blank"> Click here</a></font></li>
+
+
+
+<p>&nbsp;</p>
+
+ <h3><font size="+1">Donors' Seats</font></h3>
+
+<li><font size="+0.5">Submission of Donors' Admissions Form :: <a href="/admissions/2025/donar.jpg" target="_blank"> Click here</a></font></li>
+
+
+
+<p>&nbsp;</p>
+
+ <h3><font size="+1">Reserved Seats</font></h3>
+
+<li><font size="+0.5">List of Selected Candidates (KU Employees) :: <a href="/admissions/2025/rsemp.pdf" target="_blank">Click here</a></font></li>
+<li><font size="+0.5">List of Selected Candidates (Special Person) :: <a href="/admissions/2025/respecp.pdf" target="_blank">Click here</a></font></li>
+<li><font size="+0.5">List of Selected Candidates (Province of Sindh / Balochistan) :: <a href="/admissions/2025/rsbolsind.pdf" target="_blank">Click here</a></font></li>
+<li><font size="+0.5">List of Advocate (Son / Daughters) Reserved Seats :: <a href="/admissions/2025/rsadvson.pdf" target="_blank">Click here</a></font></li>
+<li><font size="+0.5">Submission of Reserved Admissions Form :: <a href="/admissions/2025/rsfly.jpg" target="_blank">Click here</a></font></li>
+
+
+-->
+<h3><font size="+1">Chinese Language</font></h3>
+
+<li><font  size="+0.5">Provisional List of Selected Candidates :: <a href="/admissions/2026/plscc.pdf" target="_blank"> Click here</a></font></li>
+<li><font  size="+0.5">Chinese Language Admissions:: <a href="/admissions/2026/cia.jpg" target="_blank"> Click here</a></font></li>
+
+<p>&nbsp;</p>
+
+<h3><font size="+1">Turkish Language</font></h3>
+
+<li><font  size="+0.5">Provisional List of Selected Candidates :: <a href="/admissions/2026/truklc.pdf" target="_blank"> Click here</a></font></li>
+<li><font  size="+0.5">Turkish Language Admissions:: <a href="/admissions/2026/yeturkl.jpg" target="_blank"> Click here</a></font></li>
+
+<p>&nbsp;</p>
+
+<h3><font size="+1">Evening Program</font></h3>
+
+<li><font  size="+0.5">List of Valid Claim :: <a href="https://uokadmission.edu.pk/2026/links-content/EP%20CLAIM%20LIST%202026.pdf" target="_blank"> Click here</a></font></li>
+<li><font  size="+0.5">Fee Submission Procedure :: <a href="https://uokadmission.edu.pk/2026/links-content/feesbinstr.jpg" target="_blank"> Click here</a></font></li>
+<li><font  size="+0.5">List of Selected Candidates (BS 3rd Year) :: <a href="https://uokadmission.edu.pk/2026/links-content/ep3yearadlist.pdf" target="_blank"> Click here</a> | <a href="https://uokadmission.edu.pk/2026/links-content/ep3yrclosing.pdf" target="_blank"> Closing %</a> | <a href="https://uokadmission.edu.pk/2026/links-content/EPLISTINSTR.jpg" target="_blank"> Instructions</a></font></li>
+<li><font  size="+0.5">List of Selected Candidates (BS 1st Year) :: <a href="https://uokadmission.edu.pk/2026/links-content/ep1yearadlist.pdf" target="_blank"> Click here</a> | <a href="https://uokadmission.edu.pk/2026/links-content/ep1yrclosing.pdf" target="_blank"> Closing %</a> | <a href="https://uokadmission.edu.pk/2026/links-content/EPLISTINSTR.jpg" target="_blank"> Instructions</a></font></li>
+
+<li><font  size="+0.5">Admissions Prospectus 2026 :: <a href="/admissions/2026/eveapxxvi.pdf" target="_blank"> Click here</a></font></li>
+
+<li><font  size="+0.5">D.P.A Program :: <a href="/admissions/2026/dpa.pdf" target="_blank"> Click here</a></font></li>
+
+<li><font  size="+0.5">Evening Program Admissions :: <a href="/admissions/2026/eveaf.jpg" target="_blank"> Advertisement</a></font></li>
+
+
+<p>&nbsp;</p>
+
+<h3><font size="+1">Evening Self Finance</font></h3>
+
+
+<li><font  size="+0.5">Submission of Self Finance Evening Form :: <a href="https://uokadmission.edu.pk/2026/links-content/EPSFnotice.jpg" target="_blank"> Click here</a></font></li>
+
+
+
+
+
+
+
+<p>&nbsp;</p>
+
+<h3><font size="+1">Post Magistral Diploma in Assessment, Counselling & Psychotherapy</font></h3>
+
+<li><font  size="+0.5">Advertisement (PMD-ACP)  :: <a href="/admissions/2026/pmdfly.jpg" target="_blank"> Click here </a></font></li>
+
+
+
+<p>&nbsp;</p>
+<hr/>
+<p>&nbsp;</p>
+
+<h3><font size="+1">Self Finance</font></h3>
+
+<li><font  size="+0.5">List of Selected Candidates for Self-Finance Reserved Seats :: <a href="https://uokadmission.edu.pk/2026/links-content/selflist.pdf" target="_blank"> Click here</a></font></li>
+<li><font  size="+0.5">Submission of Self Finance Admissions Form :: <a href="https://uokadmission.edu.pk/storage/1256264/1ST-YEAR-SELF-FINANCED-1.jpg" target="_blank"> Click here</a></font></li>
+
+
+
+
+<p>&nbsp;</p>
+
+
+
+
+<h3><font size="+1">Reserved Seats</font></h3>
+
+<li><font  size="+0.5">Submission of Reserved Admissions Form (Date Extended) :: <a href="/admissions/2026/rsade.jpg" target="_blank"> Click here</a></font></li>
+<li><font  size="+0.5">Submission of Reserved Admissions Form :: <a href="/admissions/2026/rsfly.jpg" target="_blank"> Click here</a></font></li>
+
+
+
+
+<p>&nbsp;</p>
+
+
+ <h3><font size="+1">Department of Visual Studies</font></h3>
+
+<li><p><font  size="+0.5">Provisional List of Selected Candidates :: <a href="https://uokadmission.edu.pk/2026/admission/vst-admission-list.pdf" target="_blank"> Click here</a> | <a href="https://uokadmission.edu.pk/2026/admission/vst-closing.pdf " target="_blank"> Closing %</a></font></p></li>
+
+<li><p><font  size="+0.5">Interview List Visual Studies Admissions :: <a href="https://uokadmission.edu.pk/2026/test-results/vst-interview.pdf" target="_blank"> Click here</a></font></p></li>
+
+<li><p><font  size="+0.5">Test Score Visual Studies Admissions :: <a href="https://uokadmission.edu.pk/2026/test-results/vst-results.pdf" target="_blank"> Click here</a></font></p></li>
+
+<li><p><font  size="+0.5">Important Instruction :: <a href="/admissions/2026/inst.jpg" target="_blank"> Click here</a></font></p></li>
+
+ <li><p><font  size="+0.5">Admission Form Submission Guideline :: <a href="/admissions/2026/afsg.jpg" target="_blank"> Click here</a></font></p></li>
+
+<li><p><font  size="+0.5">Instruction for Portal creation :: <a href="/admissions/2026/ipcg.jpg" target="_blank"> Click here</a></font></p></li>
+ 
+<li><p><font size="+0.5">Prospectus VST 2026 :: <a href="/admissions/2026/vspros.pdf" target="_blank">Click here</a></font></p></li>
+  
+<li><p><font  size="+0.5">Advertisement VST 2026 :: <a href="/admissions/2026/vsaflyer.jpg" target="_blank"> Click here </a></font></p></li>
+
+
+
+<p>&nbsp;</p>
+
+
+
+<h3><font size="+1">Doctor of Pharmacy</font></h3>
+
+<li><font  size="+0.5">List of Valid Claims :: <a href="https://uokadmission.edu.pk/2026/admission/claim-list.pdf" target="_blank"> Click here</a></font></li>
+
+<li><font  size="+0.5">Fee Submission Guidelines :: <a href="https://uokadmission.edu.pk/2026/admission/info.jpg" target="_blank"> Click here</a></font></li>
+
+<li><font  size="+0.5">Admissions List (Doctor of Pharmacy) :: <a href="https://uokadmission.edu.pk/2026/admission/form-display.pdf" target="_blank"> Click here </a> | <a href="https://uokadmission.edu.pk/2026/admission/closing-list.pdf" target="_blank"> Closing % </a> | <a href="https://uokadmission.edu.pk/2026/admission/status.jpg
+" target="_blank"> Instructions</a></font></li>
+
+<li><font  size="+0.5">Note: list of selected candidates for DPT / Doctor of Pharmacy Admissions-2026 will be announced on November 5, 2025</font></li>
+
+<li><font  size="+0.5">Test Score Doctor of Pharmacy Admissions :: <a href="https://uokadmission.edu.pk/2026/test-results/test-based-results.pdf" target="_blank"> Click here</a></font></li> 
+
+<li><font  size="+0.5">Exam Centre’s Pin Location :: <a href="/admissions/2026/tbcloc.pdf" target="_blank"> Click here</a></font></li>
+
+<li><font  size="+0.5">Admit Card for Admission Test :: <a href="/admissions/2026/tbac.jpg" target="_blank"> Click here</a></font></li>
+
+<li><font  size="+0.5">Important Instruction :: <a href="/admissions/2026/inst.jpg" target="_blank"> Click here</a></font></li>
+
+<li><font  size="+0.5">Admission Form Submission Guideline :: <a href="/admissions/2026/afsg.jpg" target="_blank"> Click here</a></font></li>
+
+<li><font  size="+0.5">Instruction for Portal creation :: <a href="/admissions/2026/ipcg.jpg" target="_blank"> Click here</a></font></li>
+
+<li><font  size="+0.5">Admissions Prospectus 2026 :: <a href="/admissions/2026/prosiikvi.pdf" target="_blank"> Click here</a></font></li>	
+   <li><font  size="+0.5">Doctor of Pharmacy :: <a href="/admissions/2026/dofaflyer.jpg" target="_blank"> Advertisement</a></font></li>
+   
+<p>&nbsp;</p>
+
+
+
+ 
+
+<h3><font size="+1">Test Based Admissions</font></h3>
+
+<li><font  size="+0.5">List of Valid Claims :: <a href="https://uokadmission.edu.pk/2026/admission/claim-list.pdf" target="_blank"> Click here</a></font></li>
+
+<li><font  size="+0.5">Fee Submission Guidelines :: <a href="https://uokadmission.edu.pk/2026/admission/info.jpg" target="_blank"> Click here</a></font></li>
+
+<li><font  size="+0.5">Admissions List (BS/B.Ed.(H)/B.E.) :: <a href="https://uokadmission.edu.pk/2026/admission/form-display.pdf" target="_blank"> Click here</a> | <a href="https://uokadmission.edu.pk/2026/admission/closing-list.pdf" target="_blank"> Closing % </a> | <a href="https://uokadmission.edu.pk/2026/admission/status.jpg
+" target="_blank"> Instructions</a></font></li>
+
+<li><font  size="+0.5">Note: list of selected candidates for BS/B.Ed.(H)/B.E. Admissions-2026 will be announced on November 5, 2025</font></li>
+
+<li><font  size="+0.5">Test Score BS/B.Ed.(H)/B.E. Admissions :: <a href="https://uokadmission.edu.pk/2026/test-results/test-based-results.pdf" target="_blank"> Click here</a></font></li> 
+
+<li><font  size="+0.5">Exam Centre’s Pin Location :: <a href="/admissions/2026/tbcloc.pdf" target="_blank"> Click here</a></font></li>
+
+<li><font  size="+0.5">Admit Card for Admission Test :: <a href="/admissions/2026/tbac.jpg" target="_blank"> Click here</a></font></li>
+
+<li><font  size="+0.5">Important Instruction :: <a href="/admissions/2026/inst.jpg" target="_blank"> Click here</a></font></li>
+
+<li><font  size="+0.5">Admission Form Submission Guideline :: <a href="/admissions/2026/afsg.jpg" target="_blank"> Click here</a></font></li>
+
+<li><font  size="+0.5">Instruction for Portal creation :: <a href="/admissions/2026/ipcg.jpg" target="_blank"> Click here</a></font></li>
+
+<li><font  size="+0.5">Admissions Prospectus 2026 :: <a href="/admissions/2026/prosiikvi.pdf" target="_blank"> Click here</a></font></li>	
+
+<li><font  size="+0.5">Test Based Admissions :: <a href="/admissions/2026/tbaflyer.jpg" target="_blank"> Advertisement</a></font></li>
+
+
+<p>&nbsp;</p>
+
+<h3><font size="+1">Open Merit Admissions</font></h3>
+
+<li><font  size="+0.5">List of Selected Candidate (BS 3rd Year Programs) :: <a href="https://uokadmission.edu.pk/2026/admission/master-merit-formno-display.pdf" target="_blank"> Click here</a> | <a href="https://uokadmission.edu.pk/2026/admission/master-merit-closing.pdf" target="_blank"> Closing%</a></font></li>
+<li><font  size="+0.5">List of Selected Candidate (BS 1st Year Programs) :: <a href="https://uokadmission.edu.pk/2026/admission/bachelor-merit-formno-display.pdf" target="_blank">Click here</a> | <a href="https://uokadmission.edu.pk/2026/admission/bachelor-merit-closing.pdf" target="_blank"> Closing%</a></font></li>
+<li><font  size="+0.5">Admissions Prospectus 2026 :: <a href="/admissions/2026/prosiikvi.pdf" target="_blank"> Click here</a></font></li>
+<li><font  size="+0.5">BS Poultry Science Admissions :: <a href="/admissions/2026/bspsfly.jpg" target="_blank"> Click here </a></font></li>
+<li><font  size="+0.5">Open Merit Based Admissions :: <a href="/admissions/2026/bsomfly.jpg" target="_blank"> Click here </a></font></li>
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>   
+<p><button class="button button1"><a href="ily.php"><strong>Last Year Information for Guidance</strong></a></button></p>
+<p>&nbsp;</p>
+<p><font size="+1.5" color="#990000"><strong><u>Instructions for Foreign Students:</u></strong></font></p>
+<p align="justify"><strong>All the students with a foreign nationality have to apply through their embassy and the Ministry of Foreign Affairs, Islamabad and they can apply till December 2023. Kindly read the admission policy carrying the detailed process for International Students given on the University web page under the office of the Foreign Students' Advisor, University of Karachi.</strong></p> 
+ 
+ 
+
+
+
+
+
+</ul>
+
+
+      
+<h3><br />  
+  </h3>          </div>  </div>  </div>      <br class="clear" />  </div>  <div id="contentendouter">                  <div id="contentend">            </div>    </div>  </div>  <div id="outer_footer">
+    <div id="outer_footer_sec">
+        <div id="footer">
+            <div class="left_footer">
+                <div class="footer_tags">
+                    <ul>
+                        <li>
+                            <h2>About Us</h2>
+                            <ul>
+                                <li><a href="/downloads/index.php">Downloads</a></li>
+                                <li><a href="/credits.php">MCN</a></li>
+                                <li><a href="/news.php"> News &amp; Events</a></li>
+                                <!--<li><a href="/news/pgallery.php">Picture Gallery</a></li>-->
+				<li><a href="/news/2018/pf.pdf" target="_blank">Pension Form</a></li>
+				<li><a href="/semesterfees/instructions.php" >Semester Fee</a></li>
+			    </ul>
+                        </li>
+                        <li>
+                            <h2>Quick Links</h2>
+                            <ul>
+                                <li><a href="/ac/index.php">Affiliation Committee</a></li>
+                                <li><a target="_blank" href="https://docs.google.com/forms/d/e/1FAIpQLScARo0Xgv9tKuaSRHY0IRrUkKzJ-IV6u28vU7kfUmRluVDxYA/viewform">Postgraduate Students Portal Registration</a></li>
+                                <li><a href="/administration/index.php#off">Directorates &amp; offices</a></li>
+                                <li><a target="_blank" href="http://uok.rozee.pk/">Job Portal</a></li>
+                                <li><a href="/sa/index.php">Student Advisor Office</a></li>
+                                <!--<li><a href="/conv/index.php">Annual Convocation</a></li>-->
+                            </ul>
+                        </li>
+                        <li>
+                         <h2></h2>
+                             <ul>                                
+                                <li><a href="/dpe/index.php">Physical Education</a></li>
+                                <li><a href="/pd/tenders.php">Tenders and Quotations</a></li>
+                                <li><a href="/syllabus/index.php">Syllabus Undergraduate Program</a></li>
+	                        <li><a href="/sgcpb/contact.php">Placements and Internships</a></li>
+                                                       <li><a href="/kujs/index.php">Karachi University Journal of Science</a></li>
+                                                       <li><a href="/harrasment/index.php">Protection Against Harassment</a></li>
+								<!--<li><a href="https://www.facebook.com/uokkhi/" target="_blank">Facebook-MCN</a></li>-->
+
+                            </ul>
+                        </li>
+                        <li>
+                            <h2>Web Links</h2>
+                            <ul>
+                            <li><a href="/library/dlib.php">Digital Library </a></li>
+                                                      <!-- <li><a target="_blank" href="https://ukarachi.onthehub.com/WebStore/Security/SignIn.aspx">Download Center HEC-Microsoft</a></li>
+			    <li><a target="_blank" href="http://www.hec.gov.pk/">Higher Education Commission </a></li> -->
+                          <li><a href="http://qecku.com/" target="_blank">Quality Enhancement Cell</a></li>
+			 <li><a href="https://kupress.pk/en/" target="_blank">Karachi University Press</a></li>
+			 <li><a href="http://naeac.org/" target="_blank">NAEAC</a></li>
+			 <li><a href="https://surveyofpakistan.gov.pk/Download">Political Map of Pakistan</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+    </div>
+                <div class="footer_nav">
+                  <p>&copy; 2026 University of Karachi</p>
+                    <ul>
+                        <li><a href="/credits.php">Credits</a></li>
+                        <li><a href="/contactus.php">Contact us</a></li>
+                        <li><a href="/copyright.php">Copyright</a></li>
+                        <li><a href="/disclaimer.php">Disclaimer</a></li>
+                        <li><a target="_blank" href="http://maps.google.com/maps?f=q&amp;source=embed&amp;hl=en&amp;geocode=&amp;q=karachi+university&amp;sll=37.0625,-95.677068&amp;sspn=39.320439,83.759766&amp;ie=UTF8&amp;hq=university&amp;hnear=Karachi,+Sindh,+Pakistan&amp;fll=24.942629,67.120467&amp;fspn=0.005506,0.010225&amp;st=109146043351405611748&amp;rq=1&amp;ev=p&amp;split=1&amp;ll=24.943962,67.117968&amp;spn=0.027161,0.036478&amp;z=14">Maps</a></li>
+                     </ul>
+                    
+                </div>
+               
+		  <div class="footer_nav" align="right">
+<br/>
+                    <p>Official Social Media Platforms, University of Karachi</p>
+                    <ul>
+                        <li><blockquote><a href="https://www.facebook.com/uoktimes/" target="_blank"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAMAAABF0y+mAAAAV1BMVEVHcEwHZv/O1v8HaP8Haf8IZ/8IaP8IZv8IZ/8IaP/r7/8IZ/8IZ/8AW/////+fsf8HZv////8AYP8AWf8AZP+Vqf/V3P8IZ/9wlP9jiv+tvP+Lpf82c/8XNRKaAAAAEHRSTlMAM/2GGN1h9exC+8LBwcGFy8UXywAAAPNJREFUKJFlk+kSgyAMhDnUQe2BQQtU3/85yxEi0P3l+E1gkyyMFXG5KmvVKjnrNSlNUlODhlE3GoebzVZ3sjMx+reDiYLwiXSgOrCHWJaPcIHafDLdB27L+sbSMfkk5rca6uiZejBLC1XoncxcSM7T7+kPZ7K78TIAmWnJHgTPyD7mbna9r4Sjh4phk7sxqVLEIeCxFiG1mISGLB67+xrmUqvQENRwMcWQ/D9WmNIKxwk4/01uvXMXGuJlfGFZR66iGahq8H99TtXKejjWy+4gLhtj0sG5CVgD74DlaNawjmYKNRxlAF2o03N4v0JOxLN6Dj8GhSiE70/PKAAAAABJRU5ErkJggg==" width="20" height="15" alt="View University of Karachi's Facebook profile" style="vertical-align:middle;" border="0"></a></blockquote></li>
+			<li><blockquote><a href="https://www.linkedin.com/company/kutimes/" target="_blank"><img src="https://static.licdn.com/scds/common/u/img/webpromo/btn_in_20x15.png" width="20" height="15" alt="View University of Karachi's LinkedIn profile" style="vertical-align:middle;" border="0"></a></blockquote></li>
+			<li><blockquote><a href="https://www.youtube.com/KUTIMES" target="_blank"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABJklEQVR4Ae2WpVaFQRSFcaeS4QVwIjTiLbgk7D1w9xeg4FQcOu6acHeXtNnDmsFd7in/WetLI+f7dbYDAFEsAUvgoeAQ5k5iSQFpIH1kkMyQFXJMTsgpwTuc6jlHes2M3qNP71mge7g76DLNg8gygZ1QckGmuSdZJ7Azq8RDCSQTCJGgBCoFBWqVQLegQJcSmPnWIr9oICMXcIr4C4FJJbD9rUX+NtzX+CIQlfVbgS0lcP4jAVNt/UCA7acCZ0oAPxfQdXMLFNUBvpHflvgbAVM7h0B6zrfeD3kB+Ucg/xLKf4biPyLJX3GH9GFUogRSBQUSTSBZEwskQpFs1USyl6E0gRSRJtJPhsnci1B69oVQeqzXzOo9+kmj3juBeDw2BkSxBCyBO+9s03HRLVCoAAAAAElFTkSuQmCC" width="20" height="15" alt="View University of Karachi's Youtube profile" style="vertical-align:middle;" border="0"></a></blockquote></li>
+                        <li><blockquote><a href="https://www.instagram.com/kutimes1951/" target="_blank"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAMAAABF0y+mAAABOFBMVEVHcExxF/13F/1zFf2AFv2MCu+iBOmyAuLEAd7SANraBMzwHpedI+XeANfmANHmAr+PF/6fD/vxAL7qArV7GP21FvnRVurnZ+P2Z9roQeDzGtXzB8v7AqvWiPn+7fn////7ftv/A7z0BKH3v/H+3fT+ruj+AJr/9/r/RcD/bMDKFff/Bo3iG+r8GrX/AIH+H5r/yeP+BHj/t9n/V5r+Am7+H37+BGT/ssX/Imz/RXv/ucz+e4z+JFT/XI3/MGL+LUf/u7f/yc7/Alr+OUf+MSz+QzT+R0T+iHD+SRj+VzH+WQX+AkL+c2L/0sT+aCX+cBL/7+j+aQL+eRv/oUX/fwL+iBD/wXz+jgD/3rr/1rn+dgz+nAP9FpT+lw7+qgH+tQD+vQD/w1f9kwf/xAD9PFn9ogj/ywD9uAfgLZLBAAAAaHRSTlMAW9H+////////xEsC///N////zFz/////////////////uP////7///////////7////////////////////////////////////////////////////////F/7VQ///+/87/vsj/uqL0GQwAAAHcSURBVHgBRMlFehwxEEDhV1VS04yZ7U04m+AmcBjfLLscJ4xLHyA0YGqSlJ7P9MT6BRC52EEQuDjlFITx2eWvXJsDQWYIKgJj4VQW5gBJAg75K5vTgZDTFUEu/kUEzqGaiC6DMBbhpqQyoyKTNYD1Hp+Ui6J0ZH1HhXNA0RfzyRIZl5WprroK3BZwwvx0aUGdB87HCIN5VBUVP9i468ZLxWLv+pg6vJmDaSiSW2eyIRNg84/HxfVJmTD3DxFWGmWjrosRpxMNGr3iIqYbG7IGK5lKvZE3jVuTynsDzHRoD3xpxaTQvIKumGBWgCouM9bPKEisJg0VTV4X0aBqQEuXQ2kGlmVmZCtgCoxBJfeAz0b8NQbWI7wOAKCZMgbn9E6tItG1HFTKRQ4jgSYpiiPu6BFJW1fW9J7oDFWWgpf0MH09YnB6yIEYnIJhLhqkpw3aC4OuUJ4QlDzX55/Um5m4Ue6dmXr59LwkBM0xy/ieVNV7zSSTZMU3fs8UNBomr+v3jQx5X1XmB7tdgnNu1JqDl+0nbnp+HpLp+WM5bB0mIMJFc/ouSgjd+U99O1qYONOhFEMonPcZCZ6eGp9eRcSwhWkSRCIxKnfeIMBh1WRcFOhTaENo/096OTA7AACDzKODDThakgAAAABJRU5ErkJggg==" width="20" height="15" alt="View University of Karachi's Instagram profile" style="vertical-align:middle;" border="0"></a></blockquote></li>
+			<li><blockquote><a href="https://www.twitter.com/UokPakistan" class="twitter-share-button" data-via="infouok">Tweet</a></blockquote></li>
+			<li><blockquote><a href="https://whatsapp.com/channel/0029Vap9QMDAO7RIzFDvuu2B" target="_blank"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAmVBMVEVHcEwg32Al1WUl02cl1GYl02Ul02Ym02Yl0mUg12Ao12Al1Gcm02Yl02Yl1GUl1GUl02Yk02Ygz2goz2gl1Gcl1GYk1GYl1WUl02cgz3Am1WYl1GYm02Ygz2Ak02Ql0mYk0WYj0mYl02Uo02Ql0mYn0WYn1GYm0mYm0mUq1Wom0WYj02Um0mYl02Yl0mYlz2Un0WQq1WUj02cilIlXAAAAM3RSTlMAEGCQz+//r2AgIJ9/78+/0IAgIN/fcDDQEH+PgBBAoIBQv0DvcHBQsDCAkKDPjzBwMJAU6DEhAAABZElEQVR4AWTTBbajUBBF0YsdiBAixN1d5z+4/vBYb0Gzo8DFqgrJclzPDyDww6ihuqYXYNGqRdr55rgThklMPdLsAnGvr9wgSoFhKdEcQjxSSRaJx+Xtk74qBmEp0YXJVP/rwdBRZgbpVHUhzPMTBMT97HcRqWKZwkrSGjbFhaxUsYWdpCGpTA5PVQk42kNLfw5A7KjiCCctiiOTOatiAC1dwNGfIZD2VXVgqA5DZRbAVarqEGtYBJYHuKl+lTagCBjXA/lRjLvtYMMGiPUAR8YT4kjSi3Cv3IGdjuDKWD6BTjQD2DmSxuBlXztb/TuWY6p7NvUsD4qRynbhWNS6PG6mZDNoFQVwVPL+LPLiN4ucDviqMf3P5tS2s76d0PTUNNFRxX5oBzEBZ//ZBeUnpbnGDvoS4oDc7rN3JOf72QH8pnbwcjEVqZ3PNdDxtlNFCVYSyUo8dypjul20kqT1byABBAAASawYPAmTfuIAAAAASUVORK5CYII=" width="20" height="15" alt="View University of Karachi's WhatsApp Channel" style="vertical-align:middle;" border="0"></a></blockquote></li>
+			
+		</ul>
+                </div>
+	    </div>
+            <div class="right_footer">
+                <div class="contact_area">
+                    <h2>V.C. Office </h2>
+                    <p>Inquiry Direct: 99261300-07 
+          Ext: 2219 </p>
+                    <p>Fax: 99261340, 99261330 (P.R.O.)</p>
+                  <p>Email: <a href="mailto:vc@uok.edu.pk">vc@uok.edu.pk</a></p>
+                  </div>
+               
+            </div>
+        </div>
+    </div>
+</div>  </body>    </html>
