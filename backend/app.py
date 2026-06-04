@@ -12,11 +12,13 @@ LLM Provider order:
   3. Static fallback (no AI)
 """
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import httpx
 import os
+from sentence_transformers import SentenceTransformer
+import chromadb
 
 app = FastAPI(title="Pakistan CS & SE Counsellor")
 
@@ -43,6 +45,52 @@ OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "gemma4:latest")
 # Provider order (comma-separated, default: lm_studio,ollama,fallback)
 PROVIDER_ORDER = os.environ.get("PROVIDER_ORDER", "lm_studio,ollama,fallback").split(",")
 
+# ──────────────────────────────────────────────
+# Chroma / RAG configuration
+# ──────────────────────────────────────────────
+
+CHROMA_DIR = os.path.join(os.path.dirname(__file__), "chroma_db")
+COLLECTION_NAME = "pakistan_university_admissions"
+EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+
+rag_model = None
+rag_collection = None
+
+
+def load_rag():
+    global rag_model, rag_collection
+    try:
+        rag_model = SentenceTransformer(EMBEDDING_MODEL)
+        client = chromadb.PersistentClient(path=CHROMA_DIR)
+        rag_collection = client.get_collection(COLLECTION_NAME)
+        print(f"RAG loaded: {rag_collection.count()} chunks in Chroma")
+    except Exception as e:
+        print(f"RAG not available: {e}")
+        rag_model = None
+        rag_collection = None
+
+
+def search_chroma(query: str, top_k: int = 5) -> list[str]:
+    if rag_model is None or rag_collection is None:
+        return []
+    query_emb = rag_model.encode(query).tolist()
+    results = rag_collection.query(
+        query_embeddings=[query_emb],
+        n_results=top_k,
+    )
+    contexts = []
+    if results["documents"] and results["documents"][0]:
+        for i, doc in enumerate(results["documents"][0]):
+            meta = results["metadatas"][0][i]
+            contexts.append(
+                f"[{meta.get('university_name', '?')} - {meta.get('category', '?')}]\n{doc}"
+            )
+    return contexts
+
+
+# Load RAG on startup
+load_rag()
+
 
 # ──────────────────────────────────────────────
 # Request / Response models
@@ -65,27 +113,6 @@ class CounselRequest(BaseModel):
 
 class CounselResponse(BaseModel):
     answer: str
-
-
-# ──────────────────────────────────────────────
-# In-memory university data (placeholder)
-# Will be replaced with Chroma retrieval in a later phase
-# ──────────────────────────────────────────────
-
-PLACEHOLDER_DOCS = [
-    "Lahore University of Management Sciences (LUMS) offers BS Computer Science. "
-    "Admission requires 60%+ in Intermediate, LUMS SBASSE test, and interview. "
-    "Annual fee: approximately PKR 800,000. Location: Lahore.",
-
-    "National University of Computer and Emerging Sciences (NUCES-FAST) offers "
-    "BS Computer Science and BS Software Engineering. Admission based on "
-    "Intermediate marks (65%+) and NTS / FAST entry test. "
-    "Annual fee: approximately PKR 350,000. Campuses in Lahore, Islamabad, Karachi, Peshawar.",
-
-    "University of Engineering and Technology (UET) Lahore offers BS Computer Science. "
-    "Admission via UET entry test and Intermediate aggregate. "
-    "Annual fee: approximately PKR 150,000. Location: Lahore.",
-]
 
 
 # =============================================
@@ -187,45 +214,6 @@ async def get_ai_response(prompt: str) -> str:
 
 
 # =============================================
-# POST /counsel — main counselling endpoint
-# =============================================
-@app.post("/counsel", response_model=CounselResponse)
-async def counsel(request: CounselRequest):
-    # Build a profile summary string
-    profile_summary = (
-        f"Name: {request.profile.name}, "
-        f"Matric: {request.profile.matric_marks}%, "
-        f"Intermediate: {request.profile.inter_marks}%, "
-        f"Entry Test: {request.profile.entry_test}, "
-        f"Preferred Field: {request.profile.preferred_field}, "
-        f"City: {request.profile.city_preference}, "
-        f"Budget: {request.profile.budget}"
-    )
-
-    # Combine all placeholder docs into a single context block
-    context = "\n\n".join(PLACEHOLDER_DOCS)
-
-    # Build the prompt
-    prompt = f"""You are a university counsellor for Pakistani students.
-Use the following university admission information to answer the student's question.
-
-Student Profile:
-{profile_summary}
-
-University Information:
-{context}
-
-Student Question: {request.question}
-
-Give a clear, helpful, and personalised answer based on the student's marks and preferences."""
-
-    # Get response from the provider chain
-    answer = await get_ai_response(prompt)
-
-    return CounselResponse(answer=answer)
-
-
-# =============================================
 # GET /health — simple health check
 # =============================================
 @app.get("/health")
@@ -258,4 +246,70 @@ async def providers():
             }
         },
         "provider_order": PROVIDER_ORDER
+    }
+
+
+# =============================================
+# POST /counsel — main counselling endpoint (RAG)
+# =============================================
+
+@app.post("/counsel", response_model=CounselResponse)
+async def counsel(request: CounselRequest):
+    # Build a profile summary string
+    profile_summary = (
+        f"Name: {request.profile.name}, "
+        f"Matric: {request.profile.matric_marks}%, "
+        f"Intermediate: {request.profile.inter_marks}%, "
+        f"Entry Test: {request.profile.entry_test}, "
+        f"Preferred Field: {request.profile.preferred_field}, "
+        f"City: {request.profile.city_preference}, "
+        f"Budget: {request.profile.budget}"
+    )
+
+    user_query = (
+        f"Student profile: {profile_summary}\n"
+        f"Question: {request.question}"
+    )
+
+    retrieved = search_chroma(user_query, top_k=5)
+
+    if retrieved:
+        context = "\n\n---\n\n".join(retrieved)
+    else:
+        context = "No university admission data is currently available in the vector database."
+
+    prompt = f"""You are a university counsellor for Pakistani students.
+Use the following university admission information to answer the student's question.
+
+Student Profile:
+{profile_summary}
+
+University Admission Information:
+{context}
+
+Student Question: {request.question}
+
+Give a clear, helpful, and personalised answer based on the student's marks and preferences.
+If the information provided does not fully answer the question, suggest the student check official university websites."""
+
+    answer = await get_ai_response(prompt)
+
+    return CounselResponse(answer=answer)
+
+
+# =============================================
+# GET /search — search Chroma vector DB
+# =============================================
+
+@app.get("/search")
+async def search(q: str = Query(..., description="Search query")):
+    results = search_chroma(q, top_k=5)
+    items = []
+    if results:
+        for i, text in enumerate(results):
+            items.append({"rank": i + 1, "text": text[:500]})
+    return {
+        "query": q,
+        "results_count": len(items),
+        "results": items
     }

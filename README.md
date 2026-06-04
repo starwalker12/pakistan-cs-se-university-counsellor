@@ -175,6 +175,40 @@ The system will rank and recommend universities using these factors:
 4. **Placeholder before scraped** — `eligibility_rules.json` values are approximate placeholders and must be updated with real scraped data
 5. **Rankings are approximate** — `university_rankings.json` scores are project-level approximations based on known reputation, not official HEC or QS rankings
 
+## Phase 6 RAG Database
+
+The RAG vector database is built from scraped university admission data. Here is the pipeline:
+
+1. **Chunking** — Each scraped admission record is split into category-based chunks (eligibility, entry_test, merit, fee, deadline)
+2. **Embeddings** — Chunks are embedded using `sentence-transformers/all-MiniLM-L6-v2` (free, local model)
+3. **Chroma storage** — Embeddings + text + metadata are stored locally in `backend/chroma_db/`
+4. **Retrieval** — When a user asks a question, the backend searches Chroma for the most relevant chunks and sends them to the LLM as context
+
+### Commands
+
+```bash
+# Step 1: Build the vector database
+cd backend
+python build_vector_db.py
+
+# Step 2: Test the RAG search
+python test_rag_search.py
+
+# Step 3: Start the backend (loads Chroma on startup)
+uvicorn app:app --reload --port 8000
+```
+
+### RAG flow in /counsel endpoint
+
+1. User submits profile + question
+2. Backend searches Chroma for top-5 relevant chunks
+3. Retrieved chunks are injected into the LLM prompt as context
+4. LLM generates a personalised answer based on the retrieved data
+
+### Search endpoint
+
+`GET /search?q=question` — returns top 5 chunks from Chroma with university name, category, and text preview.
+
 ## Technologies
 
 | Layer | Technology |
@@ -182,6 +216,6 @@ The system will rank and recommend universities using these factors:
 | Frontend | HTML, CSS, JavaScript |
 | Backend | Python, FastAPI |
 | LLM | LM Studio (primary) / Ollama (backup) |
-| Embeddings | sentence-transformers |
+| Embeddings | sentence-transformers (all-MiniLM-L6-v2) |
 | Vector DB | Chroma (local) |
 | Scraping | httpx, BeautifulSoup, pdfplumber |
