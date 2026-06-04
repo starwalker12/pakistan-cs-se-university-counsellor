@@ -143,7 +143,19 @@ async function handleSend() {
     }
 
     const data = await response.json();
-    addMessage('bot', data.answer || 'Sorry, no answer was returned.');
+    let msg = data.answer || 'Sorry, no answer was returned.';
+    if (data.provider_used) {
+      msg += '\n\n---\n[Provider: ' + data.provider_used + ']';
+    }
+    addMessage('bot', msg);
+    if (data.sources && data.sources.length > 0) {
+      let srcText = 'Sources:\n';
+      for (const s of data.sources) {
+        srcText += '• ' + s.university_name + '\n';
+        if (s.source_url) srcText += '  ' + s.source_url.split(';')[0] + '\n';
+      }
+      addMessage('bot', srcText);
+    }
 
   } catch (err) {
     hideTyping();

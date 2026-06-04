@@ -71,7 +71,7 @@ ollama serve
 
 ```bash
 cd backend
-uvicorn app:app --reload --port 8000
+python3 -m uvicorn app:app --reload --port 8000
 ```
 
 The backend will try LM Studio first, then Ollama, then a static fallback.
@@ -97,7 +97,7 @@ python3 -m http.server 8080
 
 Example with custom Ollama model:
 ```bash
-OLLAMA_MODEL=gemma2:2b uvicorn app:app --reload --port 8000
+OLLAMA_MODEL=gemma2:2b python3 -m uvicorn app:app --reload --port 8000
 ```
 
 ## Deployment Note
@@ -195,15 +195,59 @@ python build_vector_db.py
 python test_rag_search.py
 
 # Step 3: Start the backend (loads Chroma on startup)
-uvicorn app:app --reload --port 8000
+python3 -m uvicorn app:app --reload --port 8000
 ```
 
 ### RAG flow in /counsel endpoint
 
 1. User submits profile + question
-2. Backend searches Chroma for top-5 relevant chunks
-3. Retrieved chunks are injected into the LLM prompt as context
-4. LLM generates a personalised answer based on the retrieved data
+2. Backend builds a rich search query from profile fields
+3. Chroma is searched for top 7 relevant chunks
+4. Ranking data and eligibility rules are loaded
+5. Each university in the results is scored against the student's profile
+6. A master prompt is built with: chunks, ranking scores, and profile
+7. Prompt is sent to LM Studio first, then Ollama, then fallback
+8. The LLM generates a structured answer with sections:
+   - Short Summary
+   - Best Match Universities
+   - Safe Options
+   - Difficult Options
+   - Reason for Recommendation
+   - Next Steps
+   - Source Notes
+9. Response includes the answer, sources list, and provider info
+
+### Test command
+
+```bash
+curl -X POST http://localhost:8000/counsel \
+  -H "Content-Type: application/json" \
+  -d '{
+    "profile": {
+      "name": "Ali",
+      "matric_marks": "90",
+      "inter_marks": "82",
+      "entry_test": "ECAT 150",
+      "preferred_field": "Computer Science",
+      "city_preference": "Lahore",
+      "budget": "500000"
+    },
+    "question": "Which universities are best for me?"
+  }'
+```
+
+### Response format
+
+```json
+{
+  "answer": "...",
+  "sources": [
+    {"university_name": "...", "source_url": "...", "preview": "..."}
+  ],
+  "retrieved_count": 7,
+  "provider_used": "ollama"
+}
+```
 
 ### Search endpoint
 
