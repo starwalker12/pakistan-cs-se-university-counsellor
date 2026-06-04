@@ -28,9 +28,17 @@ const clearSelectedBtn = $('#clearSelectedBtn');
 let studentProfile = null;
 let selectedUniversity = null;
 let typingEl = null;
+let typingTimer = null;
 let backendOnline = false;
 let isBusy = false;
 let restoringProfile = false;
+
+const loadingStatusLines = [
+  'Searching university data',
+  'Checking your profile',
+  'Ranking suitable universities',
+  'Asking local AI for a short explanation',
+];
 
 const gradePercentages = {
   'A*': 95,
@@ -312,10 +320,10 @@ async function refreshBackendStatus() {
     const health = await response.json();
     backendOnline = true;
     const providerText = health.ollama
-      ? 'Ollama ready'
+      ? 'Local AI connected'
       : health.lm_studio
         ? 'LM Studio ready'
-        : 'Guidance mode available';
+        : 'Fast data mode ready';
     setBackendStatus(
       'online',
       'Backend connected',
@@ -341,14 +349,10 @@ function setBackendStatus(state, label, detail) {
 }
 
 function providerLabel(provider, model) {
-  const names = {
-    ollama: 'Ollama',
-    lm_studio: 'LM Studio',
-    fallback: 'Guidance mode',
-    fallback_after_incomplete: 'Guidance mode',
-  };
-  const name = names[provider] || provider || 'Provider';
-  return model ? `${name} · ${model}` : name;
+  if (provider === 'ollama') return 'Local AI connected';
+  if (provider === 'lm_studio') return 'LM Studio connected';
+  if (provider === 'fallback' || provider === 'fallback_after_incomplete') return 'Fast data mode';
+  return model ? `${provider || 'Provider'} · ${model}` : (provider || 'Provider');
 }
 
 function updateProviderBadge(data) {
@@ -384,15 +388,29 @@ function addSystemMessage(text, type = '') {
 
 function showTyping() {
   hideTyping();
+  let statusIndex = 0;
   typingEl = createMessage(
     'bot',
-    '<span class="typing-dots" aria-label="DigiCounsellor is typing"><span></span><span></span><span></span></span>'
+    `<span class="typing-progress" aria-live="polite">
+      <span class="typing-status">${loadingStatusLines[statusIndex]}</span>
+      <span class="typing-dots" aria-label="DigiCounsellor is working"><span></span><span></span><span></span></span>
+    </span>`
   );
   chatBox.appendChild(typingEl);
+  const statusNode = typingEl.querySelector('.typing-status');
+  typingTimer = window.setInterval(() => {
+    statusIndex = (statusIndex + 1) % loadingStatusLines.length;
+    if (statusNode) statusNode.textContent = loadingStatusLines[statusIndex];
+    scrollChatToBottom();
+  }, 1400);
   scrollChatToBottom();
 }
 
 function hideTyping() {
+  if (typingTimer) {
+    window.clearInterval(typingTimer);
+    typingTimer = null;
+  }
   if (typingEl) {
     typingEl.remove();
     typingEl = null;

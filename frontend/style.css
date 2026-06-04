@@ -630,6 +630,19 @@ a:focus-visible {
   color: var(--emerald-900);
 }
 
+.typing-progress {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 24px;
+}
+
+.typing-status {
+  color: var(--emerald-900);
+  font-size: 0.88rem;
+  font-weight: 780;
+}
+
 .typing-dots {
   display: inline-flex;
   align-items: center;

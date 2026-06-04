@@ -69,10 +69,10 @@ OLLAMA_ORIGINS=* ollama serve
 
 ```bash
 cd /Users/sw12/Projects/ML-Project/backend
-python3 -m uvicorn app:app --reload --port 8000
+FAST_MODE=true OLLAMA_MODEL=gemma4:latest python3 -m uvicorn app:app --port 8000
 ```
 
-The backend loads Chroma on startup, then tries Ollama first, LM Studio second, and a static guidance fallback last. Watch for:
+`FAST_MODE=true` is recommended for department demos. The backend creates recommendation cards from structured scoring first, then asks the local model for a short counselling summary. It loads Chroma on startup, then tries Ollama first, LM Studio second, and a static guidance fallback last. Watch for:
 ```
 Chroma loaded with 21 documents
 Uvicorn running on http://localhost:8000
@@ -117,6 +117,7 @@ curl -X POST http://localhost:8000/counsel \
 ```
 
 Expected response: JSON with `answer`, `recommended_universities`, `safe_options`, `difficult_options`, `next_steps`, `admission_links`, `sources`, `retrieved_count`, `provider_used`, and `selected_model`.
+In fast mode the response also includes a `timing` object with total, RAG, scoring, and LLM durations.
 
 ### Step 7 — Debug provider detection
 
@@ -201,10 +202,13 @@ curl http://localhost:8000/providers
 | `OLLAMA_URL` | `http://localhost:11434/api/chat` | Ollama endpoint |
 | `OLLAMA_MODEL` | `gemma4:latest` | Model name for Ollama |
 | `PROVIDER_ORDER` | `ollama,lm_studio,fallback` | Comma-separated provider priority |
+| `FAST_MODE` | `true` | Demo mode: top 3 RAG chunks, shorter prompt, faster local AI summary |
+| `OLLAMA_NUM_PREDICT` | `700` in fast mode, max `900` | Maximum Ollama generation length |
+| `OLLAMA_TIMEOUT` | `45` | Ollama request timeout in seconds |
 
 Example:
 ```bash
-OLLAMA_MODEL=gemma2:2b python3 -m uvicorn app:app --reload --port 8000
+FAST_MODE=true OLLAMA_MODEL=gemma4:latest python3 -m uvicorn app:app --port 8000
 ```
 
 ---
