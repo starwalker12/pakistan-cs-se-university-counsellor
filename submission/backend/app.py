@@ -93,9 +93,10 @@ UNIVERSITIES = []
 SOURCE_LINKS = []
 UNIVERSITY_BY_ID = {}
 SOURCE_LINKS_BY_ID = {}
+ADMISSION_DATA = []
 
 def load_local_data():
-    global RANKINGS, ELIGIBILITY_RULES, UNIVERSITIES, SOURCE_LINKS, UNIVERSITY_BY_ID, SOURCE_LINKS_BY_ID
+    global RANKINGS, ELIGIBILITY_RULES, UNIVERSITIES, SOURCE_LINKS, UNIVERSITY_BY_ID, SOURCE_LINKS_BY_ID, ADMISSION_DATA
     try:
         rankings_path = os.path.join(DATA_DIR, "university_rankings.json")
         with open(rankings_path, "r", encoding="utf-8") as f:
@@ -126,6 +127,14 @@ def load_local_data():
         print(f"Loaded {len(SOURCE_LINKS)} source link records")
     except Exception as e:
         print(f"Could not load source links: {e}")
+
+    try:
+        proc_path = os.path.join(PROCESSED_DIR, "university_admission_data.json")
+        with open(proc_path, "r", encoding="utf-8") as f:
+            ADMISSION_DATA = json.load(f)
+        print(f"Loaded {len(ADMISSION_DATA)} processed admission records")
+    except Exception as e:
+        print(f"Could not load processed admission data: {e}")
 
 load_local_data()
 
@@ -251,6 +260,20 @@ class AISummaryResponse(BaseModel):
     provider_used: str = ""
     selected_model: str = ""
     timing: TimingInfo | None = None
+
+class UniversityInfoRequest(BaseModel):
+    profile: Profile
+    question: str
+    university_id: str | None = None
+    info_type: str | None = None
+
+class UniversityInfoResponse(BaseModel):
+    answer: str
+    university_name: str = ""
+    info_type: str = ""
+    links: list[AdmissionLink] = Field(default_factory=list)
+    sources: list[SourceItem] = Field(default_factory=list)
+    has_exact_data: bool = False
 
 GREETING_WORDS = frozenset({
     "hey", "hello", "hi", "salam", "assalam", "alaikum",
@@ -1605,3 +1628,239 @@ async def search(q: str = Query(..., description="Search query")):
         "results_count": len(items),
         "results": items
     }
+
+# ──────────────────────────────────────────────
+# Info type detection helpers
+# ──────────────────────────────────────────────
+
+INFO_FEE = frozenset({"fee", "fees", "fee structure", "cost", "tuition", "semester fee", "total fee"})
+INFO_ELIGIBILITY = frozenset({"eligibility", "eligible", "requirements", "criteria", "minimum marks", "am i eligible"})
+INFO_ENTRY_TEST = frozenset({"entry test", "test", "nts", "nat", "ecat", "net", "admission test", "entry requirement"})
+INFO_DEADLINE = frozenset({"deadline", "last date", "dates", "schedule", "closing date"})
+INFO_ADMISSION_LINK = frozenset({"admission link", "apply", "application", "portal", "admission page", "how to apply"})
+INFO_GENERAL = frozenset({"tell me about", "details", "info", "information about", "overview"})
+
+def detect_info_type(question: str) -> str:
+    if not question:
+        return ""
+    lower = question.lower()
+    for phrase in INFO_FEE:
+        if phrase in lower:
+            return "fee"
+    for phrase in INFO_ELIGIBILITY:
+        if phrase in lower:
+            return "eligibility"
+    for phrase in INFO_ENTRY_TEST:
+        if phrase in lower:
+            return "entry_test"
+    for phrase in INFO_DEADLINE:
+        if phrase in lower:
+            return "deadline"
+    for phrase in INFO_ADMISSION_LINK:
+        if phrase in lower:
+            return "admission_links"
+    for phrase in INFO_GENERAL:
+        if phrase in lower:
+            return "general"
+    return ""
+
+def detect_university_in_question(question: str) -> str:
+    return resolve_university_id(question or "")
+
+# ──────────────────────────────────────────────
+# Build source-first university info answer
+# ──────────────────────────────────────────────
+
+def truncate_text(text: str, max_chars: int = 300) -> str:
+    if not text:
+        return ""
+    cleaned = text.replace("\n", " ").strip()
+    if len(cleaned) <= max_chars:
+        return cleaned
+    return cleaned[:max_chars].rsplit(" ", 1)[0] + "..."
+
+def find_processed_record(uni_id: str) -> dict | None:
+    for rec in ADMISSION_DATA:
+        if rec.get("university_id") == uni_id:
+            return rec
+    return None
+
+def build_university_info_answer(question: str, profile: Profile,
+                                 uni_id: str, info_type: str) -> UniversityInfoResponse:
+    name = profile.name or ""
+    university = UNIVERSITY_BY_ID.get(uni_id, {})
+    uni_name = university.get("short_name", "") or university.get("name", uni_id)
+    links = admission_links_for(uni_id)
+    proc = find_processed_record(uni_id)
+    has_exact = False
+    answer_lines = []
+    extracted = ""
+
+    if name:
+        answer_lines.append(f"{name},")
+
+    if info_type == "fee":
+        fee_text = (proc or {}).get("fee_text", "")
+        if fee_text and "Needs" not in fee_text and "needs" not in fee_text.lower():
+            has_exact = True
+            extracted = truncate_text(fee_text)
+            answer_lines.append(f"here is what I found about {uni_name} fees from the stored data:")
+            answer_lines.append("")
+            answer_lines.append(extracted)
+            answer_lines.append("")
+            answer_lines.append("Please confirm the latest amount on the official fee page.")
+        else:
+            answer_lines.append(f"I do not have exact fee text stored for {uni_name} yet. Use the official fee page below to check current amounts.")
+
+    elif info_type == "eligibility":
+        elig_text = (proc or {}).get("eligibility_text", "")
+        if elig_text and "Needs" not in elig_text and "needs" not in elig_text.lower():
+            has_exact = True
+            extracted = truncate_text(elig_text)
+            answer_lines.append(f"here is the {uni_name} eligibility information from the stored data:")
+            answer_lines.append("")
+            answer_lines.append(extracted)
+            answer_lines.append("")
+            answer_lines.append("Verify eligibility with the university before applying.")
+        else:
+            answer_lines.append(f"I do not have exact eligibility details stored for {uni_name} yet. Use the official eligibility page below.")
+
+    elif info_type == "entry_test":
+        test_text = (proc or {}).get("entry_test_text", "")
+        rule = get_eligibility(uni_id, profile.preferred_field)
+        rule_test = (rule or {}).get("entry_test_name", "")
+        if test_text and "Needs" not in test_text and "needs" not in test_text.lower():
+            has_exact = True
+            extracted = truncate_text(test_text)
+            answer_lines.append(f"here is what I found about {uni_name} entry test from the stored data:")
+            answer_lines.append("")
+            answer_lines.append(extracted)
+            answer_lines.append("")
+            answer_lines.append("Check the official entry test page for the latest format and dates.")
+        elif rule_test:
+            has_exact = True
+            answer_lines.append(f"{uni_name} entry test: {rule_test}. Check the official page for the latest format and dates.")
+        else:
+            answer_lines.append(f"I do not have exact entry test details stored for {uni_name} yet. Use the official entry test page below.")
+
+    elif info_type == "deadline":
+        deadline_text = (proc or {}).get("deadline_text", "")
+        if deadline_text and "Needs" not in deadline_text and "needs" not in deadline_text.lower():
+            has_exact = True
+            extracted = truncate_text(deadline_text)
+            answer_lines.append(f"here is deadline information for {uni_name} from the stored data:")
+            answer_lines.append("")
+            answer_lines.append(extracted)
+            answer_lines.append("")
+            answer_lines.append("Confirm the exact deadline on the official admission page.")
+        else:
+            answer_lines.append(f"I do not have exact deadline dates stored for {uni_name} yet. Check the official admission page below.")
+
+    elif info_type == "admission_links":
+        if links:
+            has_exact = True
+            answer_lines.append(f"here are the official {uni_name} admission links I have:")
+            answer_lines.append("")
+            for link in links[:5]:
+                answer_lines.append(f"- {link.label}: {link.url}")
+        else:
+            answer_lines.append(f"I do not have admission links stored for {uni_name} yet.")
+            website = university.get("website", "")
+            if website:
+                answer_lines.append(f"The official website is {website}.")
+
+    else:
+        answer_lines.append(f"here is what I know about {uni_name}.")
+        website = university.get("website", "")
+        if website:
+            answer_lines.append(f"Official website: {website}")
+        if links:
+            name_list = ", ".join(l.label for l in links[:3])
+            answer_lines.append(f"Available links: {name_list}")
+        answer_lines.append("For specific details, ask about fees, eligibility, entry test, or deadlines.")
+
+    answer = " ".join(answer_lines) if not extracted else "\n".join(answer_lines)
+    return UniversityInfoResponse(
+        answer=answer.strip(),
+        university_name=uni_name,
+        info_type=info_type or "general",
+        links=links[:5],
+        sources=[],
+        has_exact_data=has_exact,
+    )
+
+# ──────────────────────────────────────────────
+# GET /data-status — data coverage report
+# ──────────────────────────────────────────────
+
+@app.get("/data-status")
+async def data_status():
+    records = []
+    for uni in UNIVERSITIES:
+        uid = uni.get("id", "")
+        proc = find_processed_record(uid)
+        uni_links = SOURCE_LINKS_BY_ID.get(uid, {})
+        links = uni_links.get("links", {}) or {}
+        website = uni.get("website", "")
+
+        has_eligibility_link = any(
+            "eligibility" in (k or "").lower() for k in links
+        )
+        has_fee_link = any(
+            k in ("fee_structure", "tuition_fees") for k in links
+        )
+        has_entry_test_link = any(
+            "entry_test" in (k or "").lower() for k in links
+        )
+        has_admissions_link = any(
+            k in ("admissions", "admissions_homepage", "admissions_portal") for k in links
+        )
+
+        def text_ok(field: str) -> bool:
+            val = (proc or {}).get(field, "")
+            cleaned = val.strip().lower() if val else ""
+            if not cleaned:
+                return False
+            if cleaned.startswith("needs official") or cleaned.startswith("needs "):
+                return False
+            return True
+
+        records.append({
+            "university_id": uid,
+            "university_name": uni.get("short_name", uni.get("name", uid)),
+            "has_website": bool(website),
+            "has_admissions_link": has_admissions_link,
+            "has_eligibility_link": has_eligibility_link,
+            "has_fee_link": has_fee_link,
+            "has_entry_test_link": has_entry_test_link,
+            "has_eligibility_text": text_ok("eligibility_text"),
+            "has_fee_text": text_ok("fee_text"),
+            "has_entry_test_text": text_ok("entry_test_text"),
+            "has_deadline_text": text_ok("deadline_text"),
+        })
+
+    return {
+        "total_universities": len(records),
+        "records": records,
+    }
+
+# ──────────────────────────────────────────────
+# POST /university-info — source-first answer for specific questions
+# ──────────────────────────────────────────────
+
+@app.post("/university-info")
+async def university_info(request: UniversityInfoRequest):
+    question = request.question
+    profile = request.profile
+
+    uni_id = request.university_id or detect_university_in_question(question)
+    if not uni_id:
+        return UniversityInfoResponse(
+            answer=f"I could not find a specific university name in your question. Mention a university name like FAST, NUST, LUMS, or COMSATS.",
+        )
+
+    info_type = request.info_type or detect_info_type(question)
+    if not info_type:
+        info_type = "general"
+
+    return build_university_info_answer(question, profile, uni_id, info_type)

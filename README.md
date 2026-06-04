@@ -477,6 +477,7 @@ curl -X POST http://localhost:8000/counsel \
 | 18 | Strict eligibility — "Not eligible right now" group, honest wording for weak grades, O/A Level labels, student name in AI prompts, no auto-focus | Complete |
 | 19 | Intent-based chat — greetings skip backend entirely, recommendation groups show "Best matches"/"Safe"/"Difficult"/"Not eligible", all 20 universities checked per request | Complete |
 | 20 | Chat scroll fix (scroll to new message/block, not page bottom), link validation (backend + frontend filter empty/TODO/placeholder/invalid URLs), clean university source links | Complete |
+| 21 | Source-based answers — /university-info endpoint answers specific questions (fee, eligibility, entry test, deadline, admission links) using stored data first; /data-status endpoint proves data coverage for all 20 universities; frontend detects specific info intents and routes to /university-info without recommendation cards; never invents data when exact info is missing | Complete |
 
 ### Key achievements
 
@@ -493,6 +494,9 @@ curl -X POST http://localhost:8000/counsel \
 - **All 20 universities checked** — every /recommend call scores all universities from the project data (universities.json, rankings, eligibility rules). Response includes `checked_universities_count` to prove full coverage
 - **Smart scroll behavior** — chat scrolls to each new message/block (with scroll-margin for sticky header) instead of jumping to page bottom; typing animation does not force-scroll every tick
 - **Link validation everywhere** — `isValidLink()` on frontend and `is_valid_url()` on backend filter out empty, "TODO", placeholder, "#", and non-http/https URLs from admission links and source URLs. Source link data files have all TODO-noted URLs replaced with verified admissions pages or official university homepages
+- **Source-first specific answers** — when a user asks a specific question about a named university (fee, eligibility, entry test, deadline, admission links), the frontend detects this intent and calls `/university-info`. The backend returns exact stored data if available, or an honest "I do not have exact stored data for this yet" with the official link. No guessing, no invented fees, no recommendation card duplication
+- **Data coverage report** — `GET /data-status` returns a per-university breakdown of which links and scraped text fields (eligibility, fee, entry test, deadline) exist across all 20 universities. This proves the app checks each university's available data before answering
+- **20 universities with source links** — every university has at minimum an official website link. Source link files have had all TODO/unverified URLs replaced
 
 ### Team
 

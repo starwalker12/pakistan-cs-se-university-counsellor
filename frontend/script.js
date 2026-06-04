@@ -163,6 +163,16 @@ const FOLLOW_UP_PHRASES = [
   'deadline', 'requirements for', 'compare',
 ];
 
+const INFO_PHRASES = {
+  fee: ['fee', 'fees', 'fee structure', 'cost', 'tuition', 'semester fee', 'total fee'],
+  eligibility: ['eligibility', 'eligible', 'requirements', 'criteria', 'minimum marks', 'am i eligible'],
+  entry_test: ['entry test', 'test', 'nts', 'nat', 'ecat', 'net', 'admission test', 'entry requirement'],
+  deadline: ['deadline', 'last date', 'dates', 'schedule', 'closing date'],
+  admission_links: ['admission link', 'apply', 'application', 'portal', 'admission page', 'how to apply'],
+};
+
+const INFO_KEYS = Object.keys(INFO_PHRASES);
+
 function detectIntent(question) {
   if (!question) return 'unknown';
   const lower = question.toLowerCase().trim();
@@ -172,8 +182,15 @@ function detectIntent(question) {
   const isFollowUp = FOLLOW_UP_PHRASES.some((phrase) => lower.includes(phrase));
   const isRec = REC_PHRASES.some((phrase) => lower.includes(phrase));
   if (isRec) return 'recommendation';
+  if (isFollowUp && hasUni) return 'university_info';
   if (isFollowUp) return 'follow_up';
-  if (hasUni) return 'university_specific';
+  if (hasUni) {
+    const hasInfo = INFO_KEYS.some((key) =>
+      INFO_PHRASES[key].some((phrase) => lower.includes(phrase))
+    );
+    if (hasInfo) return 'university_info';
+    return 'university_specific';
+  }
   if (cleaned.length < 10) return 'greeting';
   return 'follow_up';
 }
@@ -871,6 +888,36 @@ async function requestAISummaryOnly(question, recommendData, selectedId) {
   }
 }
 
+function renderInfoLinks(links = []) {
+  if (!links.length) return null;
+  const div = document.createElement('div');
+  div.className = 'info-link-row';
+  div.innerHTML = links
+    .filter((link) => isValidLink(link.url))
+    .slice(0, 5)
+    .map((link) => `
+      <a class="link-action" href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(link.label || 'Official link')}</a>
+    `).join('');
+  return div;
+}
+
+function addInfoTurn(data) {
+  const block = document.createElement('section');
+  block.className = 'response-block';
+  const msg = createMessage('bot', `<div class="answer-content">${formatMarkdown(data.answer || '')}</div>`);
+  block.appendChild(msg);
+  const linkRow = renderInfoLinks(data.links || []);
+  if (linkRow) block.appendChild(linkRow);
+  if (!data.has_exact_data) {
+    const note = document.createElement('p');
+    note.className = 'no-exact-data-note';
+    note.textContent = 'Note: Official source links are provided; exact stored data was not available for this question.';
+    block.appendChild(note);
+  }
+  chatBox.appendChild(block);
+  scrollToElement(block);
+}
+
 function addGreetingReply(name) {
   const displayName = name || 'there';
   const msg = createMessage('bot', `Hi ${escapeHtml(displayName)}, I am ready. Ask me which universities are best for you, or ask about eligibility, fees, or admission steps.`);
@@ -899,6 +946,33 @@ async function handleSend(questionOverride = '') {
   }
 
   setBusy(true);
+
+  if (intent === 'university_info') {
+    showTyping(['Looking up university data']);
+    try {
+      const response = await fetch(`${BACKEND_URL}/university-info`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          profile: studentProfile,
+          question,
+        }),
+      });
+      hideTyping();
+      if (!response.ok) throw new Error(`Backend returned HTTP ${response.status}`);
+      const data = await response.json();
+      backendOnline = true;
+      addInfoTurn(data);
+    } catch (error) {
+      hideTyping();
+      backendOnline = false;
+      setBackendStatus('offline', 'Backend offline', 'The frontend is working, but the local FastAPI backend is not reachable on port 8000.');
+      addSystemMessage('I cannot reach the local counselling backend. Start FastAPI on port 8000, then try again.', 'error');
+    } finally {
+      setBusy(false);
+    }
+    return;
+  }
 
   if (intent === 'recommendation') {
     showTyping(recommendStatusLines);

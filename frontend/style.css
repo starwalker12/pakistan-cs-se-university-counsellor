@@ -912,6 +912,20 @@ a:focus-visible {
   background: var(--emerald-800);
 }
 
+.info-link-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.no-exact-data-note {
+  font-size: 0.85em;
+  color: var(--muted);
+  margin-top: 10px;
+  font-style: italic;
+}
+
 .next-steps {
   padding: 12px;
   color: var(--ink-2);
