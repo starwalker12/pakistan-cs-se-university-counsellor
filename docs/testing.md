@@ -1,8 +1,8 @@
-# University Admission Chatbot — Testing Report
+# DigiCounsellor — Testing Report
 
-**Project:** University Admission Chatbot
+**Project:** DigiCounsellor
 **Test Date:** May 29, 2026
-**Live URL:** https://university-admission-chatbot.vercel.app
+**Live URL:** https://digicounsellor.vercel.app
 
 ---
 

@@ -1,5 +1,5 @@
 """
-Pakistan CS & SE University Counsellor — Build RAG Vector Database
+DigiCounsellor — Build RAG Vector Database
 
 Reads processed admission data, creates text chunks, generates embeddings
 using sentence-transformers, and stores them in Chroma.

@@ -1,5 +1,5 @@
 """
-Pakistan CS & SE University Counsellor — Test RAG Search
+DigiCounsellor — Test RAG Search
 
 Loads Chroma DB and searches for example questions.
 Prints top results with university name, text preview, and source URL.

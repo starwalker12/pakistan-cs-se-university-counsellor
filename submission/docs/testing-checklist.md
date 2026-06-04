@@ -1,4 +1,4 @@
-# Testing Checklist — Pakistan CS & SE University Counsellor
+# Testing Checklist — DigiCounsellor
 
 ## Prerequisites
 

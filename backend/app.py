@@ -2,9 +2,11 @@
 DigiCounsellor — FastAPI Backend
 
 Endpoints:
-  POST /counsel          — accepts student profile + question, returns counselling answer
+  POST /counsel          — combined: structured recommendations + AI summary
+  POST /recommend        — fast structured recommendations only
+  POST /ai-summary       — local AI summary only (uses prior /recommend data)
   GET  /health           — health check
-  GET  /providers        — shows configured LLM providers
+  GET  /providers        — shows configured LLM provider status
   GET  /debug/providers  — tests provider reachability with detailed results
   GET  /search           — search Chroma vector DB
 

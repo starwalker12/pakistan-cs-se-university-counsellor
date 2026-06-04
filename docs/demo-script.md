@@ -1,8 +1,8 @@
-# Demo Script — Pakistan CS & SE University Counsellor
+# Demo Script — DigiCounsellor
 
 ## 1. Introduction (30 seconds)
 
-> "Good morning / afternoon everyone. We are Raahim Adeel, Fardan Aatir, and Muhammad Ismail. Today we will demonstrate our project — a RAG-based University Counsellor for Pakistani students who want to get into Computer Science or Software Engineering programs."
+> "Good morning / afternoon everyone. We are Raahim Adeel, Fardan Aatir, and Muhammad Ismail. Today we will demonstrate our project — DigiCounsellor, a RAG-based university counselling app for Pakistani students who want to get into Computer Science or Software Engineering programs."
 
 ## 2. The Problem (30 seconds)
 

@@ -1,4 +1,4 @@
-# Pakistan CS & SE University Counsellor — Project Report
+# DigiCounsellor — Project Report
 
 **Phase 1: Project Setup**
 

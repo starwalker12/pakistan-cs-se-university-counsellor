@@ -1,7 +1,7 @@
-# Pakistan CS & SE University Counsellor — Presentation Outline
+# DigiCounsellor — Presentation Outline
 
 ## Slide 1 — Title
-- Project: Pakistan CS & SE University Counsellor
+- Project: DigiCounsellor
 - Team Members
 - Course / Date
 

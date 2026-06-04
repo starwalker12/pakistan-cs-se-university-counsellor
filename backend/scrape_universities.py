@@ -1,5 +1,5 @@
 """
-Pakistan CS & SE University Counsellor — Official Data Collection Scraper
+DigiCounsellor — Official Data Collection Scraper
 
 Reads universities.json and source_links.json.
 Fetches official admission pages from Pakistani university websites.

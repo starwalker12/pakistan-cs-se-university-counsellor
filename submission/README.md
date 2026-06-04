@@ -38,6 +38,8 @@ DigiCounsellor is a polished RAG-based student counselling web app for Pakistani
 │       │   └── ...                        # Cleaned / chunked documents
 │       └── chroma_db/                  # Local vector database (Chroma)
 ├── docs/
+│   ├── demo-script.md          # Step-by-step demo script
+│   ├── testing-checklist.md    # 14-point testing checklist
 │   ├── report.md               # Project report
 │   └── presentation-outline.md # Presentation outline
 └── README.md
