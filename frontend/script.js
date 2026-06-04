@@ -224,6 +224,9 @@ async function handleSend() {
     return;
   }
 
+  providerBadge.classList.remove('show');
+  providerBadge.textContent = '';
+
   showTyping();
 
   try {
@@ -247,7 +250,11 @@ async function handleSend() {
     let msg = data.answer || 'Sorry, no answer was returned.';
 
     if (data.provider_used) {
-      providerBadge.textContent = data.provider_used;
+      let label = data.provider_used;
+      if (data.selected_model && data.provider_used !== 'fallback' && data.provider_used !== 'fallback_after_incomplete') {
+        label += ': ' + data.selected_model;
+      }
+      providerBadge.textContent = label;
       providerBadge.classList.add('show');
     }
 

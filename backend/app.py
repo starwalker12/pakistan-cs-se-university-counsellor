@@ -127,6 +127,7 @@ class CounselResponse(BaseModel):
     sources: list[SourceItem] = []
     retrieved_count: int = 0
     provider_used: str = ""
+    selected_model: str = ""
 
 # ──────────────────────────────────────────────
 # Academic profile normalisation
@@ -141,7 +142,7 @@ def normalize_academic_profile(profile: Profile) -> dict:
     inter_eq = 0.0
     notes = []
 
-    if profile.education_system == "olevel":
+    if profile.education_system in ("olevel",):
         o_equiv = profile.o_level_equivalence
         a_equiv = profile.a_level_equivalence
         o_grade = profile.o_level_grade
@@ -312,7 +313,7 @@ async def call_lm_studio(prompt: str) -> str | None:
                     {"role": "user", "content": prompt}
                 ],
                 "temperature": 0.3,
-                "max_tokens": 800,
+                "max_tokens": 2048,
                 "stream": False
             })
             if resp.status_code != 200:
@@ -324,13 +325,13 @@ async def call_lm_studio(prompt: str) -> str | None:
 
 async def call_ollama(prompt: str) -> str | None:
     try:
-        async with httpx.AsyncClient(timeout=45.0) as client:
+        async with httpx.AsyncClient(timeout=90.0) as client:
             resp = await client.post(OLLAMA_URL, json={
                 "model": OLLAMA_MODEL,
                 "messages": [{"role": "user", "content": prompt}],
                 "options": {
                     "temperature": 0.3,
-                    "num_predict": 800
+                    "num_predict": 2048
                 },
                 "stream": False
             })
@@ -341,7 +342,7 @@ async def call_ollama(prompt: str) -> str | None:
     except Exception:
         return None
 
-def build_fallback_answer(scores: list[dict], chunks: list[dict], profile: Profile, question: str, normalized: dict) -> str:
+def build_fallback_answer(scores: list[dict], chunks: list[dict], profile: Profile, question: str, normalized: dict, incomplete: bool = False) -> str:
     field = profile.preferred_field or "Computer Science"
     city = profile.city_preference or "any city"
     academic_note = normalized.get("academic_notes", "")
@@ -350,7 +351,10 @@ def build_fallback_answer(scores: list[dict], chunks: list[dict], profile: Profi
     lines.append(f"Here is a counselling overview for {profile.name or 'you'} in {field} (preferred city: {city}).")
     if academic_note:
         lines.append(f"\n{academic_note}")
-    lines.append("\nNote: The AI provider (LM Studio / Ollama) is not running. This answer is based on our data only.\n")
+    if incomplete:
+        lines.append("\nNote: The AI provider tried but its response was incomplete. This answer is based on our data only.\n")
+    else:
+        lines.append("\nNote: The AI provider (LM Studio / Ollama) is not running. This answer is based on our data only.\n")
 
     if scores:
         sorted_scores = sorted(scores, key=lambda s: s["total_score"], reverse=True)
@@ -414,7 +418,7 @@ def build_master_prompt(profile: Profile, question: str, context: str, scores: l
 
     scored_section = "\n".join(scored_lines) if scored_lines else "(No scoring data)"
 
-    return f"""You are a university counsellor for Pakistani students. Answer concisely.
+    return f"""You are a university counsellor for Pakistani students. Write a complete answer.
 
 STUDENT:
 Name: {profile.name}
@@ -432,16 +436,21 @@ DATA:
 SCORES (higher = better match):
 {scored_section}
 
-Answer in 5 short sections:
-1. Summary — 1 sentence
-2. Best matches — 2-3 unis with short reasons
-3. Safe options — unis where marks meet minimums
-4. Difficult options — high merit unis
-5. Next steps — practical advice
+Write exactly 5 sections below. Do NOT write a letter or greeting. Go straight into the sections:
 
-Never guarantee admission. Always say: "Eligibility depends on official policy and merit each year."
-If budget < 200k PKR, recommend public universities.
-End with: "Please verify from official university pages." Keep each section 1-3 lines."""
+1. **Summary** — 2-3 sentences summarising the student's situation and main recommendation
+2. **Best matches** — 2-3 universities that fit well, with a short reason for each
+3. **Safe options** — universities where marks meet minimums and entry is less competitive
+4. **Difficult options** — high merit universities that are harder to get into
+5. **Next steps** — practical advice on entry tests, deadlines, and applications
+
+Rules:
+- Never guarantee admission. Say: "Eligibility depends on official policy and merit each year."
+- If budget is under 200,000 PKR, recommend public universities.
+- If the student has high marks (85%+ in Inter), they can consider tier 1 universities.
+- If marks are moderate (60-75%), suggest tier 2-3 universities as primary options.
+- End with: "Please verify all details from official university admission pages before applying."
+- Write complete sentences. Finish every section before moving to the next."""
 
 # ──────────────────────────────────────────────
 # GET /health
@@ -616,6 +625,20 @@ async def debug_providers():
         }
     }
 
+def is_complete_answer(text: str) -> bool:
+    if not text:
+        return False
+    cleaned = text.strip()
+    if len(cleaned) < 100:
+        return False
+    last_char = cleaned[-1]
+    if last_char in (".", "!", "?"):
+        return True
+    if len(cleaned) > 200:
+        return True
+    return False
+
+
 # ──────────────────────────────────────────────
 # POST /counsel — main RAG counselling endpoint
 # ──────────────────────────────────────────────
@@ -662,6 +685,7 @@ async def counsel(request: CounselRequest):
 
     answer = ""
     provider_used = "fallback"
+    selected_model = ""
 
     if context:
         prompt = build_master_prompt(profile, question, context, scores, chunks, normalized)
@@ -670,15 +694,22 @@ async def counsel(request: CounselRequest):
             provider = provider.strip()
             if provider == "lm_studio":
                 result = await call_lm_studio(prompt)
-                if result:
+                if result and is_complete_answer(result):
                     answer = result
                     provider_used = "lmstudio"
+                    selected_model = LM_STUDIO_MODEL
                     break
             elif provider == "ollama":
                 result = await call_ollama(prompt)
-                if result:
+                if result and is_complete_answer(result):
                     answer = result
                     provider_used = "ollama"
+                    selected_model = OLLAMA_MODEL
+                    break
+                elif result and not is_complete_answer(result):
+                    answer = build_fallback_answer(scores, chunks, profile, question, normalized, incomplete=True)
+                    provider_used = "fallback_after_incomplete"
+                    selected_model = ""
                     break
             elif provider == "fallback":
                 answer = build_fallback_answer(scores, chunks, profile, question, normalized)
@@ -696,6 +727,7 @@ async def counsel(request: CounselRequest):
         sources=sources,
         retrieved_count=retrieved_count,
         provider_used=provider_used,
+        selected_model=selected_model,
     )
 
 # ──────────────────────────────────────────────
