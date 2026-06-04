@@ -13,6 +13,7 @@ DigiCounsellor is a polished RAG-based student counselling web app for Pakistani
 5. In split response mode, `/recommend` returns cards first without waiting for the local LLM
 6. `/ai-summary` then asks Ollama or LM Studio for a short counselling summary while the cards stay usable
 7. `/counsel` remains available as the older combined response endpoint
+8. On follow-up questions (eligibility, fees, next steps), the frontend skips `/recommend` and calls `/ai-summary` directly with the stored recommendation data — cards do not repeat for every message
 
 ## Project Structure
 
@@ -472,6 +473,7 @@ curl -X POST http://localhost:8000/counsel \
 | 8 | Frontend polish — badge, steps, samples, sources, provider | Complete |
 | 9 | Demo script + testing checklist + docs | Complete |
 | 13 | Product UI, branding, profile persistence, university cards, follow-up flow | Complete |
+| 17 | Natural chat flow — cards show only for recommendation questions, follow-ups skip card duplication | Complete |
 
 ### Key achievements
 
@@ -481,6 +483,7 @@ curl -X POST http://localhost:8000/counsel \
 - **Ranking + eligibility scoring** — combines ranking score, city, field, marks, budget, and university type
 - **Structured response fields** — recommendation cards, safe/difficult buckets, official links, next steps, sources, provider, and selected model
 - **Product-ready responsive UI** — DigiCounsellor branding, saved/editable profile, guided follow-ups, recommendation cards, provider status, and local/Vercel backend messaging
+- **Natural chat flow** — recommendation cards appear for recommendation questions; follow-up questions (eligibility, fees, next steps) use stored data and do not repeat cards
 
 ### Team
 
