@@ -23,9 +23,13 @@ A RAG-based student counsellor web app for Pakistani students who want admission
 │   ├── build_vector_db.py      # Chroma vector DB builder (placeholder)
 │   ├── requirements.txt        # Python dependencies
 │   └── data/
-│       ├── raw/                # Raw scraped data
-│       ├── processed/          # Cleaned / chunked documents
-│       └── chroma_db/          # Local vector database (Chroma)
+│       ├── universities.json           # 10 university metadata
+│       ├── source_links.json           # Official source URL placeholders
+│       ├── raw/                        # Raw scraped data
+│       ├── processed/
+│       │   ├── sample_admission_data.json  # Sample admission records (3 unis)
+│       │   └── ...                        # Cleaned / chunked documents
+│       └── chroma_db/                  # Local vector database (Chroma)
 ├── docs/
 │   ├── report.md               # Project report
 │   └── presentation-outline.md # Presentation outline
@@ -99,6 +103,25 @@ OLLAMA_MODEL=gemma2:2b uvicorn app:app --reload --port 8000
 - **Frontend**: can be deployed on Vercel as a static site
 - **Backend**: cannot run on Vercel — it needs local Python, Chroma, and an LLM provider
 - The full RAG + AI flow works only when everything runs locally on your laptop
+
+## Phase 4 Data Plan
+
+The RAG system answers admission questions using data that ultimately comes from official university sources. Here is the data pipeline plan:
+
+### Data Files
+
+| File | Purpose |
+|---|---|
+| `backend/data/universities.json` | Metadata for 10 Pakistani universities that offer CS / SE programs |
+| `backend/data/source_links.json` | Official source URL placeholders per university (admissions, fee, eligibility, entry test, merit) |
+| `backend/data/processed/sample_admission_data.json` | Sample admission records (FAST NUCES, NUST, COMSATS) — clearly marked as sample, not final |
+
+### Data Principles
+
+1. **Official sources only** — all data should come from `.edu.pk` university websites, not blogs or third-party aggregators
+2. **Verifiable** — every piece of admission info should be traceable back to an official source link
+3. **Sample before scraped** — `sample_admission_data.json` contains illustrative records that will be replaced once scraping is implemented
+4. **Structured for RAG** — data is formatted to be chunked, embedded, and stored in Chroma for retrieval
 
 ## Technologies
 

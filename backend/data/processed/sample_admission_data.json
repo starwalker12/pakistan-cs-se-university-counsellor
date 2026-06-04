@@ -1,0 +1,74 @@
+[
+  {
+    "_comment": "SAMPLE DATA — not final scraped data. Will be replaced with real scraped content in a later phase.",
+    "university": "FAST NUCES",
+    "university_id": "nuces-fast",
+    "program": "BS Computer Science",
+    "eligibility": "Minimum 60% marks in Intermediate (pre-engineering / pre-medical / computer science) or equivalent. At least 60% in Matriculation.",
+    "admission_test": "NU Test (FAST entry test) or NTS-NAT. Test score carries weight in merit calculation.",
+    "merit_criteria": "Merit is calculated based on: Matric (10%), Intermediate (40%), Entry Test (50%). Closing merit varies by campus and year.",
+    "fee_info": "Approximate annual fee: PKR 350,000 (varies by campus). Additional charges for hostel and other facilities.",
+    "city": "Islamabad (and other campuses)",
+    "source_note": "SAMPLE — based on publicly known FAST NUCES admission criteria. Verify from https://nu.edu.pk/Admission"
+  },
+  {
+    "_comment": "SAMPLE DATA — not final scraped data.",
+    "university": "FAST NUCES",
+    "university_id": "nuces-fast",
+    "program": "BS Software Engineering",
+    "eligibility": "Minimum 60% marks in Intermediate (pre-engineering / computer science) or equivalent. At least 60% in Matriculation.",
+    "admission_test": "NU Test (FAST entry test) or NTS-NAT.",
+    "merit_criteria": "Merit is calculated based on: Matric (10%), Intermediate (40%), Entry Test (50%).",
+    "fee_info": "Approximate annual fee: PKR 350,000 (varies by campus).",
+    "city": "Islamabad (and other campuses)",
+    "source_note": "SAMPLE — Verify from https://nu.edu.pk/Admission"
+  },
+  {
+    "_comment": "SAMPLE DATA — not final scraped data.",
+    "university": "NUST",
+    "university_id": "nust",
+    "program": "BS Computer Science",
+    "eligibility": "Minimum 60% marks in Intermediate or equivalent. Pre-engineering / pre-medical (with additional math) / computer science background preferred.",
+    "admission_test": "NET (NUST Entry Test) — scores from NET-1 to NET-4 are accepted for the respective admission year.",
+    "merit_criteria": "Merit aggregate: Matric (15%), Intermediate (20%), NET Score (65%). Closing merit for CS is typically very high.",
+    "fee_info": "Approximate annual fee: PKR 250,000 - 300,000. Hostel and other charges extra.",
+    "city": "Islamabad",
+    "source_note": "SAMPLE — based on publicly known NUST admission criteria. Verify from https://nust.edu.pk/admissions"
+  },
+  {
+    "_comment": "SAMPLE DATA — not final scraped data.",
+    "university": "NUST",
+    "university_id": "nust",
+    "program": "BS Software Engineering",
+    "eligibility": "Minimum 60% marks in Intermediate or equivalent. Pre-engineering / computer science background.",
+    "admission_test": "NET (NUST Entry Test).",
+    "merit_criteria": "Merit aggregate: Matric (15%), Intermediate (20%), NET Score (65%).",
+    "fee_info": "Approximate annual fee: PKR 250,000 - 300,000.",
+    "city": "Islamabad",
+    "source_note": "SAMPLE — Verify from https://nust.edu.pk/admissions"
+  },
+  {
+    "_comment": "SAMPLE DATA — not final scraped data.",
+    "university": "COMSATS",
+    "university_id": "comsats",
+    "program": "BS Computer Science",
+    "eligibility": "Minimum 50% marks in Intermediate or equivalent (pre-engineering / pre-medical with additional math / computer science).",
+    "admission_test": "CUI Entry Test or NTS-NAT. Test is mandatory for all applicants.",
+    "merit_criteria": "Merit based on: Matric (10%), Intermediate (40%), Entry Test (50%). Varies by campus — Islamabad campus usually has the highest cutoff.",
+    "fee_info": "Approximate annual fee: PKR 150,000 - 200,000. Lower than private universities.",
+    "city": "Islamabad (and other campuses)",
+    "source_note": "SAMPLE — based on publicly known COMSATS admission criteria. Verify from https://comsats.edu.pk/admissions"
+  },
+  {
+    "_comment": "SAMPLE DATA — not final scraped data.",
+    "university": "COMSATS",
+    "university_id": "comsats",
+    "program": "BS Software Engineering",
+    "eligibility": "Minimum 50% marks in Intermediate or equivalent (pre-engineering / computer science).",
+    "admission_test": "CUI Entry Test or NTS-NAT.",
+    "merit_criteria": "Merit based on: Matric (10%), Intermediate (40%), Entry Test (50%).",
+    "fee_info": "Approximate annual fee: PKR 150,000 - 200,000.",
+    "city": "Islamabad (and other campuses)",
+    "source_note": "SAMPLE — Verify from https://comsats.edu.pk/admissions"
+  }
+]

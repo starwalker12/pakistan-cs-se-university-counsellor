@@ -1,0 +1,112 @@
+[
+  {
+    "id": "nuces-fast",
+    "name": "FAST NUCES (National University of Computer and Emerging Sciences)",
+    "short_name": "FAST NUCES",
+    "city": "Islamabad",
+    "cities": ["Islamabad", "Lahore", "Karachi", "Peshawar", "Faisalabad"],
+    "province": "Islamabad (HQ)",
+    "fields": ["Computer Science", "Software Engineering", "Data Science", "Artificial Intelligence"],
+    "website": "https://nu.edu.pk",
+    "notes": "Multiple campuses across Pakistan. Known for strong CS/SE programs."
+  },
+  {
+    "id": "nust",
+    "name": "National University of Sciences and Technology (NUST)",
+    "short_name": "NUST",
+    "city": "Islamabad",
+    "cities": ["Islamabad"],
+    "province": "Islamabad",
+    "fields": ["Computer Science", "Software Engineering", "Artificial Intelligence"],
+    "website": "https://nust.edu.pk",
+    "notes": "SEECS and MCS schools offer CS/SE programs. Highly competitive entry."
+  },
+  {
+    "id": "comsats",
+    "name": "COMSATS University Islamabad (CUI)",
+    "short_name": "COMSATS",
+    "city": "Islamabad",
+    "cities": ["Islamabad", "Lahore", "Wah", "Abbottabad", "Vehari", "Sahiwal", "Attock"],
+    "province": "Islamabad (HQ)",
+    "fields": ["Computer Science", "Software Engineering", "Data Science"],
+    "website": "https://comsats.edu.pk",
+    "notes": "Multiple campuses. CS department is one of the oldest and largest in Pakistan."
+  },
+  {
+    "id": "lums",
+    "name": "Lahore University of Management Sciences (LUMS)",
+    "short_name": "LUMS",
+    "city": "Lahore",
+    "cities": ["Lahore"],
+    "province": "Punjab",
+    "fields": ["Computer Science", "Electrical Engineering and Computer Science"],
+    "website": "https://lums.edu.pk",
+    "notes": "Offers BS Computer Science through SBASSE. Private university, higher fee."
+  },
+  {
+    "id": "giki",
+    "name": "Ghulam Ishaq Khan Institute of Engineering Sciences and Technology (GIKI)",
+    "short_name": "GIKI",
+    "city": "Topi",
+    "cities": ["Topi"],
+    "province": "Khyber Pakhtunkhwa",
+    "fields": ["Computer Science", "Software Engineering"],
+    "website": "https://giki.edu.pk",
+    "notes": "Located in Topi, Swabi. Highly ranked engineering institute."
+  },
+  {
+    "id": "pieas",
+    "name": "Pakistan Institute of Engineering and Applied Sciences (PIEAS)",
+    "short_name": "PIEAS",
+    "city": "Islamabad",
+    "cities": ["Islamabad"],
+    "province": "Islamabad",
+    "fields": ["Computer Science", "Information Security"],
+    "website": "https://pieas.edu.pk",
+    "notes": "Strong in engineering and sciences. Limited CS seats, highly competitive."
+  },
+  {
+    "id": "uet-lahore",
+    "name": "University of Engineering and Technology (UET) Lahore",
+    "short_name": "UET Lahore",
+    "city": "Lahore",
+    "cities": ["Lahore"],
+    "province": "Punjab",
+    "fields": ["Computer Science", "Software Engineering"],
+    "website": "https://uet.edu.pk",
+    "notes": "Public university, lower fee. Main and KSK campuses offer CS."
+  },
+  {
+    "id": "itu-lahore",
+    "name": "Information Technology University (ITU) Lahore",
+    "short_name": "ITU Lahore",
+    "city": "Lahore",
+    "cities": ["Lahore"],
+    "province": "Punjab",
+    "fields": ["Computer Science"],
+    "website": "https://itu.edu.pk",
+    "notes": "Specialized IT university in Lahore. Offers BS Computer Science."
+  },
+  {
+    "id": "air-university",
+    "name": "Air University",
+    "short_name": "Air University",
+    "city": "Islamabad",
+    "cities": ["Islamabad", "Multan"],
+    "province": "Islamabad (HQ)",
+    "fields": ["Computer Science", "Software Engineering"],
+    "website": "https://au.edu.pk",
+    "notes": "Federally chartered public sector university. Multiple campuses."
+  },
+  {
+    "id": "bahria-university",
+    "name": "Bahria University",
+    "short_name": "Bahria University",
+    "city": "Islamabad",
+    "cities": ["Islamabad", "Lahore", "Karachi"],
+    "province": "Islamabad (HQ)",
+    "fields": ["Computer Science", "Software Engineering", "Artificial Intelligence"],
+    "website": "https://bahria.edu.pk",
+    "notes": "Federally chartered public sector university. Multiple campuses."
+  }
+]
