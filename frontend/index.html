@@ -4,18 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pakistan CS & SE University Counsellor</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="/frontend/style.css">
 </head>
 <body>
 
   <div class="app-wrapper">
 
-    <!-- ========================================== -->
-    <!-- Hero / Header                              -->
-    <!-- ========================================== -->
     <header class="hero">
       <div class="hero-content">
-        <span class="badge">RAG Based Admission Counsellor</span>
+        <span class="badge">RAG Based Student Counsellor</span>
         <h1>Pakistan CS &amp; Software Engineering<br>University Counsellor</h1>
         <p class="hero-subtitle">
           Find suitable universities based on your marks, field, city, and budget
@@ -26,12 +23,8 @@
       </div>
     </header>
 
-    <!-- ========================================== -->
-    <!-- Main layout: form + chat                   -->
-    <!-- ========================================== -->
     <div class="main-layout">
 
-      <!-- Left: Student Profile Form -->
       <section class="profile-panel">
         <h2>Student Profile</h2>
         <p class="panel-hint">Fill in your details to get personalised advice.</p>
@@ -44,13 +37,62 @@
           </div>
 
           <div class="form-group">
-            <label for="matricMarks">Matric Percentage</label>
-            <input type="number" id="matricMarks" placeholder="e.g. 90.5" step="0.1" min="0" max="100">
+            <label for="educationSystem">Education System</label>
+            <select id="educationSystem">
+              <option value="matric">Matric and Intermediate</option>
+              <option value="olevel">O Level and A Level</option>
+            </select>
           </div>
 
-          <div class="form-group">
-            <label for="interMarks">Intermediate Percentage</label>
-            <input type="number" id="interMarks" placeholder="e.g. 80.0" step="0.1" min="0" max="100">
+          <!-- Matric / Intermediate fields (shown by default) -->
+          <div id="matricFields">
+            <div class="form-group">
+              <label for="matricMarks">Matric Percentage</label>
+              <input type="number" id="matricMarks" placeholder="e.g. 90.5" step="0.1" min="0" max="100">
+            </div>
+            <div class="form-group">
+              <label for="interMarks">Intermediate Percentage</label>
+              <input type="number" id="interMarks" placeholder="e.g. 80.0" step="0.1" min="0" max="100">
+            </div>
+          </div>
+
+          <!-- O / A Level fields (hidden by default) -->
+          <div id="olevelFields" style="display:none;">
+            <div class="form-group">
+              <label for="olevelEquivalence">O Level Equivalence Percentage <span class="optional">(optional)</span></label>
+              <input type="number" id="olevelEquivalence" placeholder="e.g. 85" step="0.1" min="0" max="100">
+            </div>
+            <div class="form-group">
+              <label for="alevelEquivalence">A Level Equivalence Percentage <span class="optional">(optional)</span></label>
+              <input type="number" id="alevelEquivalence" placeholder="e.g. 80" step="0.1" min="0" max="100">
+            </div>
+            <div class="form-group">
+              <label for="olevelGrade">O Level Average Grade <span class="optional">(optional)</span></label>
+              <select id="olevelGrade">
+                <option value="">&mdash; Select &mdash;</option>
+                <option value="A*">A*</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+                <option value="E">E</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="alevelGrade">A Level Average Grade <span class="optional">(optional)</span></label>
+              <select id="alevelGrade">
+                <option value="">&mdash; Select &mdash;</option>
+                <option value="A*">A*</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+                <option value="E">E</option>
+              </select>
+            </div>
+            <div class="o-level-note">
+              For O/A Level students, this is only an estimate. Final admission depends on official IBCC equivalence and university policy.
+            </div>
           </div>
 
           <div class="form-group">
@@ -68,8 +110,28 @@
           </div>
 
           <div class="form-group">
-            <label for="cityPref">Preferred City <span class="optional">(optional)</span></label>
-            <input type="text" id="cityPref" placeholder="e.g. Lahore, Islamabad, Karachi">
+            <label for="cityPref">Preferred City</label>
+            <select id="cityPref">
+              <option value="">&mdash; Select &mdash;</option>
+              <option value="Any city">Any city</option>
+              <option value="Lahore">Lahore</option>
+              <option value="Islamabad">Islamabad</option>
+              <option value="Rawalpindi">Rawalpindi</option>
+              <option value="Karachi">Karachi</option>
+              <option value="Peshawar">Peshawar</option>
+              <option value="Quetta">Quetta</option>
+              <option value="Multan">Multan</option>
+              <option value="Faisalabad">Faisalabad</option>
+              <option value="Sialkot">Sialkot</option>
+              <option value="Gujranwala">Gujranwala</option>
+              <option value="Hyderabad">Hyderabad</option>
+              <option value="Bahawalpur">Bahawalpur</option>
+              <option value="Taxila">Taxila</option>
+              <option value="Wah Cantt">Wah Cantt</option>
+              <option value="Abbottabad">Abbottabad</option>
+              <option value="Jamshoro">Jamshoro</option>
+              <option value="Sukkur">Sukkur</option>
+            </select>
           </div>
 
           <div class="form-group">
@@ -80,7 +142,6 @@
           <button type="button" id="saveProfileBtn">Save Profile</button>
         </form>
 
-        <!-- Steps -->
         <div class="steps-box">
           <h3>How to use</h3>
           <div class="step"><span class="step-num">1</span> Enter your academic profile</div>
@@ -88,19 +149,16 @@
           <div class="step"><span class="step-num">3</span> Get university suggestions</div>
         </div>
 
-        <!-- RAG explanation -->
         <div class="rag-note">
           <strong>&#9432; How it works</strong>
           <p>This project uses RAG (Retrieval-Augmented Generation) with local university admission data and a local LLM (Gemma via Ollama) to give you personalised counselling.</p>
         </div>
 
-        <!-- Disclaimer -->
         <div class="disclaimer">
           This tool gives guidance only. Final admission depends on official university policy and merit.
         </div>
       </section>
 
-      <!-- Right: Chat Section -->
       <section class="chat-panel">
         <div class="chat-header">
           <h2>Ask a Question</h2>
@@ -114,7 +172,6 @@
           </div>
         </div>
 
-        <!-- Sample questions -->
         <div class="sample-questions" id="sampleQuestions">
           <button class="sample-btn" data-q="Which universities are best for me?">Which universities are best for me?</button>
           <button class="sample-btn" data-q="Which universities offer CS in Lahore?">Which universities offer CS in Lahore?</button>
@@ -130,15 +187,18 @@
 
     </div>
 
-    <!-- ========================================== -->
-    <!-- Footer                                     -->
-    <!-- ========================================== -->
     <footer class="app-footer">
-      <p>Raahim Adeel &bull; Fardan Aatir &bull; Muhammad Ismail</p>
+      <p>
+        <span>Raahim Adeel</span>
+        <span class="footer-sep">&bull;</span>
+        <span>Fardan Aatir</span>
+        <span class="footer-sep">&bull;</span>
+        <span>Muhammad Ismail</span>
+      </p>
     </footer>
 
   </div>
 
-  <script src="script.js"></script>
+  <script src="/frontend/script.js"></script>
 </body>
 </html>

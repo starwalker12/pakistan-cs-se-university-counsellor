@@ -2,7 +2,7 @@
  * Pakistan CS & SE University Counsellor — Frontend Logic
  *
  * Flow:
- * 1. User fills profile (name, matric, inter, entry test, field, city, budget)
+ * 1. User fills profile (name, system, marks, entry test, field, city, budget)
  * 2. User saves profile
  * 3. User asks a question in the chat
  * 4. Frontend sends profile + question to the FastAPI backend
@@ -21,50 +21,97 @@ const userInput       = document.getElementById('userInput');
 const sendBtn         = document.getElementById('sendBtn');
 const statusDot       = document.getElementById('statusDot');
 const providerBadge   = document.getElementById('providerBadge');
+const eduSystem       = document.getElementById('educationSystem');
+const matricFields    = document.getElementById('matricFields');
+const olevelFields    = document.getElementById('olevelFields');
 
 const BACKEND_URL = 'http://localhost:8000';
 
-// Student profile — will be filled when user clicks Save
 let studentProfile = null;
+
+// =============================================
+// Education system toggle
+// =============================================
+eduSystem.addEventListener('change', function () {
+  if (this.value === 'olevel') {
+    matricFields.style.display = 'none';
+    olevelFields.style.display = 'block';
+  } else {
+    matricFields.style.display = 'block';
+    olevelFields.style.display = 'none';
+  }
+});
+
+// =============================================
+// Grade to percentage mapping
+// =============================================
+function gradeToPct(grade) {
+  const map = { 'A*': 95, 'A': 90, 'B': 80, 'C': 70, 'D': 60, 'E': 50 };
+  return map[grade] || 0;
+}
 
 // =============================================
 // Save profile from form
 // =============================================
 saveBtn.addEventListener('click', function () {
+  const name = document.getElementById('studentName').value.trim();
+  const field = document.getElementById('preferredField').value;
+  const system = eduSystem.value;
 
-  // --- Light validation ---
-  const name      = document.getElementById('studentName').value.trim();
-  const matric    = document.getElementById('matricMarks').value.trim();
-  const inter     = document.getElementById('interMarks').value.trim();
-  const field     = document.getElementById('preferredField').value;
+  if (!name) { alert('Please enter your name.'); return; }
+  if (!field) { alert('Please select a preferred field.'); return; }
 
-  if (!name) {
-    alert('Please enter your name.');
-    return;
-  }
-  if (!matric) {
-    alert('Please enter your Matric percentage.');
-    return;
-  }
-  if (!inter) {
-    alert('Please enter your Intermediate percentage.');
-    return;
-  }
-  if (!field) {
-    alert('Please select a preferred field (Computer Science or Software Engineering).');
-    return;
-  }
-
-  // Build profile object and enable chat
-  studentProfile = {
+  let profile = {
     name: name,
-    matric_marks: matric,
-    inter_marks: inter,
-    entry_test: document.getElementById('entryTest').value.trim(),
+    education_system: system,
     preferred_field: field,
-    city_preference: document.getElementById('cityPref').value.trim(),
-    budget: document.getElementById('budget').value.trim()
+    city_preference: document.getElementById('cityPref').value,
+    budget: document.getElementById('budget').value.trim(),
+    entry_test: document.getElementById('entryTest').value.trim(),
+    matric_marks: '',
+    inter_marks: '',
+    o_level_equivalence: '',
+    a_level_equivalence: '',
+    o_level_grade: '',
+    a_level_grade: ''
   };
+
+  if (system === 'olevel') {
+    profile.o_level_equivalence = document.getElementById('olevelEquivalence').value.trim();
+    profile.a_level_equivalence = document.getElementById('alevelEquivalence').value.trim();
+    profile.o_level_grade = document.getElementById('olevelGrade').value;
+    profile.a_level_grade = document.getElementById('alevelGrade').value;
+
+    if (!profile.o_level_equivalence && !profile.o_level_grade &&
+        !profile.a_level_equivalence && !profile.a_level_grade) {
+      alert('Please provide at least one O Level or A Level grade or equivalence percentage.');
+      return;
+    }
+
+    let oPct = profile.o_level_equivalence ? parseFloat(profile.o_level_equivalence) : gradeToPct(profile.o_level_grade);
+    let aPct = profile.a_level_equivalence ? parseFloat(profile.a_level_equivalence) : gradeToPct(profile.a_level_grade);
+
+    if (profile.o_level_grade && !profile.o_level_equivalence && !oPct) {
+      alert('Invalid O Level grade selected.');
+      return;
+    }
+    if (profile.a_level_grade && !profile.a_level_equivalence && !aPct) {
+      alert('Invalid A Level grade selected.');
+      return;
+    }
+
+    profile.matric_marks = oPct ? String(oPct) : '';
+    profile.inter_marks = aPct ? String(aPct) : '';
+
+  } else {
+    profile.matric_marks = document.getElementById('matricMarks').value.trim();
+    profile.inter_marks = document.getElementById('interMarks').value.trim();
+
+    if (!profile.matric_marks) { alert('Please enter your Matric percentage.'); return; }
+    if (!profile.inter_marks) { alert('Please enter your Intermediate percentage.'); return; }
+  }
+
+  studentProfile = profile;
 
   userInput.disabled = false;
   sendBtn.disabled = false;
@@ -76,17 +123,13 @@ saveBtn.addEventListener('click', function () {
 
 // =============================================
 // Format inline markdown: **text** -> <b>text</b>
-// Also escape HTML to prevent XSS, then re-add bold.
 // =============================================
 function formatMarkdown(text) {
-  // Escape HTML first
   let s = text
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
-  // Convert **text** to <b>text</b> (non-greedy across lines)
   s = s.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
-  // Convert newlines to <br> for display
   s = s.replace(/\n/g, '<br>');
   return s;
 }
@@ -107,14 +150,14 @@ function addMessage(sender, text, isHTML) {
 }
 
 // =============================================
-// Show / remove a typing indicator
+// Show / remove animated typing indicator
 // =============================================
 let typingEl = null;
 
 function showTyping() {
   typingEl = document.createElement('div');
   typingEl.classList.add('message', 'bot', 'typing');
-  typingEl.textContent = 'Thinking...';
+  typingEl.innerHTML = '<span class="typing-dots"><span></span><span></span><span></span></span>';
   chatBox.appendChild(typingEl);
   chatBox.scrollTop = chatBox.scrollHeight;
 }
@@ -171,21 +214,16 @@ document.querySelectorAll('.sample-btn').forEach(function (btn) {
 // =============================================
 async function handleSend() {
   const question = userInput.value.trim();
-
-  // Validate empty question
   if (!question) return;
 
-  // Show user's message
   userInput.value = '';
   addMessage('user', question);
 
-  // Make sure profile was saved
   if (!studentProfile) {
     addMessage('bot', 'Please save your profile first before asking a question.');
     return;
   }
 
-  // Show loading indicator
   showTyping();
 
   try {
@@ -208,16 +246,13 @@ async function handleSend() {
     const data = await response.json();
     let msg = data.answer || 'Sorry, no answer was returned.';
 
-    // Show provider badge in header
     if (data.provider_used) {
       providerBadge.textContent = data.provider_used;
       providerBadge.classList.add('show');
     }
 
-    // Show answer
     addMessage('bot', msg);
 
-    // Show sources as cards
     if (data.sources && data.sources.length > 0) {
       for (const s of data.sources) {
         addSourceCard(s);

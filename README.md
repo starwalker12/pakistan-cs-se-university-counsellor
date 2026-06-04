@@ -112,7 +112,64 @@ curl -X POST http://localhost:8000/counsel \
 
 Expected response: JSON with `answer` (structured text), `sources` (array), `retrieved_count` (number), `provider_used` (string).
 
+### Step 7 — Debug provider detection
+
+Test if LM Studio or Ollama is reachable:
+
+```bash
+curl http://localhost:8000/debug/providers
+```
+
+Expected response includes detailed info for each provider:
+```json
+{
+  "lm_studio": {
+    "reachable": false,
+    "url": "http://localhost:1234/v1/chat/completions",
+    "models_url": "http://localhost:1234/v1/models",
+    "models": [],
+    "chat_reachable": false,
+    "error": "ConnectError..."
+  },
+  "ollama": {
+    "reachable": true,
+    "url": "http://localhost:11434/api/chat",
+    "tags_url": "http://localhost:11434/api/tags",
+    "models": ["gemma4:latest"],
+    "chat_reachable": true,
+    "error": ""
+  }
+}
+```
+
+### Testing providers directly (from terminal, not browser)
+
+**Test LM Studio:**
+```bash
+curl http://localhost:1234/v1/models
+# If LM Studio is running, returns list of loaded models
+```
+
+**Test Ollama:**
+```bash
+curl http://localhost:11434/api/tags
+# If Ollama is running, returns list of installed models
+```
+
+**Test backend provider info:**
+```bash
+curl http://localhost:8000/providers
+# Shows which providers are configured and reachable
+```
+
 ---
+
+## Vercel vs Local
+
+- **Vercel frontend** (`https://university-admission-chatbot.vercel.app`) shows the UI only
+- **Full RAG AI demo runs only locally** — the backend, Chroma vector DB, and Ollama/LM Studio must run on your laptop
+- The Vercel frontend will show "Backend is not running" if no local backend is detected
+- Vercel is for frontend showcase only. The AI counselling works when everything runs locally
 
 ## Troubleshooting
 
@@ -125,6 +182,9 @@ Expected response: JSON with `answer` (structured text), `sources` (array), `ret
 | Vercel deployed but no AI answers | Local AI cannot run on Vercel. The backend + LLM must run on a laptop |
 | Ollama CORS error in browser | Start with `OLLAMA_ORIGINS=* ollama serve` |
 | Chroma not found on startup | Run `cd backend && python build_vector_db.py` first |
+| LM Studio not detected | Check server is running on port 1234 with a model loaded |
+| Ollama not detected | Check `ollama serve` is running and model is installed (`ollama list`) |
+| Provider shows "reachable: false" | Run `curl http://localhost:8000/debug/providers` to see exact error |
 
 ### Environment Variables (optional)
 
