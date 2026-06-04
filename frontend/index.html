@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pakistan CS & SE University Counsellor</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="app-header">
+      <h1>Pakistan CS & SE University Counsellor</h1>
+      <p>Get personalised admission advice for Computer Science and Software Engineering programs across Pakistan.</p>
+    </header>
+
+    <main class="app-main">
+      <!-- Student Profile Form -->
+      <section class="profile-section" id="profileSection">
+        <h2>Your Profile</h2>
+        <form id="profileForm">
+          <div class="form-group">
+            <label for="matricMarks">Matriculation Marks (total or percentage):</label>
+            <input type="number" id="matricMarks" placeholder="e.g. 950 / 1050 or 90.5" step="0.1">
+          </div>
+          <div class="form-group">
+            <label for="interMarks">Intermediate Marks (total or percentage):</label>
+            <input type="number" id="interMarks" placeholder="e.g. 850 / 1100 or 77.2" step="0.1">
+          </div>
+          <div class="form-group">
+            <label for="entryTest">Entry Test Score (optional):</label>
+            <input type="text" id="entryTest" placeholder="e.g. ECAT 150 / 200 or NTS 70">
+          </div>
+          <div class="form-group">
+            <label for="preferredField">Preferred Field:</label>
+            <select id="preferredField">
+              <option value="">Select...</option>
+              <option value="CS">Computer Science</option>
+              <option value="SE">Software Engineering</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="cityPref">City Preference (optional):</label>
+            <input type="text" id="cityPref" placeholder="e.g. Lahore, Islamabad, Karachi">
+          </div>
+          <div class="form-group">
+            <label for="budget">Annual Budget (optional):</label>
+            <input type="text" id="budget" placeholder="e.g. 500000">
+          </div>
+          <button type="button" id="saveProfileBtn">Save Profile</button>
+        </form>
+      </section>
+
+      <!-- Chat Section -->
+      <section class="chat-section" id="chatSection">
+        <h2>Ask a Question</h2>
+        <div class="chat-box" id="chatBox">
+          <div class="message bot">Welcome! Please fill in your profile above, then ask me about university admissions.</div>
+        </div>
+        <div class="input-area">
+          <input type="text" id="userInput" placeholder="Type your question here..." disabled>
+          <button id="sendBtn" disabled>Send</button>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
