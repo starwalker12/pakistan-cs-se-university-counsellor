@@ -1719,6 +1719,27 @@ def find_processed_record(uni_id: str) -> dict | None:
             return rec
     return None
 
+def matches_topic(text: str, info_type: str) -> bool:
+    lower = text.lower()
+    if info_type == "fee":
+        if "fee" in lower or "fees" in lower or "tuition" in lower:
+            return True
+        count = sum(1 for k in ("cost", "charges", "semester", "financial aid") if k in lower)
+        return count >= 2
+    if info_type == "eligibility":
+        count = sum(1 for k in ("eligibility", "criteria", "requirement", "requirements",
+                                "minimum marks", "qualification", "admission criteria") if k in lower)
+        return count >= 2
+    if info_type == "entry_test":
+        if "entry test" in lower or "admission test" in lower:
+            return True
+        count = sum(1 for k in ("test", "sat", "nat", "net", "ecat", "test pattern", "entry") if k in lower)
+        return count >= 2
+    if info_type == "deadline":
+        keywords = ("deadline", "last date", "schedule", "closing date")
+        return any(k in lower for k in keywords)
+    return True
+
 async def fetch_official_page(url: str, timeout: float = 8.0) -> str | None:
     try:
         async with httpx.AsyncClient(timeout=timeout, follow_redirects=True) as client:
@@ -1742,45 +1763,44 @@ async def live_lookup_for(uni_id: str, info_type: str,
                           links: list[AdmissionLink]) -> tuple[str | None, str]:
     cache_key = live_cache_key(uni_id, info_type)
     if cache_key in LIVE_LOOKUP_CACHE:
-        return LIVE_LOOKUP_CACHE[cache_key], ""
+        cached = LIVE_LOOKUP_CACHE[cache_key]
+        if cached and matches_topic(cached, info_type):
+            return cached, ""
+        return None, ""
     target_url = ""
-    link_label = ""
     if info_type == "fee":
         for ln in links:
             if any(t in (ln.label or "").lower() for t in ("fee", "tuition")):
                 target_url = ln.url
-                link_label = ln.label
                 break
     elif info_type == "eligibility":
         for ln in links:
             if "eligibility" in (ln.label or "").lower():
                 target_url = ln.url
-                link_label = ln.label
                 break
     elif info_type == "entry_test":
         for ln in links:
             if "test" in (ln.label or "").lower():
                 target_url = ln.url
-                link_label = ln.label
                 break
     elif info_type == "deadline":
         for ln in links:
             if "schedule" in (ln.label or "").lower() or "schedule" in (ln.note or "").lower():
                 target_url = ln.url
-                link_label = ln.label
                 break
     if not target_url:
         for ln in links:
             if "admission" in (ln.label or "").lower():
                 target_url = ln.url
-                link_label = ln.label
                 break
     if not target_url:
         return None, ""
     text = await fetch_official_page(target_url)
     if text:
         LIVE_LOOKUP_CACHE[cache_key] = text
-        return text, target_url
+        if matches_topic(text, info_type):
+            return text, target_url
+        return None, target_url
     return None, ""
 
 async def build_university_info_answer(question: str, profile: Profile,
@@ -1847,6 +1867,8 @@ async def build_university_info_answer(question: str, profile: Profile,
                 answer_lines.append(extracted)
                 answer_lines.append("")
                 answer_lines.append("Confirm the latest details on the official page above.")
+            elif live_url:
+                answer_lines.append(f"I checked the official page, but it did not contain clear {f_label} details. Use the link below to check directly.")
             elif info_type == "entry_test":
                 rule = get_eligibility(uni_id, profile.preferred_field)
                 rule_test = (rule or {}).get("entry_test_name", "")
@@ -1854,8 +1876,10 @@ async def build_university_info_answer(question: str, profile: Profile,
                     has_exact = True
                     data_source = "stored"
                     answer_lines.append(f"{uni_name} entry test: {rule_test}. Check the official page for the latest format and dates.")
+                elif live_url:
+                    answer_lines.append(f"I checked the official page, but it did not contain clear {f_label} details. Use the link below to check directly.")
                 else:
-                    answer_lines.append("I also could not fetch it live from the official site right now. Use the link below to check directly.")
+                    answer_lines.append("I could not reach the official site right now. Use the link below to check directly.")
 
     elif info_type == "admission_links":
         if links:
