@@ -6,9 +6,10 @@
     "city": "Islamabad",
     "cities": ["Islamabad", "Lahore", "Karachi", "Peshawar", "Faisalabad"],
     "province": "Islamabad (HQ)",
+    "type": "private",
     "fields": ["Computer Science", "Software Engineering", "Data Science", "Artificial Intelligence"],
     "website": "https://nu.edu.pk",
-    "notes": "Multiple campuses across Pakistan. Known for strong CS/SE programs."
+    "notes": "Multiple campuses across Pakistan. Known for producing top CS graduates."
   },
   {
     "id": "nust",
@@ -17,6 +18,7 @@
     "city": "Islamabad",
     "cities": ["Islamabad"],
     "province": "Islamabad",
+    "type": "public",
     "fields": ["Computer Science", "Software Engineering", "Artificial Intelligence"],
     "website": "https://nust.edu.pk",
     "notes": "SEECS and MCS schools offer CS/SE programs. Highly competitive entry."
@@ -28,9 +30,10 @@
     "city": "Islamabad",
     "cities": ["Islamabad", "Lahore", "Wah", "Abbottabad", "Vehari", "Sahiwal", "Attock"],
     "province": "Islamabad (HQ)",
+    "type": "public",
     "fields": ["Computer Science", "Software Engineering", "Data Science"],
     "website": "https://comsats.edu.pk",
-    "notes": "Multiple campuses. CS department is one of the oldest and largest in Pakistan."
+    "notes": "Multiple campuses. CS department is one of the largest in Pakistan."
   },
   {
     "id": "lums",
@@ -39,9 +42,10 @@
     "city": "Lahore",
     "cities": ["Lahore"],
     "province": "Punjab",
+    "type": "private",
     "fields": ["Computer Science", "Electrical Engineering and Computer Science"],
     "website": "https://lums.edu.pk",
-    "notes": "Offers BS Computer Science through SBASSE. Private university, higher fee."
+    "notes": "Offers BS Computer Science through SBASSE. Higher fee bracket."
   },
   {
     "id": "giki",
@@ -50,6 +54,7 @@
     "city": "Topi",
     "cities": ["Topi"],
     "province": "Khyber Pakhtunkhwa",
+    "type": "private",
     "fields": ["Computer Science", "Software Engineering"],
     "website": "https://giki.edu.pk",
     "notes": "Located in Topi, Swabi. Highly ranked engineering institute."
@@ -61,9 +66,10 @@
     "city": "Islamabad",
     "cities": ["Islamabad"],
     "province": "Islamabad",
+    "type": "public",
     "fields": ["Computer Science", "Information Security"],
     "website": "https://pieas.edu.pk",
-    "notes": "Strong in engineering and sciences. Limited CS seats, highly competitive."
+    "notes": "Strong in engineering and sciences. Limited CS seats."
   },
   {
     "id": "uet-lahore",
@@ -72,9 +78,10 @@
     "city": "Lahore",
     "cities": ["Lahore"],
     "province": "Punjab",
+    "type": "public",
     "fields": ["Computer Science", "Software Engineering"],
     "website": "https://uet.edu.pk",
-    "notes": "Public university, lower fee. Main and KSK campuses offer CS."
+    "notes": "Public university, lower fee. Main and KSK campuses."
   },
   {
     "id": "itu-lahore",
@@ -83,9 +90,10 @@
     "city": "Lahore",
     "cities": ["Lahore"],
     "province": "Punjab",
-    "fields": ["Computer Science"],
+    "type": "public",
+    "fields": ["Computer Science", "Data Science"],
     "website": "https://itu.edu.pk",
-    "notes": "Specialized IT university in Lahore. Offers BS Computer Science."
+    "notes": "Specialized IT university in Lahore. Newer but growing program."
   },
   {
     "id": "air-university",
@@ -94,9 +102,10 @@
     "city": "Islamabad",
     "cities": ["Islamabad", "Multan"],
     "province": "Islamabad (HQ)",
+    "type": "public",
     "fields": ["Computer Science", "Software Engineering"],
     "website": "https://au.edu.pk",
-    "notes": "Federally chartered public sector university. Multiple campuses."
+    "notes": "Federally chartered public sector university."
   },
   {
     "id": "bahria-university",
@@ -105,8 +114,129 @@
     "city": "Islamabad",
     "cities": ["Islamabad", "Lahore", "Karachi"],
     "province": "Islamabad (HQ)",
+    "type": "public",
     "fields": ["Computer Science", "Software Engineering", "Artificial Intelligence"],
     "website": "https://bahria.edu.pk",
-    "notes": "Federally chartered public sector university. Multiple campuses."
+    "notes": "Federally chartered public sector university."
+  },
+  {
+    "id": "punjab-university",
+    "name": "University of the Punjab (PU)",
+    "short_name": "Punjab University",
+    "city": "Lahore",
+    "cities": ["Lahore"],
+    "province": "Punjab",
+    "type": "public",
+    "fields": ["Computer Science", "Information Technology"],
+    "website": "https://pu.edu.pk",
+    "notes": "Oldest university in Pakistan. Offers BS CS and BS IT."
+  },
+  {
+    "id": "qau",
+    "name": "Quaid-i-Azam University (QAU)",
+    "short_name": "QAU",
+    "city": "Islamabad",
+    "cities": ["Islamabad"],
+    "province": "Islamabad",
+    "type": "public",
+    "fields": ["Computer Science"],
+    "website": "https://qau.edu.pk",
+    "notes": "Top-ranked general university with a growing CS department."
+  },
+  {
+    "id": "ned-university",
+    "name": "NED University of Engineering and Technology",
+    "short_name": "NED University",
+    "city": "Karachi",
+    "cities": ["Karachi"],
+    "province": "Sindh",
+    "type": "public",
+    "fields": ["Computer Science", "Software Engineering"],
+    "website": "https://neduet.edu.pk",
+    "notes": "Top engineering university in Karachi. Public sector, lower fee."
+  },
+  {
+    "id": "uet-taxila",
+    "name": "University of Engineering and Technology (UET) Taxila",
+    "short_name": "UET Taxila",
+    "city": "Taxila",
+    "cities": ["Taxila"],
+    "province": "Punjab",
+    "type": "public",
+    "fields": ["Computer Science", "Software Engineering"],
+    "website": "https://uettaxila.edu.pk",
+    "notes": "Public engineering university. Offers CS and SE programs."
+  },
+  {
+    "id": "university-of-karachi",
+    "name": "University of Karachi (UoK)",
+    "short_name": "University of Karachi",
+    "city": "Karachi",
+    "cities": ["Karachi"],
+    "province": "Sindh",
+    "type": "public",
+    "fields": ["Computer Science"],
+    "website": "https://uok.edu.pk",
+    "notes": "Largest university in Karachi. Offers BS Computer Science."
+  },
+  {
+    "id": "ucp",
+    "name": "University of Central Punjab (UCP)",
+    "short_name": "UCP",
+    "city": "Lahore",
+    "cities": ["Lahore"],
+    "province": "Punjab",
+    "type": "private",
+    "fields": ["Computer Science", "Software Engineering"],
+    "website": "https://ucp.edu.pk",
+    "notes": "Private university in Lahore. Offers CS and SE programs."
+  },
+  {
+    "id": "virtual-university",
+    "name": "Virtual University of Pakistan (VU)",
+    "short_name": "Virtual University",
+    "city": "Lahore",
+    "cities": ["Lahore"],
+    "province": "Punjab",
+    "type": "public",
+    "fields": ["Computer Science", "Software Engineering", "Information Technology"],
+    "website": "https://vu.edu.pk",
+    "notes": "Distance learning university. Offers CS, SE, and IT programs at low cost."
+  },
+  {
+    "id": "szabist",
+    "name": "Shaheed Zulfikar Ali Bhutto Institute of Science and Technology (SZABIST)",
+    "short_name": "SZABIST",
+    "city": "Karachi",
+    "cities": ["Karachi", "Islamabad", "Larkana", "Hyderabad"],
+    "province": "Sindh (HQ)",
+    "type": "private",
+    "fields": ["Computer Science", "Software Engineering"],
+    "website": "https://szabist.edu.pk",
+    "notes": "Private university with multiple campuses. Offers CS and SE."
+  },
+  {
+    "id": "iba-karachi",
+    "name": "Institute of Business Administration (IBA) Karachi",
+    "short_name": "IBA Karachi",
+    "city": "Karachi",
+    "cities": ["Karachi"],
+    "province": "Sindh",
+    "type": "public",
+    "fields": ["Computer Science", "Data Science"],
+    "website": "https://iba.edu.pk",
+    "notes": "Prestigious institute. Offers BS Computer Science and BS Data Science."
+  },
+  {
+    "id": "ist",
+    "name": "Institute of Space Technology (IST)",
+    "short_name": "IST",
+    "city": "Islamabad",
+    "cities": ["Islamabad"],
+    "province": "Islamabad",
+    "type": "public",
+    "fields": ["Computer Science", "Software Engineering", "Artificial Intelligence"],
+    "website": "https://ist.edu.pk",
+    "notes": "Specialized institute under SUPARCO. Offers CS, SE, and AI programs."
   }
 ]

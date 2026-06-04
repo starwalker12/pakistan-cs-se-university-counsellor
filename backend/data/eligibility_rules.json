@@ -1,0 +1,333 @@
+[
+  {
+    "_comment": "PLACEHOLDER RULES — not final. Values shown are approximate based on general knowledge. Exact eligibility must be verified from official university admission pages.",
+    "university_id": "nuces-fast",
+    "university": "FAST NUCES",
+    "program": "BS Computer Science",
+    "minimum_inter_percentage": 60,
+    "minimum_matric_percentage": 60,
+    "entry_test_required": true,
+    "entry_test_name": "NU Test or NTS-NAT",
+    "notes": "Placeholder: verify exact minimum percentages and weight formula from https://nu.edu.pk/Admission"
+  },
+  {
+    "university_id": "nuces-fast",
+    "university": "FAST NUCES",
+    "program": "BS Software Engineering",
+    "minimum_inter_percentage": 60,
+    "minimum_matric_percentage": 60,
+    "entry_test_required": true,
+    "entry_test_name": "NU Test or NTS-NAT",
+    "notes": "Placeholder: verify exact minimum percentages and weight formula from https://nu.edu.pk/Admission"
+  },
+  {
+    "university_id": "nust",
+    "university": "NUST",
+    "program": "BS Computer Science",
+    "minimum_inter_percentage": 60,
+    "minimum_matric_percentage": 60,
+    "entry_test_required": true,
+    "entry_test_name": "NET (NUST Entry Test)",
+    "notes": "Placeholder: verify exact eligibility and aggregate formula from https://nust.edu.pk/admissions"
+  },
+  {
+    "university_id": "nust",
+    "university": "NUST",
+    "program": "BS Software Engineering",
+    "minimum_inter_percentage": 60,
+    "minimum_matric_percentage": 60,
+    "entry_test_required": true,
+    "entry_test_name": "NET (NUST Entry Test)",
+    "notes": "Placeholder: verify exact eligibility from https://nust.edu.pk/admissions"
+  },
+  {
+    "university_id": "comsats",
+    "university": "COMSATS",
+    "program": "BS Computer Science",
+    "minimum_inter_percentage": 50,
+    "minimum_matric_percentage": 50,
+    "entry_test_required": true,
+    "entry_test_name": "CUI Entry Test or NTS-NAT",
+    "notes": "Placeholder: verify exact eligibility from https://comsats.edu.pk/admissions"
+  },
+  {
+    "university_id": "comsats",
+    "university": "COMSATS",
+    "program": "BS Software Engineering",
+    "minimum_inter_percentage": 50,
+    "minimum_matric_percentage": 50,
+    "entry_test_required": true,
+    "entry_test_name": "CUI Entry Test or NTS-NAT",
+    "notes": "Placeholder: verify exact eligibility from https://comsats.edu.pk/admissions"
+  },
+  {
+    "university_id": "lums",
+    "university": "LUMS",
+    "program": "BS Computer Science",
+    "minimum_inter_percentage": 60,
+    "minimum_matric_percentage": 60,
+    "entry_test_required": true,
+    "entry_test_name": "SAT or LUMS SBASSE Test",
+    "notes": "Placeholder: LUMS has a holistic admission process. Verify exact requirements from https://lums.edu.pk/admissions"
+  },
+  {
+    "university_id": "giki",
+    "university": "GIKI",
+    "program": "BS Computer Science",
+    "minimum_inter_percentage": 60,
+    "minimum_matric_percentage": 60,
+    "entry_test_required": true,
+    "entry_test_name": "GIKI Entry Test",
+    "notes": "Placeholder: verify exact eligibility from https://giki.edu.pk/admissions"
+  },
+  {
+    "university_id": "giki",
+    "university": "GIKI",
+    "program": "BS Software Engineering",
+    "minimum_inter_percentage": 60,
+    "minimum_matric_percentage": 60,
+    "entry_test_required": true,
+    "entry_test_name": "GIKI Entry Test",
+    "notes": "Placeholder: verify exact eligibility from https://giki.edu.pk/admissions"
+  },
+  {
+    "university_id": "pieas",
+    "university": "PIEAS",
+    "program": "BS Computer Science",
+    "minimum_inter_percentage": 60,
+    "minimum_matric_percentage": 60,
+    "entry_test_required": true,
+    "entry_test_name": "PIEAS Entry Test (PIEAS-ET)",
+    "notes": "Placeholder: verify exact eligibility from https://pieas.edu.pk/admissions"
+  },
+  {
+    "university_id": "uet-lahore",
+    "university": "UET Lahore",
+    "program": "BS Computer Science",
+    "minimum_inter_percentage": 55,
+    "minimum_matric_percentage": 55,
+    "entry_test_required": true,
+    "entry_test_name": "UET Entry Test",
+    "notes": "Placeholder: verify exact eligibility from https://uet.edu.pk/admissions"
+  },
+  {
+    "university_id": "uet-lahore",
+    "university": "UET Lahore",
+    "program": "BS Software Engineering",
+    "minimum_inter_percentage": 55,
+    "minimum_matric_percentage": 55,
+    "entry_test_required": true,
+    "entry_test_name": "UET Entry Test",
+    "notes": "Placeholder: verify exact eligibility from https://uet.edu.pk/admissions"
+  },
+  {
+    "university_id": "itu-lahore",
+    "university": "ITU Lahore",
+    "program": "BS Computer Science",
+    "minimum_inter_percentage": 50,
+    "minimum_matric_percentage": 50,
+    "entry_test_required": true,
+    "entry_test_name": "ITU Entry Test",
+    "notes": "Placeholder: verify exact eligibility from https://itu.edu.pk/admissions"
+  },
+  {
+    "university_id": "air-university",
+    "university": "Air University",
+    "program": "BS Computer Science",
+    "minimum_inter_percentage": 50,
+    "minimum_matric_percentage": 50,
+    "entry_test_required": true,
+    "entry_test_name": "Air University Entry Test",
+    "notes": "Placeholder: verify exact eligibility from https://au.edu.pk/admissions"
+  },
+  {
+    "university_id": "air-university",
+    "university": "Air University",
+    "program": "BS Software Engineering",
+    "minimum_inter_percentage": 50,
+    "minimum_matric_percentage": 50,
+    "entry_test_required": true,
+    "entry_test_name": "Air University Entry Test",
+    "notes": "Placeholder: verify exact eligibility from https://au.edu.pk/admissions"
+  },
+  {
+    "university_id": "bahria-university",
+    "university": "Bahria University",
+    "program": "BS Computer Science",
+    "minimum_inter_percentage": 50,
+    "minimum_matric_percentage": 50,
+    "entry_test_required": true,
+    "entry_test_name": "Bahria University Entry Test or NTS-NAT",
+    "notes": "Placeholder: verify exact eligibility from https://bahria.edu.pk/admissions"
+  },
+  {
+    "university_id": "bahria-university",
+    "university": "Bahria University",
+    "program": "BS Software Engineering",
+    "minimum_inter_percentage": 50,
+    "minimum_matric_percentage": 50,
+    "entry_test_required": true,
+    "entry_test_name": "Bahria University Entry Test or NTS-NAT",
+    "notes": "Placeholder: verify exact eligibility from https://bahria.edu.pk/admissions"
+  },
+  {
+    "university_id": "punjab-university",
+    "university": "Punjab University",
+    "program": "BS Computer Science",
+    "minimum_inter_percentage": 50,
+    "minimum_matric_percentage": 50,
+    "entry_test_required": true,
+    "entry_test_name": "PU Entry Test or NTS-NAT",
+    "notes": "Placeholder: verify exact eligibility from https://pu.edu.pk/admissions"
+  },
+  {
+    "university_id": "qau",
+    "university": "QAU",
+    "program": "BS Computer Science",
+    "minimum_inter_percentage": 50,
+    "minimum_matric_percentage": 50,
+    "entry_test_required": true,
+    "entry_test_name": "QAU Entry Test or NTS-NAT",
+    "notes": "Placeholder: verify exact eligibility from https://qau.edu.pk"
+  },
+  {
+    "university_id": "ned-university",
+    "university": "NED University",
+    "program": "BS Computer Science",
+    "minimum_inter_percentage": 55,
+    "minimum_matric_percentage": 55,
+    "entry_test_required": true,
+    "entry_test_name": "NED Entry Test",
+    "notes": "Placeholder: verify exact eligibility from https://neduet.edu.pk"
+  },
+  {
+    "university_id": "ned-university",
+    "university": "NED University",
+    "program": "BS Software Engineering",
+    "minimum_inter_percentage": 55,
+    "minimum_matric_percentage": 55,
+    "entry_test_required": true,
+    "entry_test_name": "NED Entry Test",
+    "notes": "Placeholder: verify exact eligibility from https://neduet.edu.pk"
+  },
+  {
+    "university_id": "uet-taxila",
+    "university": "UET Taxila",
+    "program": "BS Computer Science",
+    "minimum_inter_percentage": 50,
+    "minimum_matric_percentage": 50,
+    "entry_test_required": true,
+    "entry_test_name": "UET Taxila Entry Test",
+    "notes": "Placeholder: verify exact eligibility from https://uettaxila.edu.pk"
+  },
+  {
+    "university_id": "uet-taxila",
+    "university": "UET Taxila",
+    "program": "BS Software Engineering",
+    "minimum_inter_percentage": 50,
+    "minimum_matric_percentage": 50,
+    "entry_test_required": true,
+    "entry_test_name": "UET Taxila Entry Test",
+    "notes": "Placeholder: verify exact eligibility from https://uettaxila.edu.pk"
+  },
+  {
+    "university_id": "university-of-karachi",
+    "university": "University of Karachi",
+    "program": "BS Computer Science",
+    "minimum_inter_percentage": 50,
+    "minimum_matric_percentage": 50,
+    "entry_test_required": true,
+    "entry_test_name": "UoK Entry Test or NTS-NAT",
+    "notes": "Placeholder: verify exact eligibility from https://uok.edu.pk"
+  },
+  {
+    "university_id": "ucp",
+    "university": "UCP",
+    "program": "BS Computer Science",
+    "minimum_inter_percentage": 50,
+    "minimum_matric_percentage": 50,
+    "entry_test_required": false,
+    "entry_test_name": "May accept on intermediate merit or conduct own test",
+    "notes": "Placeholder: verify exact eligibility from https://ucp.edu.pk"
+  },
+  {
+    "university_id": "ucp",
+    "university": "UCP",
+    "program": "BS Software Engineering",
+    "minimum_inter_percentage": 50,
+    "minimum_matric_percentage": 50,
+    "entry_test_required": false,
+    "entry_test_name": "May accept on intermediate merit or conduct own test",
+    "notes": "Placeholder: verify exact eligibility from https://ucp.edu.pk"
+  },
+  {
+    "university_id": "virtual-university",
+    "university": "Virtual University",
+    "program": "BS Computer Science",
+    "minimum_inter_percentage": 50,
+    "minimum_matric_percentage": 50,
+    "entry_test_required": false,
+    "entry_test_name": "No entry test required",
+    "notes": "Placeholder: Open admission policy. Verify exact eligibility from https://vu.edu.pk"
+  },
+  {
+    "university_id": "virtual-university",
+    "university": "Virtual University",
+    "program": "BS Software Engineering",
+    "minimum_inter_percentage": 50,
+    "minimum_matric_percentage": 50,
+    "entry_test_required": false,
+    "entry_test_name": "No entry test required",
+    "notes": "Placeholder: verify exact eligibility from https://vu.edu.pk"
+  },
+  {
+    "university_id": "szabist",
+    "university": "SZABIST",
+    "program": "BS Computer Science",
+    "minimum_inter_percentage": 50,
+    "minimum_matric_percentage": 50,
+    "entry_test_required": true,
+    "entry_test_name": "SZABIST Entry Test",
+    "notes": "Placeholder: verify exact eligibility from https://szabist.edu.pk"
+  },
+  {
+    "university_id": "szabist",
+    "university": "SZABIST",
+    "program": "BS Software Engineering",
+    "minimum_inter_percentage": 50,
+    "minimum_matric_percentage": 50,
+    "entry_test_required": true,
+    "entry_test_name": "SZABIST Entry Test",
+    "notes": "Placeholder: verify exact eligibility from https://szabist.edu.pk"
+  },
+  {
+    "university_id": "iba-karachi",
+    "university": "IBA Karachi",
+    "program": "BS Computer Science",
+    "minimum_inter_percentage": 60,
+    "minimum_matric_percentage": 60,
+    "entry_test_required": true,
+    "entry_test_name": "IBA Entry Test or SAT",
+    "notes": "Placeholder: verify exact eligibility from https://iba.edu.pk"
+  },
+  {
+    "university_id": "ist",
+    "university": "IST",
+    "program": "BS Computer Science",
+    "minimum_inter_percentage": 55,
+    "minimum_matric_percentage": 55,
+    "entry_test_required": true,
+    "entry_test_name": "IST Entry Test or NTS-NAT",
+    "notes": "Placeholder: verify exact eligibility from https://ist.edu.pk"
+  },
+  {
+    "university_id": "ist",
+    "university": "IST",
+    "program": "BS Software Engineering",
+    "minimum_inter_percentage": 55,
+    "minimum_matric_percentage": 55,
+    "entry_test_required": true,
+    "entry_test_name": "IST Entry Test or NTS-NAT",
+    "notes": "Placeholder: verify exact eligibility from https://ist.edu.pk"
+  }
+]

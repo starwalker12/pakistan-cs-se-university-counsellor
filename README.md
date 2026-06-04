@@ -23,8 +23,10 @@ A RAG-based student counsellor web app for Pakistani students who want admission
 │   ├── build_vector_db.py      # Chroma vector DB builder (placeholder)
 │   ├── requirements.txt        # Python dependencies
 │   └── data/
-│       ├── universities.json           # 10 university metadata
+│       ├── universities.json           # 20 university metadata
 │       ├── source_links.json           # Official source URL placeholders
+│       ├── university_rankings.json    # Approximate ranking tiers and scores
+│       ├── eligibility_rules.json      # Placeholder eligibility rules
 │       ├── raw/                        # Raw scraped data
 │       ├── processed/
 │       │   ├── sample_admission_data.json  # Sample admission records (3 unis)
@@ -112,16 +114,32 @@ The RAG system answers admission questions using data that ultimately comes from
 
 | File | Purpose |
 |---|---|
-| `backend/data/universities.json` | Metadata for 10 Pakistani universities that offer CS / SE programs |
+| `backend/data/universities.json` | Metadata for 20 Pakistani universities that offer CS / SE programs |
 | `backend/data/source_links.json` | Official source URL placeholders per university (admissions, fee, eligibility, entry test, merit) |
+| `backend/data/university_rankings.json` | Approximate ranking tiers and scores for 20 universities |
+| `backend/data/eligibility_rules.json` | Placeholder eligibility rules (minimum marks, entry test requirements) |
 | `backend/data/processed/sample_admission_data.json` | Sample admission records (FAST NUCES, NUST, COMSATS) — clearly marked as sample, not final |
+
+### Ranking Plan
+
+The system will rank and recommend universities using these factors:
+
+1. **University ranking score** — from `university_rankings.json` (tiers and scores based on CS/SE reputation)
+2. **Student marks** — Matric and Intermediate percentages compared against eligibility minimums
+3. **Entry test score** — Whether the student has taken a relevant entry test
+4. **Selected field** — Filter universities that offer the student's preferred field (CS or SE)
+5. **City preference** — Filter or prioritize universities in the student's preferred city
+6. **Budget range** — Public universities are lower fee; private universities are higher fee
+
+**Important**: This is not final admission advice. All eligibility criteria and merit cutoffs vary each year. Students must verify from official university admission pages before applying.
 
 ### Data Principles
 
 1. **Official sources only** — all data should come from `.edu.pk` university websites, not blogs or third-party aggregators
 2. **Verifiable** — every piece of admission info should be traceable back to an official source link
 3. **Sample before scraped** — `sample_admission_data.json` contains illustrative records that will be replaced once scraping is implemented
-4. **Structured for RAG** — data is formatted to be chunked, embedded, and stored in Chroma for retrieval
+4. **Placeholder before scraped** — `eligibility_rules.json` values are approximate placeholders and must be updated with real scraped data
+5. **Rankings are approximate** — `university_rankings.json` scores are project-level approximations based on known reputation, not official HEC or QS rankings
 
 ## Technologies
 

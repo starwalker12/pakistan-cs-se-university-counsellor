@@ -1,0 +1,163 @@
+[
+  {
+    "_comment": "All rankings are approximate project rankings based on known CS/SE reputation in Pakistan and publicly available ranking sources. Verify before final submission.",
+    "university_id": "nuces-fast",
+    "rank_tier": 1,
+    "tier_label": "Strongest",
+    "ranking_score": 92,
+    "ranking_basis": "Widely regarded as the top CS/SE university in Pakistan. Strong industry reputation and graduate outcomes.",
+    "ranking_source_note": "Approximate project ranking based on general reputation among Pakistani CS students and employers."
+  },
+  {
+    "university_id": "nust",
+    "rank_tier": 1,
+    "tier_label": "Strongest",
+    "ranking_score": 90,
+    "ranking_basis": "Top-ranked engineering university nationally. SEECS school highly competitive for CS/SE.",
+    "ranking_source_note": "Approximate project ranking based on known CS reputation and public ranking sources. Verify before final submission."
+  },
+  {
+    "university_id": "lums",
+    "rank_tier": 1,
+    "tier_label": "Strongest",
+    "ranking_score": 88,
+    "ranking_basis": "Prestigious private university. Strong CS program through SBASSE. Higher fee limits access.",
+    "ranking_source_note": "Approximate project ranking based on known CS reputation and public ranking sources. Verify before final submission."
+  },
+  {
+    "university_id": "giki",
+    "rank_tier": 2,
+    "tier_label": "Strong",
+    "ranking_score": 82,
+    "ranking_basis": "Highly ranked engineering institute. Strong SE program. Remote location in Topi.",
+    "ranking_source_note": "Approximate project ranking based on known CS reputation and public ranking sources. Verify before final submission."
+  },
+  {
+    "university_id": "pieas",
+    "rank_tier": 2,
+    "tier_label": "Strong",
+    "ranking_score": 80,
+    "ranking_basis": "Highly competitive entry. Limited CS seats but strong engineering reputation.",
+    "ranking_source_note": "Approximate project ranking based on known CS reputation and public ranking sources. Verify before final submission."
+  },
+  {
+    "university_id": "comsats",
+    "rank_tier": 2,
+    "tier_label": "Strong",
+    "ranking_score": 78,
+    "ranking_basis": "One of the oldest and largest CS departments in Pakistan. Strong research output.",
+    "ranking_source_note": "Approximate project ranking based on known CS reputation and public ranking sources. Verify before final submission."
+  },
+  {
+    "university_id": "iba-karachi",
+    "rank_tier": 2,
+    "tier_label": "Strong",
+    "ranking_score": 77,
+    "ranking_basis": "Prestigious institute. Growing CS program with good industry links in Karachi.",
+    "ranking_source_note": "Approximate project ranking based on known CS reputation and public ranking sources. Verify before final submission."
+  },
+  {
+    "university_id": "uet-lahore",
+    "rank_tier": 3,
+    "tier_label": "Good",
+    "ranking_score": 72,
+    "ranking_basis": "Top public engineering university. Strong engineering programs, lower fee.",
+    "ranking_source_note": "Approximate project ranking based on known CS reputation and public ranking sources. Verify before final submission."
+  },
+  {
+    "university_id": "ned-university",
+    "rank_tier": 3,
+    "tier_label": "Good",
+    "ranking_score": 68,
+    "ranking_basis": "Top engineering university in Karachi. Good CS and SE programs at low public fee.",
+    "ranking_source_note": "Approximate project ranking based on known CS reputation and public ranking sources. Verify before final submission."
+  },
+  {
+    "university_id": "uet-taxila",
+    "rank_tier": 3,
+    "tier_label": "Good",
+    "ranking_score": 66,
+    "ranking_basis": "Public engineering university with good CS/SE programs in the Punjab region.",
+    "ranking_source_note": "Approximate project ranking based on known CS reputation and public ranking sources. Verify before final submission."
+  },
+  {
+    "university_id": "itu-lahore",
+    "rank_tier": 3,
+    "tier_label": "Good",
+    "ranking_score": 64,
+    "ranking_basis": "Specialized IT university. Newer program but growing reputation in Lahore.",
+    "ranking_source_note": "Approximate project ranking based on known CS reputation and public ranking sources. Verify before final submission."
+  },
+  {
+    "university_id": "ist",
+    "rank_tier": 3,
+    "tier_label": "Good",
+    "ranking_score": 62,
+    "ranking_basis": "Specialized institute under SUPARCO. Strong in engineering and technology.",
+    "ranking_source_note": "Approximate project ranking based on known CS reputation and public ranking sources. Verify before final submission."
+  },
+  {
+    "university_id": "air-university",
+    "rank_tier": 4,
+    "tier_label": "Backup",
+    "ranking_score": 58,
+    "ranking_basis": "Federally chartered public university. Decent CS/SE programs in Islamabad.",
+    "ranking_source_note": "Approximate project ranking based on known CS reputation and public ranking sources. Verify before final submission."
+  },
+  {
+    "university_id": "bahria-university",
+    "rank_tier": 4,
+    "tier_label": "Backup",
+    "ranking_score": 56,
+    "ranking_basis": "Multiple campus university. Offers CS/SE/AI across Islamabad, Lahore, Karachi.",
+    "ranking_source_note": "Approximate project ranking based on known CS reputation and public ranking sources. Verify before final submission."
+  },
+  {
+    "university_id": "punjab-university",
+    "rank_tier": 4,
+    "tier_label": "Backup",
+    "ranking_score": 54,
+    "ranking_basis": "Oldest university in Pakistan. Offers BS CS and BS IT. Large alumni network.",
+    "ranking_source_note": "Approximate project ranking based on known CS reputation and public ranking sources. Verify before final submission."
+  },
+  {
+    "university_id": "qau",
+    "rank_tier": 4,
+    "tier_label": "Backup",
+    "ranking_score": 52,
+    "ranking_basis": "Top-ranked general university. CS department is smaller but growing.",
+    "ranking_source_note": "Approximate project ranking based on known CS reputation and public ranking sources. Verify before final submission."
+  },
+  {
+    "university_id": "university-of-karachi",
+    "rank_tier": 4,
+    "tier_label": "Backup",
+    "ranking_score": 50,
+    "ranking_basis": "Largest university in Karachi. Offers BS CS at low public fee.",
+    "ranking_source_note": "Approximate project ranking based on known CS reputation and public ranking sources. Verify before final submission."
+  },
+  {
+    "university_id": "ucp",
+    "rank_tier": 4,
+    "tier_label": "Backup",
+    "ranking_score": 48,
+    "ranking_basis": "Private university in Lahore. Offers CS and SE programs.",
+    "ranking_source_note": "Approximate project ranking based on known CS reputation and public ranking sources. Verify before final submission."
+  },
+  {
+    "university_id": "szabist",
+    "rank_tier": 4,
+    "tier_label": "Backup",
+    "ranking_score": 44,
+    "ranking_basis": "Private university with multiple campuses. Offers CS and SE programs.",
+    "ranking_source_note": "Approximate project ranking based on known CS reputation and public ranking sources. Verify before final submission."
+  },
+  {
+    "university_id": "virtual-university",
+    "rank_tier": 4,
+    "tier_label": "Backup",
+    "ranking_score": 42,
+    "ranking_basis": "Distance learning option. Flexible and low cost. Good for students who cannot attend in person.",
+    "ranking_source_note": "Approximate project ranking based on known CS reputation and public ranking sources. Verify before final submission."
+  }
+]
