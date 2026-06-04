@@ -365,6 +365,7 @@ a {
   background-image: url("data:image/svg+xml,%3Csvg width='14' height='14' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 7.5L10 12.5L15 7.5' stroke='%230F4F3D' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
+  text-overflow: ellipsis;
 }
 
 .form-group input::placeholder {
@@ -840,6 +841,12 @@ a:focus-visible {
   color: #56646f;
   background: #f2f5f7;
   border: 1px solid #dce5ea;
+}
+
+.fit-not-eligible {
+  color: var(--red);
+  background: var(--red-bg);
+  border: 1px solid #f1c9c9;
 }
 
 .card-copy {

@@ -474,6 +474,7 @@ curl -X POST http://localhost:8000/counsel \
 | 9 | Demo script + testing checklist + docs | Complete |
 | 13 | Product UI, branding, profile persistence, university cards, follow-up flow | Complete |
 | 17 | Natural chat flow — cards show only for recommendation questions, follow-ups skip card duplication | Complete |
+| 18 | Strict eligibility — "Not eligible right now" group, honest wording for weak grades, O/A Level labels, student name in AI prompts, no auto-focus | Complete |
 
 ### Key achievements
 
@@ -484,6 +485,8 @@ curl -X POST http://localhost:8000/counsel \
 - **Structured response fields** — recommendation cards, safe/difficult buckets, official links, next steps, sources, provider, and selected model
 - **Product-ready responsive UI** — DigiCounsellor branding, saved/editable profile, guided follow-ups, recommendation cards, provider status, and local/Vercel backend messaging
 - **Natural chat flow** — recommendation cards appear for recommendation questions; follow-up questions (eligibility, fees, next steps) use stored data and do not repeat cards
+- **Honest eligibility grouping** — universities are grouped into "Best matches", "Safe", "Difficult", and "Not eligible right now" with blunt reasons for weak grades (D/E, low equivalence). Follow-up questions about a specific university skip the /recommend endpoint entirely
+- **O/A Level wording** — the app correctly uses "O/A Level" for O/A Level students and "Matric/Inter" for Matric/Inter students everywhere: AI prompts, saved profile display, and fallback answers
 
 ### Team
 

@@ -210,6 +210,7 @@ class CounselResponse(BaseModel):
     recommended_universities: list[RecommendationItem] = Field(default_factory=list)
     safe_options: list[RecommendationItem] = Field(default_factory=list)
     difficult_options: list[RecommendationItem] = Field(default_factory=list)
+    not_eligible_options: list[RecommendationItem] = Field(default_factory=list)
     next_steps: list[str] = Field(default_factory=list)
     admission_links: list[AdmissionLink] = Field(default_factory=list)
     retrieved_count: int = 0
@@ -223,6 +224,7 @@ class RecommendResponse(BaseModel):
     recommended_universities: list[RecommendationItem] = Field(default_factory=list)
     safe_options: list[RecommendationItem] = Field(default_factory=list)
     difficult_options: list[RecommendationItem] = Field(default_factory=list)
+    not_eligible_options: list[RecommendationItem] = Field(default_factory=list)
     next_steps: list[str] = Field(default_factory=list)
     admission_links: list[AdmissionLink] = Field(default_factory=list)
     retrieved_count: int = 0
@@ -238,6 +240,7 @@ class AISummaryRequest(BaseModel):
     recommended_universities: list[RecommendationItem] = Field(default_factory=list)
     safe_options: list[RecommendationItem] = Field(default_factory=list)
     difficult_options: list[RecommendationItem] = Field(default_factory=list)
+    not_eligible_options: list[RecommendationItem] = Field(default_factory=list)
     sources: list[SourceItem] = Field(default_factory=list)
 
 class AISummaryResponse(BaseModel):
@@ -553,15 +556,26 @@ def eligibility_summary(rule: dict | None, normalized: dict) -> tuple[str, str]:
     min_inter = float(rule.get("minimum_inter_percentage", 0) or 0)
     min_matric = float(rule.get("minimum_matric_percentage", 0) or 0)
     test_name = rule.get("entry_test_name") or "Entry test"
-    if inter_pct >= min_inter and matric_pct >= min_matric:
-        status = "eligible"
-        summary = f"Meets the approximate {min_inter:g}% Inter and {min_matric:g}% Matric minimums. {test_name} may still affect merit."
-    elif inter_pct >= min_inter or matric_pct >= min_matric:
-        status = "borderline"
-        summary = f"Partly meets the approximate minimums; confirm equivalence, subjects, and merit formula."
-    else:
-        status = "difficult"
-        summary = f"Below the approximate {min_inter:g}% Inter / {min_matric:g}% Matric guideline, so this is difficult unless official rules differ."
+    status = "eligible"
+    summary = f"Meets the approximate {min_inter:g}% Inter and {min_matric:g}% Matric minimums. {test_name} may still affect merit."
+
+    if inter_pct < min_inter or matric_pct < min_matric:
+        inter_gap = min_inter - inter_pct if min_inter > 0 else 0
+        matric_gap = min_matric - matric_pct if min_matric > 0 else 0
+        gap = max(inter_gap, matric_gap)
+
+        if inter_pct < 50 and min_inter >= 60:
+            status = "not_eligible"
+            summary = f"Your marks ({inter_pct}%) are well below the {min_inter:g}% minimum. This university will not consider your application at this level."
+        elif gap >= 15:
+            status = "not_eligible"
+            summary = f"Your marks fall {gap:g}% short of the {min_inter:g}% minimum guideline. Admission is not realistic at this point."
+        elif inter_pct >= min_inter or matric_pct >= min_matric:
+            status = "borderline"
+            summary = f"Partly meets the approximate minimums; confirm equivalence, subjects, and merit formula."
+        else:
+            status = "difficult"
+            summary = f"Below the approximate {min_inter:g}% Inter / {min_matric:g}% Matric guideline. Very difficult unless official rules differ significantly."
     return status, summary
 
 def score_university(profile: Profile, uni_id: str, normalized: dict, effective_city: str = "") -> dict:
@@ -619,7 +633,9 @@ def score_university(profile: Profile, uni_id: str, normalized: dict, effective_
 
     total = int(base_score + city_bonus + city_penalty + field_bonus + marks_fit + type_bonus + budget_bonus)
     inter_pct = normalized["inter_equivalent_pct"]
-    if elig_status == "difficult":
+    if elig_status == "not_eligible":
+        fit_level = "Not eligible"
+    elif elig_status == "difficult":
         fit_level = "Difficult"
     elif tier <= 2 and inter_pct < 82:
         fit_level = "Difficult"
@@ -669,8 +685,11 @@ def build_recommendation_item(score: dict, profile: Profile, chunks: list[dict],
         fee_summary = "Usually a lower public-sector fee bracket; verify the latest fee page."
     else:
         fee_summary = "Private-sector fees can be higher; verify the latest official fee page."
+    fit_level = score.get("fit_level", "")
     match_reason = "; ".join(score.get("match_reasons") or [])
-    if not match_reason:
+    if fit_level == "Not eligible":
+        match_reason = score.get("eligibility_summary", "Your marks are below this university's minimum requirements.")
+    elif not match_reason:
         match_reason = ranking.get("ranking_basis") or university.get("notes", "Relevant option from the university data.")
     source_preview = chunk_preview_for(uni_id, chunks) or university.get("notes", "")
     return RecommendationItem(
@@ -693,7 +712,7 @@ def build_recommendation_item(score: dict, profile: Profile, chunks: list[dict],
     )
 
 def build_recommendation_lists(profile: Profile, normalized: dict, chunks: list[dict],
-                               question: str, selected_university: str = "") -> tuple[list[RecommendationItem], list[RecommendationItem], list[RecommendationItem], str]:
+                               question: str, selected_university: str = "") -> tuple[list[RecommendationItem], list[RecommendationItem], list[RecommendationItem], list[RecommendationItem], str]:
     effective_city = profile.city_preference
     if not effective_city or effective_city.lower() == "any city":
         inferred_city = infer_city_from_text(question)
@@ -708,18 +727,24 @@ def build_recommendation_lists(profile: Profile, normalized: dict, chunks: list[
     if selected_id and selected_id in candidate_ids:
         selected_score = score_university(profile, selected_id, normalized, effective_city)
         scores = [selected_score] + [s for s in scores if s.get("university_id") != selected_id]
-    recommendations = [build_recommendation_item(s, profile, chunks, effective_city) for s in scores[:5]]
+    eligible_scores = [s for s in scores if s.get("fit_level") != "Not eligible"]
+    not_eligible_scores = [s for s in scores if s.get("fit_level") == "Not eligible"]
+    recommendations = [build_recommendation_item(s, profile, chunks, effective_city) for s in eligible_scores[:5]]
     safe = [
         build_recommendation_item(s, profile, chunks, effective_city)
-        for s in scores
+        for s in eligible_scores
         if s.get("fit_level") in ("Safe", "Backup")
     ][:3]
     difficult = [
         build_recommendation_item(s, profile, chunks, effective_city)
-        for s in scores
+        for s in eligible_scores
         if s.get("fit_level") == "Difficult"
     ][:3]
-    return recommendations, safe, difficult, selected_id
+    not_eligible = [
+        build_recommendation_item(s, profile, chunks, effective_city)
+        for s in not_eligible_scores[:4]
+    ]
+    return recommendations, safe, difficult, not_eligible, selected_id
 
 def build_next_steps(recommendations: list[RecommendationItem], selected_id: str = "") -> list[str]:
     if selected_id and recommendations:
@@ -790,11 +815,13 @@ async def call_ollama(prompt: str, num_predict: int | None = None) -> str | None
 
 def build_fallback_answer(recommendations: list[RecommendationItem], safe_options: list[RecommendationItem],
                           difficult_options: list[RecommendationItem], profile: Profile,
-                          question: str, normalized: dict, incomplete: bool = False,
-                          fast_mode: bool = FAST_MODE) -> str:
+                          not_eligible_options: list[RecommendationItem] | None = None,
+                          question: str = "", normalized: dict | None = None,
+                          incomplete: bool = False, fast_mode: bool = FAST_MODE) -> str:
     field = normalize_field(profile.preferred_field)
     city = profile.city_preference or "any city"
-    academic_note = normalized.get("academic_notes", "")
+    academic_note = (normalized or {}).get("academic_notes", "")
+    not_eligible = not_eligible_options or []
 
     if fast_mode:
         best = recommendations[0] if recommendations else None
@@ -815,12 +842,16 @@ def build_fallback_answer(recommendations: list[RecommendationItem], safe_option
         if safe:
             lines.append("\n**Safe option**")
             lines.append(f"{safe.short_name} is the safer route: {safe.eligibility_summary}")
-        if difficult_options:
-            lines.append("\n**Next step**")
-            lines.append(f"Treat {difficult_options[0].short_name} as a higher-merit option, then select a university card to check fees, requirements, and official admission links.")
-        else:
+        if not_eligible:
+            lines.append("\n**Not eligible right now**")
+            for rec in not_eligible[:3]:
+                lines.append(f"- {rec.short_name}: {rec.match_reason}")
+        if recommendations:
             lines.append("\n**Next step**")
             lines.append("Select a university card to check fees, requirements, and official admission links before applying.")
+        else:
+            lines.append("\n**Next step**")
+            lines.append("Add more profile details for a stronger shortlist.")
         return "\n".join(lines)
 
     lines = []
@@ -847,6 +878,11 @@ def build_fallback_answer(recommendations: list[RecommendationItem], safe_option
         lines.append("\n**Difficult options**")
         for rec in difficult_options[:3]:
             lines.append(f"- {rec.short_name}: strong reputation, but merit or fit may be tougher for this profile.")
+
+    if not_eligible:
+        lines.append("\n**Not eligible right now**")
+        for rec in not_eligible[:3]:
+            lines.append(f"- {rec.short_name}: {rec.match_reason}")
 
     lines.append("\n**Next steps:**")
     lines.append("1. Open the official admission and eligibility links for the shortlisted universities.")
@@ -878,12 +914,15 @@ def build_master_prompt(profile: Profile, question: str, context: str,
                         recommendations: list[RecommendationItem],
                         safe_options: list[RecommendationItem],
                         difficult_options: list[RecommendationItem],
+                        not_eligible_options: list[RecommendationItem],
                         normalized: dict, selected_id: str = "",
                         fast_mode: bool = FAST_MODE) -> str:
     field = normalize_field(profile.preferred_field)
     city = profile.city_preference or "any city"
     budget_str = profile.budget or "not specified"
     academic_notes = normalized.get("academic_notes", "")
+    is_olevel = profile.education_system == "olevel"
+    level_label = "O/A Level" if is_olevel else "Matric/Inter"
 
     inter_pct = normalized["inter_equivalent_pct"]
     matric_pct = normalized["matric_equivalent_pct"]
@@ -898,6 +937,7 @@ def build_master_prompt(profile: Profile, question: str, context: str,
     rec_section = "\n".join(rec_lines) if rec_lines else "(No structured recommendations)"
     safe_section = ", ".join([r.short_name for r in safe_options]) or "None identified"
     difficult_section = ", ".join([r.short_name for r in difficult_options]) or "None identified"
+    not_eligible_txt = ", ".join([f"{r.short_name} ({r.match_reason})" for r in not_eligible_options]) or "None identified"
     selected_line = f"Selected university focus: {selected_id}" if selected_id else "Selected university focus: none"
 
     if fast_mode:
@@ -905,7 +945,7 @@ def build_master_prompt(profile: Profile, question: str, context: str,
 
 STUDENT:
 Name: {profile.name}
-Marks: Matric {matric_pct}%, Inter {inter_pct}%
+Marks: {level_label} — {matric_pct}% / {inter_pct}%
 Field: {field} | City: {city} | Budget: {budget_str} | University type: {profile.university_type}
 Entry Test: {profile.entry_test or "not specified"}
 {selected_line}
@@ -921,6 +961,9 @@ SAFE OPTIONS:
 
 DIFFICULT OPTIONS:
 {difficult_section}
+
+NOT ELIGIBLE RIGHT NOW:
+{not_eligible_txt}
 
 DATA NOTES:
 {context}
@@ -943,7 +986,7 @@ Finish the Next step section with one complete sentence and a full stop."""
 
 STUDENT:
 Name: {profile.name}
-Marks: Matric {matric_pct}%, Inter {inter_pct}%
+Marks: {level_label} — {matric_pct}% / {inter_pct}%
 Entry Test: {profile.entry_test}
 Field: {field} | City: {city} | Budget: {budget_str} | University type: {profile.university_type}
 {("Note: " + academic_notes) if academic_notes else ""}
@@ -963,6 +1006,9 @@ SAFE OPTIONS:
 
 DIFFICULT OPTIONS:
 {difficult_section}
+
+NOT ELIGIBLE RIGHT NOW:
+{not_eligible_txt}
 
 Write exactly 5 short sections. Do not write a letter or greeting. Do not mention JSON, retrieval, embeddings, or internal scores unless useful to the student.
 
@@ -1241,7 +1287,7 @@ def build_recommendation_result(profile: Profile, question: str,
     retrieved_count = len(chunks)
 
     scoring_start = time.perf_counter()
-    recommendations, safe_options, difficult_options, selected_id = build_recommendation_lists(
+    recommendations, safe_options, difficult_options, not_eligible_options, selected_id = build_recommendation_lists(
         profile, normalized, chunks, question, selected_id
     )
     next_steps = build_next_steps(recommendations, selected_id)
@@ -1261,6 +1307,7 @@ def build_recommendation_result(profile: Profile, question: str,
         recommended_universities=recommendations,
         safe_options=safe_options,
         difficult_options=difficult_options,
+        not_eligible_options=not_eligible_options,
         next_steps=next_steps,
         admission_links=admission_links,
         retrieved_count=retrieved_count,
@@ -1281,10 +1328,11 @@ async def generate_ai_summary(profile: Profile, question: str, selected_id: str,
                               recommendations: list[RecommendationItem],
                               safe_options: list[RecommendationItem],
                               difficult_options: list[RecommendationItem],
+                              not_eligible_options: list[RecommendationItem],
                               normalized: dict, context: str) -> tuple[str, str, str, float]:
     prompt = build_master_prompt(
         profile, question, context, recommendations, safe_options,
-        difficult_options, normalized, selected_id, True
+        difficult_options, not_eligible_options, normalized, selected_id, True
     )
     llm_start = time.perf_counter()
     answer = ""
@@ -1310,7 +1358,8 @@ async def generate_ai_summary(profile: Profile, question: str, selected_id: str,
             if result:
                 answer = build_fallback_answer(
                     recommendations, safe_options, difficult_options,
-                    profile, question, normalized, incomplete=True,
+                    profile, not_eligible_options=not_eligible_options,
+                    question=question, normalized=normalized, incomplete=True,
                     fast_mode=True
                 )
                 provider_used = "fallback"
@@ -1319,7 +1368,8 @@ async def generate_ai_summary(profile: Profile, question: str, selected_id: str,
         elif provider == "fallback":
             answer = build_fallback_answer(
                 recommendations, safe_options, difficult_options,
-                profile, question, normalized, fast_mode=True
+                profile, not_eligible_options=not_eligible_options,
+                question=question, normalized=normalized, fast_mode=True
             )
             provider_used = "fallback"
             selected_model = "rule-based guidance"
@@ -1329,7 +1379,8 @@ async def generate_ai_summary(profile: Profile, question: str, selected_id: str,
     if not answer:
         answer = build_fallback_answer(
             recommendations, safe_options, difficult_options,
-            profile, question, normalized, fast_mode=True
+            profile, not_eligible_options=not_eligible_options,
+            question=question, normalized=normalized, fast_mode=True
         )
         provider_used = "fallback"
         selected_model = "rule-based guidance"
@@ -1383,6 +1434,7 @@ async def ai_summary(request: AISummaryRequest):
     recommendations = request.recommended_universities
     safe_options = request.safe_options
     difficult_options = request.difficult_options
+    not_eligible_options = request.not_eligible_options
     context = build_context_from_sources(request.sources)
     rag_seconds = 0.0
     scoring_seconds = 0.0
@@ -1395,6 +1447,7 @@ async def ai_summary(request: AISummaryRequest):
         recommendations = rec_response.recommended_universities
         safe_options = rec_response.safe_options
         difficult_options = rec_response.difficult_options
+        not_eligible_options = rec_response.not_eligible_options
         context = rec_result["context"]
         rec_timing = rec_response.timing or TimingInfo()
         rag_seconds = rec_timing.rag_seconds
@@ -1402,7 +1455,7 @@ async def ai_summary(request: AISummaryRequest):
 
     answer, provider_used, selected_model, llm_seconds = await generate_ai_summary(
         request.profile, request.question, selected_id, recommendations,
-        safe_options, difficult_options, normalized, context
+        safe_options, difficult_options, not_eligible_options, normalized, context
     )
     total_seconds = time.perf_counter() - total_start
     response = AISummaryResponse(
@@ -1445,7 +1498,8 @@ async def counsel(request: CounselRequest):
     answer, provider_used, selected_model, llm_seconds = await generate_ai_summary(
         request.profile, request.question, rec_result["selected_id"],
         rec_response.recommended_universities, rec_response.safe_options,
-        rec_response.difficult_options, rec_result["normalized"], rec_result["context"]
+        rec_response.difficult_options, rec_response.not_eligible_options,
+        rec_result["normalized"], rec_result["context"]
     )
 
     total_seconds = time.perf_counter() - total_start
@@ -1456,6 +1510,7 @@ async def counsel(request: CounselRequest):
         recommended_universities=rec_response.recommended_universities,
         safe_options=rec_response.safe_options,
         difficult_options=rec_response.difficult_options,
+        not_eligible_options=rec_response.not_eligible_options,
         next_steps=rec_response.next_steps,
         admission_links=rec_response.admission_links,
         retrieved_count=rec_response.retrieved_count,

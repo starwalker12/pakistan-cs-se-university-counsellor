@@ -84,6 +84,8 @@ function setEducationFields(system) {
   const isOLevel = system === 'olevel';
   matricFields.classList.toggle('hidden', isOLevel);
   olevelFields.classList.toggle('hidden', !isOLevel);
+  document.getElementById('matricMarks').required = !isOLevel;
+  document.getElementById('interMarks').required = !isOLevel;
 }
 
 function showProfileNotice(message, type = 'success') {
@@ -124,6 +126,13 @@ function gradeToPct(grade) {
 function needsFreshRecommendations(question) {
   if (!question) return false;
   const lower = question.toLowerCase().trim();
+  const followedByAction = [
+    'tell me about', 'check eligibility for', 'fees for',
+    'show requirements for', 'what should i do next for',
+    'tell me more about', 'admission requirements for',
+  ];
+  const isFollowUp = followedByAction.some((phrase) => lower.includes(phrase));
+  if (isFollowUp) return false;
   const freshPatterns = [
     'best for me', 'recommend', 'best match', 'safe option',
     'universities in', 'cs in', 'se in', 'options for me',
@@ -243,11 +252,14 @@ function renderActiveProfile(profile) {
     : profile.university_type === 'private'
       ? 'Private preferred'
       : 'Public or private';
+  const isOLevel = profile.education_system === 'olevel';
+  const levelLabel1 = isOLevel ? 'O Level' : 'Matric';
+  const levelLabel2 = isOLevel ? 'A Level' : 'Inter';
   activeProfileSummary.hidden = false;
   activeProfileSummary.innerHTML = `
     <strong>Using saved profile</strong>
     ${escapeHtml(profile.name)} · ${escapeHtml(profile.preferred_field)} · ${escapeHtml(city)}<br>
-    Matric/O Level ${escapeHtml(profile.matric_marks)}% · Inter/A Level ${escapeHtml(profile.inter_marks)}% · ${escapeHtml(typeLabel)}
+    ${levelLabel1} ${escapeHtml(profile.matric_marks)}% · ${levelLabel2} ${escapeHtml(profile.inter_marks)}% · ${escapeHtml(typeLabel)}
   `;
 }
 
@@ -453,6 +465,7 @@ function scrollChatToBottom() {
 
 function fitClass(fit = '') {
   const value = fit.toLowerCase();
+  if (value.includes('not eligible')) return 'fit-not-eligible';
   if (value.includes('best')) return 'fit-best';
   if (value.includes('safe')) return 'fit-safe';
   if (value.includes('difficult')) return 'fit-difficult';
@@ -483,11 +496,12 @@ function renderRecommendationCard(rec) {
       <li><strong>Test:</strong> ${escapeHtml(rec.entry_test || 'Check official policy')}</li>
       <li><strong>Fees:</strong> ${escapeHtml(rec.fee_summary || 'Verify latest official fee page')}</li>
     </ul>
+    ${firstLinks.length ? `
     <div class="link-row">
       ${firstLinks.map((link) => `
         <a class="link-action" href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(link.label || 'Official link')}</a>
       `).join('')}
-    </div>
+    </div>` : ''}
     <div class="card-actions">
       <button type="button" class="mini-action" data-action="focus">Select</button>
       <button type="button" class="mini-action" data-action="eligibility">Eligibility</button>
@@ -512,17 +526,17 @@ function renderRecommendationCard(rec) {
   return card;
 }
 
-function renderRecommendations(recommendations = []) {
+function renderRecommendations(recommendations = [], heading = 'Recommended universities') {
   if (!recommendations.length) return null;
   const section = document.createElement('section');
   section.className = 'recommendation-set';
-  const heading = document.createElement('h3');
-  heading.className = 'recommendation-heading';
-  heading.textContent = 'Recommended universities';
+  const title = document.createElement('h3');
+  title.className = 'recommendation-heading';
+  title.textContent = heading;
   const grid = document.createElement('div');
   grid.className = 'recommendation-grid';
   recommendations.slice(0, 5).forEach((rec) => grid.appendChild(renderRecommendationCard(rec)));
-  section.append(heading, grid);
+  section.append(title, grid);
   return section;
 }
 
@@ -613,13 +627,12 @@ function addRecommendationTurn(data) {
   block.appendChild(summaryMessage);
 
   const recommendations = data.recommended_universities || [];
-  const selectedFromResponse = recommendations.find((rec) => rec.university_id === data.selected_university);
-  if (selectedFromResponse && (!selectedUniversity || selectedUniversity.university_id !== selectedFromResponse.university_id)) {
-    setSelectedUniversity(selectedFromResponse, false);
-  }
+  const notEligible = data.not_eligible_options || [];
 
   const recSection = renderRecommendations(recommendations);
   if (recSection) block.appendChild(recSection);
+  const notEligibleSection = renderRecommendations(notEligible, 'Not eligible right now');
+  if (notEligibleSection) block.appendChild(notEligibleSection);
   block.appendChild(renderNextSteps(data.next_steps || [], recommendations));
   const sourcesPanel = renderSources(data.sources || []);
   if (sourcesPanel) block.appendChild(sourcesPanel);
@@ -638,13 +651,12 @@ function addAssistantTurn(data) {
   block.appendChild(createMessage('bot', `<div class="answer-content">${formatMarkdown(data.answer || 'I could not generate an answer for this request.')}</div>`));
 
   const recommendations = data.recommended_universities || [];
-  const selectedFromResponse = recommendations.find((rec) => rec.university_id === data.selected_university);
-  if (selectedFromResponse && (!selectedUniversity || selectedUniversity.university_id !== selectedFromResponse.university_id)) {
-    setSelectedUniversity(selectedFromResponse, false);
-  }
+  const notEligible = data.not_eligible_options || [];
 
   const recSection = renderRecommendations(recommendations);
   if (recSection) block.appendChild(recSection);
+  const notEligibleSection = renderRecommendations(notEligible, 'Not eligible right now');
+  if (notEligibleSection) block.appendChild(notEligibleSection);
   block.appendChild(renderNextSteps(data.next_steps || [], recommendations));
   const sourcesPanel = renderSources(data.sources || []);
   if (sourcesPanel) block.appendChild(sourcesPanel);
@@ -737,6 +749,7 @@ async function requestAISummary(question, recommendData, summaryHandle, selected
         recommended_universities: recommendData.recommended_universities || [],
         safe_options: recommendData.safe_options || [],
         difficult_options: recommendData.difficult_options || [],
+        not_eligible_options: recommendData.not_eligible_options || [],
         sources: recommendData.sources || [],
       }),
     });
@@ -777,6 +790,7 @@ async function requestAISummaryOnly(question, recommendData, selectedId) {
         recommended_universities: recommendData.recommended_universities || [],
         safe_options: recommendData.safe_options || [],
         difficult_options: recommendData.difficult_options || [],
+        not_eligible_options: recommendData.not_eligible_options || [],
         sources: recommendData.sources || [],
       }),
     });
