@@ -3,13 +3,13 @@ Pakistan CS & SE University Counsellor — FastAPI Backend
 
 Endpoints:
   POST /counsel  — accepts student profile + question, returns counselling answer
+  GET  /health   — health check
+  GET  /providers — shows configured LLM providers
 
-Flow:
-  1. Receive profile + question from frontend
-  2. Query Chroma vector DB for relevant university documents (RAG retrieval)
-  3. Build prompt with profile + retrieved context
-  4. Send prompt to local Ollama (Gemma) for final answer
-  5. Return answer to frontend
+LLM Provider order:
+  1. LM Studio (OpenAI-compatible endpoint)
+  2. Ollama (local)
+  3. Static fallback (no AI)
 """
 
 from fastapi import FastAPI
@@ -28,8 +28,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-OLLAMA_URL = "http://localhost:11434/api/generate"
-OLLAMA_MODEL = "gemma4:latest"
+# ──────────────────────────────────────────────
+# Provider configuration (from environment)
+# ──────────────────────────────────────────────
+
+# LM Studio
+LM_STUDIO_URL = os.environ.get("LM_STUDIO_URL", "http://localhost:1234/v1/chat/completions")
+LM_STUDIO_MODEL = os.environ.get("LM_STUDIO_MODEL", "gemma")
+
+# Ollama
+OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434/api/chat")
+OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "gemma4:latest")
+
+# Provider order (comma-separated, default: lm_studio,ollama,fallback)
+PROVIDER_ORDER = os.environ.get("PROVIDER_ORDER", "lm_studio,ollama,fallback").split(",")
 
 
 # ──────────────────────────────────────────────
@@ -37,6 +49,7 @@ OLLAMA_MODEL = "gemma4:latest"
 # ──────────────────────────────────────────────
 
 class Profile(BaseModel):
+    name: str = ""
     matric_marks: str = ""
     inter_marks: str = ""
     entry_test: str = ""
@@ -56,7 +69,7 @@ class CounselResponse(BaseModel):
 
 # ──────────────────────────────────────────────
 # In-memory university data (placeholder)
-# Will be replaced with Chroma retrieval in Phase 2
+# Will be replaced with Chroma retrieval in a later phase
 # ──────────────────────────────────────────────
 
 PLACEHOLDER_DOCS = [
@@ -75,16 +88,114 @@ PLACEHOLDER_DOCS = [
 ]
 
 
-# ──────────────────────────────────────────────
-# POST /counsel — main counselling endpoint
-# ──────────────────────────────────────────────
+# =============================================
+# Helper: call LM Studio (OpenAI compatible)
+# =============================================
+async def call_lm_studio(prompt: str) -> str | None:
+    """
+    Send prompt to LM Studio's OpenAI-compatible endpoint.
+    Returns the answer text, or None on failure.
+    """
+    try:
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            resp = await client.post(LM_STUDIO_URL, json={
+                "model": LM_STUDIO_MODEL,
+                "messages": [
+                    {"role": "system", "content": "You are a helpful university counsellor for Pakistani students."},
+                    {"role": "user", "content": prompt}
+                ],
+                "stream": False
+            })
+            if resp.status_code != 200:
+                return None
+            data = resp.json()
+            # OpenAI format: choices[0].message.content
+            return data["choices"][0]["message"]["content"].strip()
+    except Exception:
+        return None
 
+
+# =============================================
+# Helper: call Ollama (local)
+# =============================================
+async def call_ollama(prompt: str) -> str | None:
+    """
+    Send prompt to Ollama chat API.
+    Returns the answer text, or None on failure.
+    """
+    try:
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            resp = await client.post(OLLAMA_URL, json={
+                "model": OLLAMA_MODEL,
+                "messages": [
+                    {"role": "user", "content": prompt}
+                ],
+                "stream": False
+            })
+            if resp.status_code != 200:
+                return None
+            data = resp.json()
+            # Ollama chat format: message.content
+            return data["message"]["content"].strip()
+    except Exception:
+        return None
+
+
+# =============================================
+# Helper: fallback response (no AI)
+# =============================================
+def fallback_response(prompt: str) -> str:
+    """
+    Static fallback when no LLM provider is available.
+    Returns a simple FAQ-style answer.
+    """
+    return (
+        "I'm sorry, but the AI providers (LM Studio and Ollama) are not "
+        "currently available. Please make sure at least one of them is running.\n\n"
+        "In the meantime, here is what you can do:\n"
+        "- Start LM Studio, load a model, and start the local server on port 1234\n"
+        "- Or start Ollama with: ollama serve\n\n"
+        "Once either provider is running, restart the backend and try again."
+    )
+
+
+# =============================================
+# Helper: get AI response (tries providers in order)
+# =============================================
+async def get_ai_response(prompt: str) -> str:
+    """
+    Try each provider in PROVIDER_ORDER and return the first successful response.
+    """
+    for provider in PROVIDER_ORDER:
+        provider = provider.strip()
+
+        if provider == "lm_studio":
+            answer = await call_lm_studio(prompt)
+            if answer:
+                return answer
+
+        elif provider == "ollama":
+            answer = await call_ollama(prompt)
+            if answer:
+                return answer
+
+        elif provider == "fallback":
+            return fallback_response(prompt)
+
+    # If no provider matched (shouldn't happen if fallback is in the list)
+    return fallback_response(prompt)
+
+
+# =============================================
+# POST /counsel — main counselling endpoint
+# =============================================
 @app.post("/counsel", response_model=CounselResponse)
 async def counsel(request: CounselRequest):
-    # Build a simple profile summary string
+    # Build a profile summary string
     profile_summary = (
-        f"Matric: {request.profile.matric_marks}, "
-        f"Intermediate: {request.profile.inter_marks}, "
+        f"Name: {request.profile.name}, "
+        f"Matric: {request.profile.matric_marks}%, "
+        f"Intermediate: {request.profile.inter_marks}%, "
         f"Entry Test: {request.profile.entry_test}, "
         f"Preferred Field: {request.profile.preferred_field}, "
         f"City: {request.profile.city_preference}, "
@@ -94,7 +205,7 @@ async def counsel(request: CounselRequest):
     # Combine all placeholder docs into a single context block
     context = "\n\n".join(PLACEHOLDER_DOCS)
 
-    # Build the prompt for Ollama
+    # Build the prompt
     prompt = f"""You are a university counsellor for Pakistani students.
 Use the following university admission information to answer the student's question.
 
@@ -108,28 +219,43 @@ Student Question: {request.question}
 
 Give a clear, helpful, and personalised answer based on the student's marks and preferences."""
 
-    # Call local Ollama
-    try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            resp = await client.post(OLLAMA_URL, json={
-                "model": OLLAMA_MODEL,
-                "prompt": prompt,
-                "stream": False
-            })
-            data = resp.json()
-            answer = data.get("response", "").strip()
-            if not answer:
-                answer = "I could not generate an answer at this time."
-    except Exception as e:
-        answer = f"Ollama is not running. Start it with: ollama serve\n\nDebug: {str(e)}"
+    # Get response from the provider chain
+    answer = await get_ai_response(prompt)
 
     return CounselResponse(answer=answer)
 
 
-# ──────────────────────────────────────────────
-# Health check
-# ──────────────────────────────────────────────
-
+# =============================================
+# GET /health — simple health check
+# =============================================
 @app.get("/health")
 async def health():
-    return {"status": "ok", "model": OLLAMA_MODEL}
+    return {
+        "status": "ok",
+        "message": "Backend is running"
+    }
+
+
+# =============================================
+# GET /providers — show configured providers
+# =============================================
+@app.get("/providers")
+async def providers():
+    return {
+        "providers": {
+            "lm_studio": {
+                "url": LM_STUDIO_URL,
+                "model": LM_STUDIO_MODEL,
+                "active": "lm_studio" in PROVIDER_ORDER
+            },
+            "ollama": {
+                "url": OLLAMA_URL,
+                "model": OLLAMA_MODEL,
+                "active": "ollama" in PROVIDER_ORDER
+            },
+            "fallback": {
+                "active": "fallback" in PROVIDER_ORDER
+            }
+        },
+        "provider_order": PROVIDER_ORDER
+    }
