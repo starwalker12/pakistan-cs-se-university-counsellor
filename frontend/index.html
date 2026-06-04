@@ -7,62 +7,115 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <header class="app-header">
-      <h1>Pakistan CS & SE University Counsellor</h1>
-      <p>Get personalised admission advice for Computer Science and Software Engineering programs across Pakistan.</p>
+
+  <div class="app-wrapper">
+
+    <!-- ========================================== -->
+    <!-- Hero / Header                              -->
+    <!-- ========================================== -->
+    <header class="hero">
+      <div class="hero-content">
+        <h1>Pakistan CS &amp; Software Engineering<br>University Counsellor</h1>
+        <p class="hero-subtitle">
+          Find suitable universities based on your marks, field, city, and budget
+        </p>
+        <p class="hero-tagline">
+          Powered by RAG &mdash; Retrieval-Augmented Generation with local university admission data
+        </p>
+      </div>
     </header>
 
-    <main class="app-main">
-      <!-- Student Profile Form -->
-      <section class="profile-section" id="profileSection">
-        <h2>Your Profile</h2>
-        <form id="profileForm">
+    <!-- ========================================== -->
+    <!-- Main layout: form + chat                   -->
+    <!-- ========================================== -->
+    <div class="main-layout">
+
+      <!-- Left: Student Profile Form -->
+      <section class="profile-panel">
+        <h2>Student Profile</h2>
+        <p class="panel-hint">Fill in your details to get personalised advice.</p>
+
+        <form id="profileForm" autocomplete="off">
+
           <div class="form-group">
-            <label for="matricMarks">Matriculation Marks (total or percentage):</label>
-            <input type="number" id="matricMarks" placeholder="e.g. 950 / 1050 or 90.5" step="0.1">
+            <label for="studentName">Student Name</label>
+            <input type="text" id="studentName" placeholder="e.g. Ali Khan">
           </div>
+
           <div class="form-group">
-            <label for="interMarks">Intermediate Marks (total or percentage):</label>
-            <input type="number" id="interMarks" placeholder="e.g. 850 / 1100 or 77.2" step="0.1">
+            <label for="matricMarks">Matric Percentage</label>
+            <input type="number" id="matricMarks" placeholder="e.g. 90.5" step="0.1" min="0" max="100">
           </div>
+
           <div class="form-group">
-            <label for="entryTest">Entry Test Score (optional):</label>
-            <input type="text" id="entryTest" placeholder="e.g. ECAT 150 / 200 or NTS 70">
+            <label for="interMarks">Intermediate Percentage</label>
+            <input type="number" id="interMarks" placeholder="e.g. 80.0" step="0.1" min="0" max="100">
           </div>
+
           <div class="form-group">
-            <label for="preferredField">Preferred Field:</label>
+            <label for="entryTest">Entry Test Score <span class="optional">(optional)</span></label>
+            <input type="text" id="entryTest" placeholder="e.g. ECAT 150/200 or NTS 70">
+          </div>
+
+          <div class="form-group">
+            <label for="preferredField">Preferred Field</label>
             <select id="preferredField">
-              <option value="">Select...</option>
+              <option value="">&mdash; Select &mdash;</option>
               <option value="CS">Computer Science</option>
               <option value="SE">Software Engineering</option>
             </select>
           </div>
+
           <div class="form-group">
-            <label for="cityPref">City Preference (optional):</label>
+            <label for="cityPref">Preferred City <span class="optional">(optional)</span></label>
             <input type="text" id="cityPref" placeholder="e.g. Lahore, Islamabad, Karachi">
           </div>
+
           <div class="form-group">
-            <label for="budget">Annual Budget (optional):</label>
-            <input type="text" id="budget" placeholder="e.g. 500000">
+            <label for="budget">Budget Range (PKR) <span class="optional">(optional)</span></label>
+            <input type="text" id="budget" placeholder="e.g. 100000 &ndash; 500000">
           </div>
+
           <button type="button" id="saveProfileBtn">Save Profile</button>
         </form>
+
+        <!-- RAG explanation -->
+        <div class="rag-note">
+          <strong>&#9432; How it works</strong>
+          <p>This project uses RAG (Retrieval-Augmented Generation) with local university admission data and a local LLM (Gemma via Ollama) to give you personalised counselling.</p>
+        </div>
       </section>
 
-      <!-- Chat Section -->
-      <section class="chat-section" id="chatSection">
-        <h2>Ask a Question</h2>
-        <div class="chat-box" id="chatBox">
-          <div class="message bot">Welcome! Please fill in your profile above, then ask me about university admissions.</div>
+      <!-- Right: Chat Section -->
+      <section class="chat-panel">
+        <div class="chat-header">
+          <h2>Ask a Question</h2>
+          <span class="status-dot" id="statusDot"></span>
         </div>
-        <div class="input-area">
+
+        <div class="chat-messages" id="chatBox">
+          <div class="message bot">
+            Welcome! Please fill in your profile on the left, then ask me about university admissions.
+          </div>
+        </div>
+
+        <div class="chat-input-area">
           <input type="text" id="userInput" placeholder="Type your question here..." disabled>
           <button id="sendBtn" disabled>Send</button>
         </div>
       </section>
-    </main>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- Footer                                     -->
+    <!-- ========================================== -->
+    <footer class="app-footer">
+      <p>Raahim Adeel &bull; Fardan Aatir &bull; Muhammad Ismail</p>
+    </footer>
+
   </div>
+
   <script src="script.js"></script>
 </body>
 </html>
