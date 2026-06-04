@@ -38,52 +38,93 @@ A RAG-based student counsellor web app for Pakistani students who want admission
 └── README.md
 ```
 
-## Running the Full Local Demo
+## Quick Demo Setup (5 minutes)
 
-The full AI demo runs locally. Vercel can host the frontend only — the backend, LM Studio / Ollama, and Chroma must run on your laptop.
+**Full AI RAG demo runs locally** because Ollama or LM Studio runs on your laptop. Vercel can show the frontend, but local AI needs the local backend.
 
-### Prerequisites
-
-- Python 3.10+
-- LM Studio (with a model loaded) OR Ollama (with Gemma installed)
-
-### Step 1 — Install Python dependencies
+### Step 1 — Install dependencies
 
 ```bash
-cd backend
+cd /Users/sw12/Projects/ML-Project/backend
 pip install -r requirements.txt
 ```
 
 ### Step 2 — Start an LLM provider
 
-**Option A — LM Studio (recommended)**
-1. Open LM Studio
-2. Load the Gemma model
-3. Click the "Start Server" button (default port: 1234)
-4. The backend will automatically use `http://localhost:1234/v1/chat/completions`
-
-**Option B — Ollama (backup)**
+**Option A — Ollama (easiest)**
 ```bash
-ollama serve
+OLLAMA_ORIGINS=* ollama serve
 ```
 
-### Step 3 — Start the FastAPI backend
+**Option B — LM Studio**
+1. Open LM Studio
+2. Load a model (e.g. Gemma)
+3. Click "Start Server" (default port 1234)
+
+### Step 3 — Start the backend
 
 ```bash
-cd backend
+cd /Users/sw12/Projects/ML-Project/backend
 python3 -m uvicorn app:app --reload --port 8000
 ```
 
-The backend will try LM Studio first, then Ollama, then a static fallback.
+The backend loads Chroma on startup, then tries LM Studio first, Ollama second, and a static fallback last. Watch for:
+```
+Chroma loaded with 21 documents
+Uvicorn running on http://localhost:8000
+```
 
 ### Step 4 — Open the frontend
 
-Open `frontend/index.html` in your browser, or serve it:
+```bash
+cd /Users/sw12/Projects/ML-Project
+python3 -m http.server 8080
+```
+
+Open in your browser: **http://localhost:8080/frontend/index.html**
+
+### Step 5 — Run a demo test
 
 ```bash
-python3 -m http.server 8080
-# Open http://localhost:8080/frontend/index.html
+curl http://localhost:8000/health
 ```
+
+Expected response: `{"status":"ok","chroma_docs":21,"ollama":true,"lm_studio":false}`
+
+### Step 6 — Full RAG counsel test
+
+```bash
+curl -X POST http://localhost:8000/counsel \
+  -H "Content-Type: application/json" \
+  -d '{
+    "profile": {
+      "name": "Ali",
+      "matric_marks": "90",
+      "inter_marks": "82",
+      "entry_test": "ECAT 150",
+      "preferred_field": "CS",
+      "city_preference": "Lahore",
+      "budget": "500000"
+    },
+    "question": "Which universities are best for me?"
+  }'
+```
+
+Expected response: JSON with `answer` (structured text), `sources` (array), `retrieved_count` (number), `provider_used` (string).
+
+---
+
+## Troubleshooting
+
+| Problem | Solution |
+|---|---|
+| Frontend shows "Backend is not running" | Start uvicorn in the backend folder |
+| Answer says "Fallback (no AI)" | Start Ollama (`ollama serve`) or LM Studio |
+| Search returns zero results | Rebuild Chroma: `cd backend && python build_vector_db.py` |
+| Frontend is blank / not loading | Run `python3 -m http.server 8080` and open the URL above |
+| Vercel deployed but no AI answers | Local AI cannot run on Vercel. The backend + LLM must run on a laptop |
+| Ollama CORS error in browser | Start with `OLLAMA_ORIGINS=* ollama serve` |
+| Chroma not found on startup | Run `cd backend && python build_vector_db.py` first |
 
 ### Environment Variables (optional)
 
@@ -95,10 +136,12 @@ python3 -m http.server 8080
 | `OLLAMA_MODEL` | `gemma4:latest` | Model name for Ollama |
 | `PROVIDER_ORDER` | `lm_studio,ollama,fallback` | Comma-separated provider priority |
 
-Example with custom Ollama model:
+Example:
 ```bash
 OLLAMA_MODEL=gemma2:2b python3 -m uvicorn app:app --reload --port 8000
 ```
+
+---
 
 ## Deployment Note
 
@@ -263,3 +306,43 @@ curl -X POST http://localhost:8000/counsel \
 | Embeddings | sentence-transformers (all-MiniLM-L6-v2) |
 | Vector DB | Chroma (local) |
 | Scraping | httpx, BeautifulSoup, pdfplumber |
+
+---
+
+## Project Summary
+
+**Pakistan CS & SE University Counsellor** is a complete RAG-based student counselling web app. It answers admission questions for 20 Pakistani universities using official scraped data, a local vector database, and a local LLM — all running on a laptop with no internet dependency after setup.
+
+### What was built
+
+| Phase | What | Status |
+|---|---|---|
+| 1 | Project structure, starter files | Complete |
+| 2 | UI — hero, student form, chat, responsive | Complete |
+| 3 | LLM providers — LM Studio + Ollama + fallback | Complete |
+| 4 | 20 universities with rankings and eligibility rules | Complete |
+| 5 | Web scraper — 12 universities scraped, 8 need manual data | Complete |
+| 6 | Chroma vector DB — 21 chunks from admission data | Complete |
+| 7 | RAG pipeline — retrieval + scoring + structured LLM response | Complete |
+| 8 | Frontend polish — badge, steps, samples, sources, provider | Complete |
+| 9 | Demo script + testing checklist + docs | Complete |
+
+### Key achievements
+
+- **12 universities** with real admission data from official `.edu.pk` websites
+- **21 chunks** in Chroma vector database, each with category metadata
+- **3-tier provider chain** — LM Studio → Ollama → fallback (no cloud APIs)
+- **Ranking + eligibility scoring** — combines ranking score, city, field, and marks fit
+- **Structured LLM response** — Short Summary, Best Match, Safe Options, Difficult Options, Reason, Next Steps, Source Notes
+- **Clean responsive UI** — works on laptop and mobile with sample questions, source cards, and provider badge
+
+### Team
+
+Raahim Adeel, Fardan Aatir, and Muhammad Ismail
+
+### Related documents
+
+- `docs/demo-script.md` — step-by-step demo script for department event
+- `docs/testing-checklist.md` — 14-point testing checklist
+- `docs/report.md` — project report
+- `docs/presentation-outline.md` — presentation outline
