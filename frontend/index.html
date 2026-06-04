@@ -3,200 +3,236 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pakistan CS & SE University Counsellor</title>
+  <meta name="theme-color" content="#0f4f3d">
+  <title>DigiCounsellor | CS &amp; SE Admissions Pakistan</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/favicon.svg">
   <link rel="stylesheet" href="/frontend/style.css">
 </head>
 <body>
+  <a class="skip-link" href="#chatWorkspace">Skip to counselling chat</a>
 
-  <div class="app-wrapper">
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="/frontend/index.html" aria-label="DigiCounsellor home">
+        <img class="brand-mark" src="/frontend/assets/logo.svg" alt="" width="44" height="44">
+        <span class="brand-copy">
+          <span class="wordmark">DigiCounsellor</span>
+          <span class="tagline">
+            <span class="tagline-full">Your smart admission guide for CS &amp; Software Engineering in Pakistan</span>
+            <span class="tagline-short">CS &amp; SE admission guidance for Pakistan</span>
+          </span>
+        </span>
+      </a>
 
-    <header class="hero">
-      <div class="hero-content">
-        <span class="badge">RAG Based Student Counsellor</span>
-        <h1>Pakistan CS &amp; Software Engineering<br>University Counsellor</h1>
-        <p class="hero-subtitle">
-          Find suitable universities based on your marks, field, city, and budget
-        </p>
-        <p class="hero-tagline">
-          Powered by RAG &mdash; Retrieval-Augmented Generation with local university admission data
-        </p>
+      <div class="topbar-status" aria-live="polite">
+        <span class="connection-pill" id="backendState">Checking backend</span>
+        <span class="provider-badge" id="providerBadge">Provider pending</span>
       </div>
     </header>
 
-    <div class="main-layout">
+    <main class="workspace">
+      <aside class="profile-panel" aria-labelledby="profileTitle">
+        <div class="panel-heading">
+          <div>
+            <p class="section-label">Applicant profile</p>
+            <h1 id="profileTitle">Build your shortlist</h1>
+          </div>
+          <span class="state-pill" id="profileState">Not saved</span>
+        </div>
 
-      <section class="profile-panel">
-        <h2>Student Profile</h2>
-        <p class="panel-hint">Fill in your details to get personalised advice.</p>
+        <p class="panel-hint">Save the profile once, then keep refining it as your admission plan changes.</p>
+
+        <div class="form-notice" id="profileNotice" role="status" aria-live="polite"></div>
 
         <form id="profileForm" autocomplete="off">
+          <fieldset class="form-section">
+            <legend>Academic details</legend>
 
-          <div class="form-group">
-            <label for="studentName">Student Name</label>
-            <input type="text" id="studentName" placeholder="e.g. Ali Khan">
-          </div>
+            <div class="form-group">
+              <label for="studentName">Student name <span>Required</span></label>
+              <input type="text" id="studentName" placeholder="e.g. Fardan" autocomplete="name">
+            </div>
 
-          <div class="form-group">
-            <label for="educationSystem">Education System</label>
-            <select id="educationSystem">
-              <option value="matric">Matric and Intermediate</option>
-              <option value="olevel">O Level and A Level</option>
-            </select>
-          </div>
-
-          <!-- Matric / Intermediate fields (shown by default) -->
-          <div id="matricFields">
             <div class="form-group">
-              <label for="matricMarks">Matric Percentage</label>
-              <input type="number" id="matricMarks" placeholder="e.g. 90.5" step="0.1" min="0" max="100">
-            </div>
-            <div class="form-group">
-              <label for="interMarks">Intermediate Percentage</label>
-              <input type="number" id="interMarks" placeholder="e.g. 80.0" step="0.1" min="0" max="100">
-            </div>
-          </div>
-
-          <!-- O / A Level fields (hidden by default) -->
-          <div id="olevelFields" style="display:none;">
-            <div class="form-group">
-              <label for="olevelEquivalence">O Level Equivalence Percentage <span class="optional">(optional)</span></label>
-              <input type="number" id="olevelEquivalence" placeholder="e.g. 85" step="0.1" min="0" max="100">
-            </div>
-            <div class="form-group">
-              <label for="alevelEquivalence">A Level Equivalence Percentage <span class="optional">(optional)</span></label>
-              <input type="number" id="alevelEquivalence" placeholder="e.g. 80" step="0.1" min="0" max="100">
-            </div>
-            <div class="form-group">
-              <label for="olevelGrade">O Level Average Grade <span class="optional">(optional)</span></label>
-              <select id="olevelGrade">
-                <option value="">&mdash; Select &mdash;</option>
-                <option value="A*">A*</option>
-                <option value="A">A</option>
-                <option value="B">B</option>
-                <option value="C">C</option>
-                <option value="D">D</option>
-                <option value="E">E</option>
+              <label for="educationSystem">Education system <span>Required</span></label>
+              <select id="educationSystem">
+                <option value="matric_inter">Matric + Intermediate</option>
+                <option value="olevel">O Level + A Level</option>
               </select>
             </div>
+
+            <div id="matricFields" class="field-grid">
+              <div class="form-group">
+                <label for="matricMarks">Matric percentage <span>Required</span></label>
+                <input type="number" id="matricMarks" name="dc_matric_pct" placeholder="e.g. 90" step="0.1" min="0" max="100" inputmode="decimal" autocomplete="new-password">
+              </div>
+              <div class="form-group">
+                <label for="interMarks">Intermediate percentage <span>Required</span></label>
+                <input type="number" id="interMarks" name="dc_inter_pct" placeholder="e.g. 79.7" step="0.1" min="0" max="100" inputmode="decimal" autocomplete="new-password">
+              </div>
+            </div>
+
+            <div id="olevelFields" class="field-grid hidden">
+              <div class="form-group">
+                <label for="olevelEquivalence">O Level equivalence <span>Optional</span></label>
+                <input type="number" id="olevelEquivalence" name="dc_olevel_equiv" placeholder="85" step="0.1" min="0" max="100" inputmode="decimal" autocomplete="new-password">
+              </div>
+              <div class="form-group">
+                <label for="alevelEquivalence">A Level equivalence <span>Optional</span></label>
+                <input type="number" id="alevelEquivalence" name="dc_alevel_equiv" placeholder="80" step="0.1" min="0" max="100" inputmode="decimal" autocomplete="new-password">
+              </div>
+              <div class="form-group">
+                <label for="olevelGrade">O Level average grade <span>Optional</span></label>
+                <select id="olevelGrade">
+                  <option value="">Select grade</option>
+                  <option value="A*">A*</option>
+                  <option value="A">A</option>
+                  <option value="B">B</option>
+                  <option value="C">C</option>
+                  <option value="D">D</option>
+                  <option value="E">E</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="alevelGrade">A Level average grade <span>Optional</span></label>
+                <select id="alevelGrade">
+                  <option value="">Select grade</option>
+                  <option value="A*">A*</option>
+                  <option value="A">A</option>
+                  <option value="B">B</option>
+                  <option value="C">C</option>
+                  <option value="D">D</option>
+                  <option value="E">E</option>
+                </select>
+              </div>
+              <p class="inline-note">O/A Level estimates are guidance only. Official IBCC equivalence and each university policy decide final eligibility.</p>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-section">
+            <legend>Preferences</legend>
+
+            <div class="field-grid">
+              <div class="form-group">
+                <label for="preferredField">Preferred field <span>Required</span></label>
+                <select id="preferredField">
+                  <option value="">Select field</option>
+                  <option value="Computer Science">Computer Science</option>
+                  <option value="Software Engineering">Software Engineering</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="cityPref">Preferred city <span>Optional</span></label>
+                <select id="cityPref">
+                  <option value="Any city">Any city</option>
+                  <option value="Lahore">Lahore</option>
+                  <option value="Islamabad">Islamabad</option>
+                  <option value="Rawalpindi">Rawalpindi</option>
+                  <option value="Karachi">Karachi</option>
+                  <option value="Peshawar">Peshawar</option>
+                  <option value="Quetta">Quetta</option>
+                  <option value="Multan">Multan</option>
+                  <option value="Faisalabad">Faisalabad</option>
+                  <option value="Sialkot">Sialkot</option>
+                  <option value="Gujranwala">Gujranwala</option>
+                  <option value="Hyderabad">Hyderabad</option>
+                  <option value="Bahawalpur">Bahawalpur</option>
+                  <option value="Taxila">Taxila</option>
+                  <option value="Wah">Wah</option>
+                  <option value="Abbottabad">Abbottabad</option>
+                  <option value="Jamshoro">Jamshoro</option>
+                  <option value="Sukkur">Sukkur</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field-grid">
+              <div class="form-group">
+                <label for="budget">Budget per semester <span>Optional</span></label>
+                <input type="text" id="budget" placeholder="e.g. 200000">
+              </div>
+
+              <div class="form-group">
+                <label for="entryTest">Entry test score <span>Optional</span></label>
+                <input type="text" id="entryTest" placeholder="e.g. ECAT 150/200">
+              </div>
+            </div>
+
             <div class="form-group">
-              <label for="alevelGrade">A Level Average Grade <span class="optional">(optional)</span></label>
-              <select id="alevelGrade">
-                <option value="">&mdash; Select &mdash;</option>
-                <option value="A*">A*</option>
-                <option value="A">A</option>
-                <option value="B">B</option>
-                <option value="C">C</option>
-                <option value="D">D</option>
-                <option value="E">E</option>
+              <label for="universityType">University type <span>Optional</span></label>
+              <select id="universityType">
+                <option value="either">Public or private</option>
+                <option value="public">Public preferred</option>
+                <option value="private">Private preferred</option>
               </select>
             </div>
-            <div class="o-level-note">
-              For O/A Level students, this is only an estimate. Final admission depends on official IBCC equivalence and university policy.
-            </div>
-          </div>
+          </fieldset>
 
-          <div class="form-group">
-            <label for="entryTest">Entry Test Score <span class="optional">(optional)</span></label>
-            <input type="text" id="entryTest" placeholder="e.g. ECAT 150/200 or NTS 70">
+          <div class="profile-actions">
+            <button type="button" id="saveProfileBtn" class="primary-btn">Save profile</button>
+            <button type="button" id="clearProfileBtn" class="secondary-btn">Clear</button>
           </div>
-
-          <div class="form-group">
-            <label for="preferredField">Preferred Field</label>
-            <select id="preferredField">
-              <option value="">&mdash; Select &mdash;</option>
-              <option value="CS">Computer Science</option>
-              <option value="SE">Software Engineering</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="cityPref">Preferred City</label>
-            <select id="cityPref">
-              <option value="">&mdash; Select &mdash;</option>
-              <option value="Any city">Any city</option>
-              <option value="Lahore">Lahore</option>
-              <option value="Islamabad">Islamabad</option>
-              <option value="Rawalpindi">Rawalpindi</option>
-              <option value="Karachi">Karachi</option>
-              <option value="Peshawar">Peshawar</option>
-              <option value="Quetta">Quetta</option>
-              <option value="Multan">Multan</option>
-              <option value="Faisalabad">Faisalabad</option>
-              <option value="Sialkot">Sialkot</option>
-              <option value="Gujranwala">Gujranwala</option>
-              <option value="Hyderabad">Hyderabad</option>
-              <option value="Bahawalpur">Bahawalpur</option>
-              <option value="Taxila">Taxila</option>
-              <option value="Wah Cantt">Wah Cantt</option>
-              <option value="Abbottabad">Abbottabad</option>
-              <option value="Jamshoro">Jamshoro</option>
-              <option value="Sukkur">Sukkur</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="budget">Budget Range (PKR) <span class="optional">(optional)</span></label>
-            <input type="text" id="budget" placeholder="e.g. 100000 &ndash; 500000">
-          </div>
-
-          <button type="button" id="saveProfileBtn">Save Profile</button>
         </form>
 
-        <div class="steps-box">
-          <h3>How to use</h3>
-          <div class="step"><span class="step-num">1</span> Enter your academic profile</div>
-          <div class="step"><span class="step-num">2</span> Ask your admission question</div>
-          <div class="step"><span class="step-num">3</span> Get university suggestions</div>
-        </div>
+        <div class="active-profile" id="activeProfileSummary" hidden></div>
+      </aside>
 
-        <div class="rag-note">
-          <strong>&#9432; How it works</strong>
-          <p>This project uses RAG (Retrieval-Augmented Generation) with local university admission data and a local LLM (Gemma via Ollama) to give you personalised counselling.</p>
-        </div>
-
-        <div class="disclaimer">
-          This tool gives guidance only. Final admission depends on official university policy and merit.
-        </div>
-      </section>
-
-      <section class="chat-panel">
-        <div class="chat-header">
-          <h2>Ask a Question</h2>
-          <span class="status-dot" id="statusDot"></span>
-          <span class="provider-badge" id="providerBadge"></span>
-        </div>
-
-        <div class="chat-messages" id="chatBox">
-          <div class="message bot">
-            Welcome! Please fill in your profile on the left, then ask me about university admissions.
+      <section class="chat-panel" id="chatWorkspace" aria-labelledby="chatTitle">
+        <div class="chat-toolbar">
+          <div>
+            <p class="section-label">Counselling assistant</p>
+            <h2 id="chatTitle">Plan your CS/SE admission route</h2>
+          </div>
+          <div class="chat-status">
+            <span class="status-dot" id="statusDot" aria-hidden="true"></span>
+            <span id="chatStatusText">Profile needed</span>
           </div>
         </div>
 
-        <div class="sample-questions" id="sampleQuestions">
-          <button class="sample-btn" data-q="Which universities are best for me?">Which universities are best for me?</button>
-          <button class="sample-btn" data-q="Which universities offer CS in Lahore?">Which universities offer CS in Lahore?</button>
-          <button class="sample-btn" data-q="Am I eligible for FAST?">Am I eligible for FAST?</button>
-          <button class="sample-btn" data-q="What are safe options for me?">What are safe options for me?</button>
+        <div class="runtime-banner" id="runtimeBanner" role="status" aria-live="polite">
+          Connecting to the local counselling backend.
         </div>
 
-        <div class="chat-input-area">
-          <input type="text" id="userInput" placeholder="Type your question here..." disabled>
-          <button id="sendBtn" disabled>Send</button>
+        <div class="selected-university hidden" id="selectedUniversityBar">
+          <div>
+            <span class="mini-label">Focused university</span>
+            <strong id="selectedUniversityName">None selected</strong>
+          </div>
+          <button type="button" class="ghost-btn" id="clearSelectedBtn">Clear focus</button>
         </div>
+
+        <div class="chat-messages" id="chatBox" aria-live="polite">
+          <article class="message bot assistant-intro">
+            <div class="message-avatar" aria-hidden="true">DC</div>
+            <div class="message-body">
+              <strong>DigiCounsellor is ready.</strong>
+              <p>Save your profile, then ask for recommendations, eligibility, fees, or admission links. I will keep the advice focused on your academic profile.</p>
+            </div>
+          </article>
+        </div>
+
+        <div class="sample-questions" id="sampleQuestions" aria-label="Suggested questions">
+          <button type="button" class="sample-btn" data-q="Which universities are best for me?">Best matches</button>
+          <button type="button" class="sample-btn" data-q="Which universities offer CS in Lahore?">CS in Lahore</button>
+          <button type="button" class="sample-btn" data-q="Am I eligible for FAST?">FAST eligibility</button>
+          <button type="button" class="sample-btn" data-q="What are safe options for me?">Safe options</button>
+          <button type="button" class="sample-btn" data-q="Help me compare universities.">Compare options</button>
+        </div>
+
+        <form class="chat-input-area" id="chatForm">
+          <label class="sr-only" for="userInput">Ask DigiCounsellor a question</label>
+          <input type="text" id="userInput" placeholder="Save your profile to start asking questions" disabled>
+          <button type="submit" id="sendBtn" class="send-btn" disabled>Send</button>
+        </form>
       </section>
-
-    </div>
+    </main>
 
     <footer class="app-footer">
-      <p>
-        <span>Raahim Adeel</span>
-        <span class="footer-sep">&bull;</span>
-        <span>Fardan Aatir</span>
-        <span class="footer-sep">&bull;</span>
-        <span>Muhammad Ismail</span>
-      </p>
+      <span>DigiCounsellor</span>
+      <span>Guidance only. Verify final details on official university admission pages.</span>
+      <span>Raahim Adeel · Fardan Aatir · Muhammad Ismail</span>
     </footer>
-
   </div>
 
   <script src="/frontend/script.js"></script>

@@ -1,22 +1,26 @@
-# Pakistan CS & SE University Counsellor
+# DigiCounsellor
 
-A RAG-based student counsellor web app for Pakistani students who want admission in Computer Science or Software Engineering programs.
+Your smart admission guide for CS & Software Engineering in Pakistan.
+
+DigiCounsellor is a polished RAG-based student counselling web app for Pakistani applicants. It combines a saved student profile, local university admission data, ranking/eligibility logic, Chroma retrieval, and a local LLM to guide students from recommendations to eligibility, fee checks, official admission links, and next steps.
 
 ## How It Works
 
-1. Student fills in their profile (name, marks, entry test score, preferred field, city, budget)
-2. Student asks a question (e.g. "Which universities can I get into with 80% in FSC?")
+1. Student saves a profile with academic system, marks/equivalence, preferred field, city, budget, entry test, and university type
+2. Student asks a question or chooses a guided follow-up
 3. The backend retrieves relevant university admission information from a local Chroma vector database
-4. The backend sends the retrieved context plus the student profile to a local LLM (LM Studio or Ollama)
-5. A personalised counselling answer is returned to the student
+4. Ranking, eligibility, city, field, type, and budget logic produce structured recommendation cards
+5. The backend sends retrieved context plus the structured shortlist to Ollama first, then LM Studio if configured, then a rule-based guidance fallback
+6. The frontend renders a counselling answer, university cards, official links, sources, and next-step actions
 
 ## Project Structure
 
 ```
 ├── frontend/
 │   ├── index.html          # Main HTML page with profile form and chat
-│   ├── style.css           # Green theme styling
-│   └── script.js           # Frontend logic — sends profile + question to backend
+│   ├── style.css           # DigiCounsellor product UI styling
+│   ├── script.js           # Profile persistence, chat, cards, follow-ups
+│   └── assets/             # Logo and favicon
 ├── backend/
 │   ├── app.py              # FastAPI server with /counsel, /health, /providers endpoints
 │   ├── scrape_universities.py  # Web scraper (placeholder)
@@ -68,7 +72,7 @@ cd /Users/sw12/Projects/ML-Project/backend
 python3 -m uvicorn app:app --reload --port 8000
 ```
 
-The backend loads Chroma on startup, then tries LM Studio first, Ollama second, and a static fallback last. Watch for:
+The backend loads Chroma on startup, then tries Ollama first, LM Studio second, and a static guidance fallback last. Watch for:
 ```
 Chroma loaded with 21 documents
 Uvicorn running on http://localhost:8000
@@ -89,7 +93,7 @@ Open in your browser: **http://localhost:8080/frontend/index.html**
 curl http://localhost:8000/health
 ```
 
-Expected response: `{"status":"ok","chroma_docs":21,"ollama":true,"lm_studio":false}`
+Expected response includes `status`, `chroma_docs`, `ollama`, `lm_studio`, `default_provider`, and `ollama_model`.
 
 ### Step 6 — Full RAG counsel test
 
@@ -99,32 +103,94 @@ curl -X POST http://localhost:8000/counsel \
   -d '{
     "profile": {
       "name": "Ali",
-      "matric_marks": "90",
-      "inter_marks": "82",
+      "education_system": "matric_inter",
+      "matric_percentage": "90",
+      "intermediate_percentage": "82",
       "entry_test": "ECAT 150",
-      "preferred_field": "CS",
+      "preferred_field": "Computer Science",
       "city_preference": "Lahore",
-      "budget": "500000"
+      "budget": "500000",
+      "university_type": "either"
     },
     "question": "Which universities are best for me?"
   }'
 ```
 
-Expected response: JSON with `answer` (structured text), `sources` (array), `retrieved_count` (number), `provider_used` (string).
+Expected response: JSON with `answer`, `recommended_universities`, `safe_options`, `difficult_options`, `next_steps`, `admission_links`, `sources`, `retrieved_count`, `provider_used`, and `selected_model`.
+
+### Step 7 — Debug provider detection
+
+Test if LM Studio or Ollama is reachable:
+
+```bash
+curl http://localhost:8000/debug/providers
+```
+
+Expected response includes detailed info for each provider:
+```json
+{
+  "lm_studio": {
+    "reachable": false,
+    "url": "http://localhost:1234/v1/chat/completions",
+    "models_url": "http://localhost:1234/v1/models",
+    "models": [],
+    "chat_reachable": false,
+    "error": "ConnectError..."
+  },
+  "ollama": {
+    "reachable": true,
+    "url": "http://localhost:11434/api/chat",
+    "tags_url": "http://localhost:11434/api/tags",
+    "models": ["gemma4:latest"],
+    "chat_reachable": true,
+    "error": ""
+  }
+}
+```
+
+### Testing providers directly (from terminal, not browser)
+
+**Test LM Studio:**
+```bash
+curl http://localhost:1234/v1/models
+# If LM Studio is running, returns list of loaded models
+```
+
+**Test Ollama:**
+```bash
+curl http://localhost:11434/api/tags
+# If Ollama is running, returns list of installed models
+```
+
+**Test backend provider info:**
+```bash
+curl http://localhost:8000/providers
+# Shows which providers are configured and reachable
+```
 
 ---
+
+## Vercel vs Local
+
+- **Vercel frontend** shows the DigiCounsellor UI only
+- **Full RAG AI demo runs only locally** — the backend, Chroma vector DB, and Ollama/LM Studio must run on your laptop
+- The Vercel frontend shows a clean backend status banner if no local backend is detected
+- Vercel is for frontend showcase only. The AI counselling works when everything runs locally
 
 ## Troubleshooting
 
 | Problem | Solution |
 |---|---|
-| Frontend shows "Backend is not running" | Start uvicorn in the backend folder |
-| Answer says "Fallback (no AI)" | Start Ollama (`ollama serve`) or LM Studio |
+| Frontend shows backend offline | Start uvicorn in the backend folder |
+| Provider badge says guidance mode | Start Ollama (`ollama serve`) or LM Studio |
 | Search returns zero results | Rebuild Chroma: `cd backend && python build_vector_db.py` |
 | Frontend is blank / not loading | Run `python3 -m http.server 8080` and open the URL above |
 | Vercel deployed but no AI answers | Local AI cannot run on Vercel. The backend + LLM must run on a laptop |
 | Ollama CORS error in browser | Start with `OLLAMA_ORIGINS=* ollama serve` |
 | Chroma not found on startup | Run `cd backend && python build_vector_db.py` first |
+| LM Studio not detected | Check server is running on port 1234 with a model loaded |
+| Ollama not detected | Check `ollama serve` is running and model is installed (`ollama list`) |
+| Provider shows "reachable: false" | Run `curl http://localhost:8000/debug/providers` to see exact error |
 
 ### Environment Variables (optional)
 
@@ -134,7 +200,7 @@ Expected response: JSON with `answer` (structured text), `sources` (array), `ret
 | `LM_STUDIO_MODEL` | `gemma` | Model name for LM Studio |
 | `OLLAMA_URL` | `http://localhost:11434/api/chat` | Ollama endpoint |
 | `OLLAMA_MODEL` | `gemma4:latest` | Model name for Ollama |
-| `PROVIDER_ORDER` | `lm_studio,ollama,fallback` | Comma-separated provider priority |
+| `PROVIDER_ORDER` | `ollama,lm_studio,fallback` | Comma-separated provider priority |
 
 Example:
 ```bash
@@ -148,6 +214,32 @@ OLLAMA_MODEL=gemma2:2b python3 -m uvicorn app:app --reload --port 8000
 - **Frontend**: can be deployed on Vercel as a static site
 - **Backend**: cannot run on Vercel — it needs local Python, Chroma, and an LLM provider
 - The full RAG + AI flow works only when everything runs locally on your laptop
+
+## Vercel Frontend Deployment
+
+The frontend can be deployed on Vercel as a static site. The `vercel.json` at the project root is configured to serve `frontend/index.html` from any route.
+
+### Manual deploy (no CLI needed)
+
+1. Go to https://vercel.com/new
+2. Import the GitHub repository `starwalker12/pakistan-cs-se-university-counsellor`
+3. Keep default settings:
+   - **Framework Preset**: Other
+   - **Root Directory**: ./
+   - **Build Command**: (none)
+   - **Output Directory**: . (or leave blank)
+4. Click **Deploy**
+
+### CLI deploy
+
+```bash
+npm install -g vercel
+vercel --prod
+```
+
+### Important
+
+The Vercel frontend shows the UI only. The backend, Chroma DB, and Ollama/LM Studio must run on your laptop for the full RAG counselling to work. The frontend shows a clean local-backend status banner if no backend is detected.
 
 ## Phase 4 Data Plan
 
@@ -245,20 +337,13 @@ python3 -m uvicorn app:app --reload --port 8000
 
 1. User submits profile + question
 2. Backend builds a rich search query from profile fields
-3. Chroma is searched for top 7 relevant chunks
-4. Ranking data and eligibility rules are loaded
-5. Each university in the results is scored against the student's profile
-6. A master prompt is built with: chunks, ranking scores, and profile
-7. Prompt is sent to LM Studio first, then Ollama, then fallback
-8. The LLM generates a structured answer with sections:
-   - Short Summary
-   - Best Match Universities
-   - Safe Options
-   - Difficult Options
-   - Reason for Recommendation
-   - Next Steps
-   - Source Notes
-9. Response includes the answer, sources list, and provider info
+3. Chroma is searched for top relevant chunks
+4. Ranking data, university metadata, source links, and eligibility rules are loaded
+5. Known universities are scored against marks, field, city, type, and budget
+6. The endpoint returns structured recommendation cards plus safe/difficult buckets
+7. A master prompt is built with retrieved chunks, the structured shortlist, and profile
+8. Prompt is sent to Ollama first, then LM Studio, then fallback
+9. Response includes answer text, cards, next steps, official links, sources, provider, and selected model
 
 ### Test command
 
@@ -287,8 +372,16 @@ curl -X POST http://localhost:8000/counsel \
   "sources": [
     {"university_name": "...", "source_url": "...", "preview": "..."}
   ],
-  "retrieved_count": 7,
-  "provider_used": "ollama"
+  "recommended_universities": [
+    {
+      "short_name": "NUST",
+      "fit_level": "Difficult",
+      "admission_links": []
+    }
+  ],
+  "retrieved_count": 8,
+  "provider_used": "ollama",
+  "selected_model": "gemma4:latest"
 }
 ```
 
@@ -302,7 +395,7 @@ curl -X POST http://localhost:8000/counsel \
 |---|---|
 | Frontend | HTML, CSS, JavaScript |
 | Backend | Python, FastAPI |
-| LLM | LM Studio (primary) / Ollama (backup) |
+| LLM | Ollama (primary) / LM Studio (optional) / rule-based fallback |
 | Embeddings | sentence-transformers (all-MiniLM-L6-v2) |
 | Vector DB | Chroma (local) |
 | Scraping | httpx, BeautifulSoup, pdfplumber |
@@ -311,7 +404,7 @@ curl -X POST http://localhost:8000/counsel \
 
 ## Project Summary
 
-**Pakistan CS & SE University Counsellor** is a complete RAG-based student counselling web app. It answers admission questions for 20 Pakistani universities using official scraped data, a local vector database, and a local LLM — all running on a laptop with no internet dependency after setup.
+**DigiCounsellor** is a product-style RAG student counselling web app. It answers admission questions for 20 Pakistani universities using scraped official data, a local vector database, structured ranking/eligibility logic, and a local LLM running on a laptop.
 
 ### What was built
 
@@ -326,15 +419,16 @@ curl -X POST http://localhost:8000/counsel \
 | 7 | RAG pipeline — retrieval + scoring + structured LLM response | Complete |
 | 8 | Frontend polish — badge, steps, samples, sources, provider | Complete |
 | 9 | Demo script + testing checklist + docs | Complete |
+| 13 | Product UI, branding, profile persistence, university cards, follow-up flow | Complete |
 
 ### Key achievements
 
 - **12 universities** with real admission data from official `.edu.pk` websites
 - **21 chunks** in Chroma vector database, each with category metadata
-- **3-tier provider chain** — LM Studio → Ollama → fallback (no cloud APIs)
-- **Ranking + eligibility scoring** — combines ranking score, city, field, and marks fit
-- **Structured LLM response** — Short Summary, Best Match, Safe Options, Difficult Options, Reason, Next Steps, Source Notes
-- **Clean responsive UI** — works on laptop and mobile with sample questions, source cards, and provider badge
+- **3-tier provider chain** — Ollama → LM Studio → guidance fallback (no cloud APIs)
+- **Ranking + eligibility scoring** — combines ranking score, city, field, marks, budget, and university type
+- **Structured response fields** — recommendation cards, safe/difficult buckets, official links, next steps, sources, provider, and selected model
+- **Product-ready responsive UI** — DigiCounsellor branding, saved/editable profile, guided follow-ups, recommendation cards, provider status, and local/Vercel backend messaging
 
 ### Team
 
