@@ -68,6 +68,17 @@ function escapeHtml(value = '') {
     .replace(/'/g, '&#039;');
 }
 
+function isValidLink(url) {
+  if (!url || typeof url !== 'string') return false;
+  const trimmed = url.trim();
+  if (!trimmed) return false;
+  if (trimmed === '#') return false;
+  if (trimmed.toLowerCase().startsWith('todo')) return false;
+  if (trimmed.toLowerCase().includes('placeholder')) return false;
+  if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://')) return false;
+  return true;
+}
+
 function formatMarkdown(text = '') {
   return escapeHtml(text)
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
@@ -440,13 +451,15 @@ function createMessage(sender, html, extraClass = '') {
 }
 
 function addUserMessage(text) {
-  chatBox.appendChild(createMessage('user', escapeHtml(text)));
-  scrollChatToBottom();
+  const el = createMessage('user', escapeHtml(text));
+  chatBox.appendChild(el);
+  scrollToElement(el);
 }
 
 function addSystemMessage(text, type = '') {
-  chatBox.appendChild(createMessage('system', escapeHtml(text), type));
-  scrollChatToBottom();
+  const el = createMessage('system', escapeHtml(text), type);
+  chatBox.appendChild(el);
+  scrollToElement(el);
 }
 
 function showTyping(lines = loadingStatusLines) {
@@ -465,9 +478,8 @@ function showTyping(lines = loadingStatusLines) {
   typingTimer = window.setInterval(() => {
     statusIndex = (statusIndex + 1) % activeLines.length;
     if (statusNode) statusNode.textContent = activeLines[statusIndex];
-    scrollChatToBottom();
   }, 1400);
-  scrollChatToBottom();
+  scrollToElement(typingEl);
 }
 
 function hideTyping() {
@@ -479,6 +491,11 @@ function hideTyping() {
     typingEl.remove();
     typingEl = null;
   }
+}
+
+function scrollToElement(el) {
+  if (!el) return;
+  el.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 function scrollChatToBottom() {
@@ -498,7 +515,7 @@ function renderRecommendationCard(rec) {
   const card = document.createElement('article');
   card.className = 'recommendation-card';
   const fields = (rec.fields || []).slice(0, 3).join(', ');
-  const firstLinks = (rec.admission_links || []).slice(0, 3);
+  const validLinks = (rec.admission_links || []).filter((link) => isValidLink(link.url)).slice(0, 3);
   card.innerHTML = `
     <div class="card-top">
       <div>
@@ -518,9 +535,9 @@ function renderRecommendationCard(rec) {
       <li><strong>Test:</strong> ${escapeHtml(rec.entry_test || 'Check official policy')}</li>
       <li><strong>Fees:</strong> ${escapeHtml(rec.fee_summary || 'Verify latest official fee page')}</li>
     </ul>
-    ${firstLinks.length ? `
+    ${validLinks.length ? `
     <div class="link-row">
-      ${firstLinks.map((link) => `
+      ${validLinks.map((link) => `
         <a class="link-action" href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(link.label || 'Official link')}</a>
       `).join('')}
     </div>` : ''}
@@ -604,10 +621,11 @@ function renderSources(sources = []) {
     <div class="source-list">
       ${sources.map((source) => {
         const url = (source.source_url || '').split(';')[0];
+        const validUrl = isValidLink(url) ? url : '';
         return `
           <div class="source-item">
             <strong>${escapeHtml(source.university_name || 'University source')}</strong>
-            ${url ? `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(url)}</a>` : ''}
+            ${validUrl ? `<a href="${escapeHtml(validUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(validUrl)}</a>` : ''}
             <span>${escapeHtml((source.preview || '').slice(0, 180))}</span>
           </div>
         `;
@@ -674,7 +692,7 @@ function addRecommendationTurn(data) {
   const sourcesPanel = renderSources(data.sources || []);
   if (sourcesPanel) block.appendChild(sourcesPanel);
   chatBox.appendChild(block);
-  scrollChatToBottom();
+  scrollToElement(block);
   return {
     block,
     summaryBody: summaryMessage.querySelector('.message-body'),
@@ -713,7 +731,7 @@ function addAssistantTurn(data) {
   const sourcesPanel = renderSources(data.sources || []);
   if (sourcesPanel) block.appendChild(sourcesPanel);
   chatBox.appendChild(block);
-  scrollChatToBottom();
+  scrollToElement(block);
 }
 
 function addSummaryOnlyMessage(data) {
@@ -722,14 +740,14 @@ function addSummaryOnlyMessage(data) {
   block.className = 'response-block';
   block.appendChild(createMessage('bot', `<div class="answer-content">${formatMarkdown(data.answer || 'I could not generate an answer for this request.')}</div>`));
   chatBox.appendChild(block);
-  scrollChatToBottom();
+  scrollToElement(block);
 }
 
 function setSelectedUniversity(rec, scroll = true) {
   selectedUniversity = rec;
   selectedUniversityName.textContent = `${rec.short_name || rec.university_name} · ${rec.city || 'Pakistan'}`;
   selectedUniversityBar.classList.remove('hidden');
-  if (scroll) scrollChatToBottom();
+  if (scroll) scrollToElement(selectedUniversityBar);
 }
 
 function clearSelectedUniversity() {
@@ -857,7 +875,7 @@ function addGreetingReply(name) {
   const displayName = name || 'there';
   const msg = createMessage('bot', `Hi ${escapeHtml(displayName)}, I am ready. Ask me which universities are best for you, or ask about eligibility, fees, or admission steps.`);
   chatBox.appendChild(msg);
-  scrollChatToBottom();
+  scrollToElement(msg);
 }
 
 async function handleSend(questionOverride = '') {

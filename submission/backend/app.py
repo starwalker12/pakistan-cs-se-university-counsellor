@@ -523,6 +523,22 @@ def resolve_university_id(text: str) -> str:
             return uni.get("id", "")
     return ""
 
+def is_valid_url(url: str) -> bool:
+    if not url or not isinstance(url, str):
+        return False
+    cleaned = url.strip()
+    if not cleaned:
+        return False
+    if cleaned == "#":
+        return False
+    if cleaned.lower().startswith("todo"):
+        return False
+    if "placeholder" in cleaned.lower():
+        return False
+    if not cleaned.startswith("http://") and not cleaned.startswith("https://"):
+        return False
+    return True
+
 def admission_links_for(uni_id: str) -> list[AdmissionLink]:
     record = SOURCE_LINKS_BY_ID.get(uni_id, {})
     links = record.get("links", {}) or {}
@@ -548,14 +564,17 @@ def admission_links_for(uni_id: str) -> list[AdmissionLink]:
     ordered_keys = [k for k in preferred_order if k in links]
     ordered_keys.extend(k for k in links if k not in ordered_keys)
     result = []
-    for key in ordered_keys[:5]:
+    for key in ordered_keys[:8]:
         item = links.get(key, {})
+        url = (item.get("url") or "").strip()
+        if not is_valid_url(url):
+            continue
         result.append(AdmissionLink(
             label=label_map.get(key, key.replace("_", " ").title()),
-            url=item.get("url", ""),
+            url=url,
             note=item.get("note", "")
         ))
-    return result
+    return result[:5]
 
 def chunk_preview_for(uni_id: str, chunks: list[dict], categories: tuple[str, ...] = ()) -> str:
     for chunk in chunks:

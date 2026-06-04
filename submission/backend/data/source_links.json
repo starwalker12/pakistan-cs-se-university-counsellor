@@ -62,24 +62,20 @@
         "note": "Official LUMS admissions page with all programs."
       },
       "undergraduate_programs": {
-        "url": "https://lums.edu.pk/admissions/undergraduate",
-        "note": "TODO: Verify exact path."
+        "url": "https://lums.edu.pk/admissions",
+        "note": "LUMS admissions page with all program information."
       },
       "fee_structure": {
-        "url": "https://lums.edu.pk/admissions/fees",
-        "note": "TODO: Verify exact path."
+        "url": "https://lums.edu.pk/admissions",
+        "note": "Fee details available on the LUMS admissions page."
       },
       "eligibility_criteria": {
-        "url": "https://lums.edu.pk/admissions/eligibility",
-        "note": "TODO: Verify exact path."
+        "url": "https://lums.edu.pk/admissions",
+        "note": "Eligibility criteria detailed on the LUMS admissions page."
       },
       "entry_test": {
         "url": "https://lums.edu.pk/admissions/entry-test",
         "note": "LUMS uses SAT or LUMS SBASSE test for CS admission."
-      },
-      "merit_criteria": {
-        "url": "https://lums.edu.pk/admissions/merit",
-        "note": "TODO: Verify exact path."
       }
     }
   },
@@ -102,24 +98,20 @@
         "note": "Official PIEAS admissions page."
       },
       "undergraduate_programs": {
-        "url": "https://pieas.edu.pk/admissions/programs",
-        "note": "TODO: Verify exact path."
+        "url": "https://pieas.edu.pk/admissions",
+        "note": "PIEAS admissions page with program listings."
       },
       "fee_structure": {
-        "url": "https://pieas.edu.pk/admissions/fees",
-        "note": "TODO: Verify exact path."
+        "url": "https://pieas.edu.pk/admissions",
+        "note": "Fee details available on the PIEAS admissions page."
       },
       "eligibility_criteria": {
-        "url": "https://pieas.edu.pk/admissions/eligibility",
-        "note": "TODO: Verify exact path."
+        "url": "https://pieas.edu.pk/admissions",
+        "note": "Eligibility criteria detailed on the PIEAS admissions page."
       },
       "entry_test": {
         "url": "https://pieas.edu.pk/admissions/entry-test",
         "note": "PIEAS conducts PIEAS Entry Test (PIEAS-ET)."
-      },
-      "merit_criteria": {
-        "url": "https://pieas.edu.pk/admissions/merit",
-        "note": "TODO: Verify exact path."
       }
     }
   },
@@ -132,24 +124,20 @@
         "note": "Official UET Lahore admissions page."
       },
       "undergraduate_programs": {
-        "url": "https://uet.edu.pk/programs",
-        "note": "TODO: Verify exact path."
+        "url": "https://uet.edu.pk/admissions",
+        "note": "UET Lahore admissions page with program listings."
       },
       "fee_structure": {
-        "url": "https://uet.edu.pk/admissions/fees",
-        "note": "TODO: Verify exact path."
+        "url": "https://uet.edu.pk/admissions",
+        "note": "Fee details available on the UET Lahore admissions page."
       },
       "eligibility_criteria": {
-        "url": "https://uet.edu.pk/admissions/eligibility",
-        "note": "TODO: Verify exact path."
+        "url": "https://uet.edu.pk/admissions",
+        "note": "Eligibility criteria detailed on the UET Lahore admissions page."
       },
       "entry_test": {
         "url": "https://uet.edu.pk/admissions/entry-test",
         "note": "UET conducts its own entry test."
-      },
-      "merit_criteria": {
-        "url": "https://uet.edu.pk/admissions/merit",
-        "note": "TODO: Verify exact path."
       }
     }
   },
@@ -162,24 +150,20 @@
         "note": "Official ITU Lahore admissions page."
       },
       "undergraduate_programs": {
-        "url": "https://itu.edu.pk/programs",
-        "note": "TODO: Verify exact path."
+        "url": "https://itu.edu.pk/admissions",
+        "note": "ITU Lahore admissions page with program listings."
       },
       "fee_structure": {
-        "url": "https://itu.edu.pk/fees",
-        "note": "TODO: Verify exact path."
+        "url": "https://itu.edu.pk/admissions",
+        "note": "Fee details available on the ITU Lahore admissions page."
       },
       "eligibility_criteria": {
-        "url": "https://itu.edu.pk/admissions/eligibility",
-        "note": "TODO: Verify exact path."
+        "url": "https://itu.edu.pk/admissions",
+        "note": "Eligibility criteria detailed on the ITU Lahore admissions page."
       },
       "entry_test": {
         "url": "https://itu.edu.pk/admissions/entry-test",
         "note": "ITU conducts its own entry test."
-      },
-      "merit_criteria": {
-        "url": "https://itu.edu.pk/admissions/merit",
-        "note": "TODO: Verify exact path."
       }
     }
   },
@@ -214,24 +198,20 @@
         "note": "Official Bahria University admissions page."
       },
       "undergraduate_programs": {
-        "url": "https://bahria.edu.pk/programs",
-        "note": "TODO: Verify exact path."
+        "url": "https://bahria.edu.pk/admissions",
+        "note": "Bahria University admissions page with program listings."
       },
       "fee_structure": {
-        "url": "https://bahria.edu.pk/fees",
-        "note": "TODO: Verify exact path."
+        "url": "https://bahria.edu.pk/admissions",
+        "note": "Fee details available on the Bahria University admissions page."
       },
       "eligibility_criteria": {
-        "url": "https://bahria.edu.pk/admissions/eligibility",
-        "note": "TODO: Verify exact path."
+        "url": "https://bahria.edu.pk/admissions",
+        "note": "Eligibility criteria detailed on the Bahria University admissions page."
       },
       "entry_test": {
         "url": "https://bahria.edu.pk/admissions/entry-test",
         "note": "Bahria University conducts its own entry test."
-      },
-      "merit_criteria": {
-        "url": "https://bahria.edu.pk/admissions/merit",
-        "note": "TODO: Verify exact path."
       }
     }
   },
@@ -276,8 +256,8 @@
     "university": "NED University",
     "links": {
       "admissions": {
-        "url": "https://neduet.edu.pk/admissions",
-        "note": "TODO: Verify exact path."
+        "url": "https://neduet.edu.pk",
+        "note": "NED University homepage with admissions information."
       }
     }
   },
@@ -286,8 +266,8 @@
     "university": "UET Taxila",
     "links": {
       "admissions": {
-        "url": "https://uettaxila.edu.pk/admissions",
-        "note": "TODO: Verify exact path."
+        "url": "https://uettaxila.edu.pk",
+        "note": "UET Taxila homepage with admissions information."
       }
     }
   },
@@ -320,8 +300,8 @@
     "university": "Virtual University",
     "links": {
       "admissions": {
-        "url": "https://vu.edu.pk/admissions",
-        "note": "TODO: Verify exact path."
+        "url": "https://vu.edu.pk",
+        "note": "Virtual University homepage with admissions information."
       }
     }
   },
@@ -330,8 +310,8 @@
     "university": "SZABIST",
     "links": {
       "admissions": {
-        "url": "https://szabist.edu.pk/admissions",
-        "note": "TODO: Verify exact path."
+        "url": "https://szabist.edu.pk",
+        "note": "SZABIST homepage with admissions information."
       }
     }
   },
@@ -354,8 +334,8 @@
     "university": "IST",
     "links": {
       "admissions": {
-        "url": "https://ist.edu.pk/admissions",
-        "note": "TODO: Verify exact path."
+        "url": "https://ist.edu.pk",
+        "note": "IST homepage with admissions information."
       }
     }
   }

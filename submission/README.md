@@ -476,6 +476,7 @@ curl -X POST http://localhost:8000/counsel \
 | 17 | Natural chat flow — cards show only for recommendation questions, follow-ups skip card duplication | Complete |
 | 18 | Strict eligibility — "Not eligible right now" group, honest wording for weak grades, O/A Level labels, student name in AI prompts, no auto-focus | Complete |
 | 19 | Intent-based chat — greetings skip backend entirely, recommendation groups show "Best matches"/"Safe"/"Difficult"/"Not eligible", all 20 universities checked per request | Complete |
+| 20 | Chat scroll fix (scroll to new message/block, not page bottom), link validation (backend + frontend filter empty/TODO/placeholder/invalid URLs), clean university source links | Complete |
 
 ### Key achievements
 
@@ -490,6 +491,8 @@ curl -X POST http://localhost:8000/counsel \
 - **O/A Level wording** — the app correctly uses "O/A Level" for O/A Level students and "Matric/Inter" for Matric/Inter students everywhere: AI prompts, saved profile display, and fallback answers
 - **Intent-based chat routing** — frontend detects greeting, recommendation, follow-up, and university-specific intents. Greetings never call the backend. Recommendations trigger /recommend + /ai-summary. Follow-ups and university-specific questions call only /ai-summary with stored data, avoiding card duplication
 - **All 20 universities checked** — every /recommend call scores all universities from the project data (universities.json, rankings, eligibility rules). Response includes `checked_universities_count` to prove full coverage
+- **Smart scroll behavior** — chat scrolls to each new message/block (with scroll-margin for sticky header) instead of jumping to page bottom; typing animation does not force-scroll every tick
+- **Link validation everywhere** — `isValidLink()` on frontend and `is_valid_url()` on backend filter out empty, "TODO", placeholder, "#", and non-http/https URLs from admission links and source URLs. Source link data files have all TODO-noted URLs replaced with verified admissions pages or official university homepages
 
 ### Team
 

@@ -748,6 +748,11 @@ a:focus-visible {
   display: grid;
   gap: 14px;
   width: 100%;
+  scroll-margin-top: 100px;
+}
+
+.message {
+  scroll-margin-top: 100px;
 }
 
 .recommendation-set {
