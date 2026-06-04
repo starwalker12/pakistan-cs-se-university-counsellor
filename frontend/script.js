@@ -123,26 +123,48 @@ function gradeToPct(grade) {
   return gradePercentages[grade] || 0;
 }
 
-function needsFreshRecommendations(question) {
-  if (!question) return false;
+const GREETINGS = new Set([
+  'hey', 'hello', 'hi', 'salam', 'assalam', 'alaikum',
+  'thanks', 'thank you', 'thankyou', 'ok', 'okay',
+  'yes', 'no', 'thx',
+]);
+
+const REC_PHRASES = [
+  'best for me', 'recommend', 'best match', 'safe option',
+  'universities in', 'cs in', 'se in', 'options for me',
+  'show me option', 'which universit',
+  'suitable for me', 'good for me', 'suggest',
+  'apply to',
+];
+
+const UNI_NAMES = [
+  'fast', 'lums', 'nust', 'pims', 'giki', 'habib', 'itu',
+  'ned', 'comsats', 'bahria', 'iqra', 'szabist',
+  'uet', 'lse', 'punjab university', 'karachi university',
+  'nca', 'beaconhouse', 'air university', 'qau', 'ucp',
+  'virtual university', 'ist', 'pieas', 'iba',
+];
+
+const FOLLOW_UP_PHRASES = [
+  'tell me about', 'tell me more', 'check eligibility',
+  'fees for', 'admission requirement', 'admission link',
+  'what should i do next', 'how to apply', 'entry test',
+  'deadline', 'requirements for', 'compare',
+];
+
+function detectIntent(question) {
+  if (!question) return 'unknown';
   const lower = question.toLowerCase().trim();
-  const followedByAction = [
-    'tell me about', 'check eligibility for', 'fees for',
-    'show requirements for', 'what should i do next for',
-    'tell me more about', 'admission requirements for',
-  ];
-  const isFollowUp = followedByAction.some((phrase) => lower.includes(phrase));
-  if (isFollowUp) return false;
-  const freshPatterns = [
-    'best for me', 'recommend', 'best match', 'safe option',
-    'universities in', 'cs in', 'se in', 'options for me',
-    'compare universit', 'show me option', 'which universit',
-    'suitable for me', 'good for me', 'suggest',
-  ];
-  for (const pattern of freshPatterns) {
-    if (lower.includes(pattern)) return true;
-  }
-  return false;
+  const cleaned = lower.replace(/[.!?,]+$/, '').trim();
+  if (GREETINGS.has(cleaned)) return 'greeting';
+  const hasUni = UNI_NAMES.some((name) => lower.includes(name));
+  const isFollowUp = FOLLOW_UP_PHRASES.some((phrase) => lower.includes(phrase));
+  const isRec = REC_PHRASES.some((phrase) => lower.includes(phrase));
+  if (isRec) return 'recommendation';
+  if (isFollowUp) return 'follow_up';
+  if (hasUni) return 'university_specific';
+  if (cleaned.length < 10) return 'greeting';
+  return 'follow_up';
 }
 
 function collectProfile() {
@@ -535,7 +557,7 @@ function renderRecommendations(recommendations = [], heading = 'Recommended univ
   title.textContent = heading;
   const grid = document.createElement('div');
   grid.className = 'recommendation-grid';
-  recommendations.slice(0, 5).forEach((rec) => grid.appendChild(renderRecommendationCard(rec)));
+  recommendations.slice(0, 6).forEach((rec) => grid.appendChild(renderRecommendationCard(rec)));
   section.append(title, grid);
   return section;
 }
@@ -627,12 +649,27 @@ function addRecommendationTurn(data) {
   block.appendChild(summaryMessage);
 
   const recommendations = data.recommended_universities || [];
+  const safeOptions = data.safe_options || [];
+  const difficultOptions = data.difficult_options || [];
   const notEligible = data.not_eligible_options || [];
 
-  const recSection = renderRecommendations(recommendations);
-  if (recSection) block.appendChild(recSection);
+  let hasAnyCards = false;
+  const recSection = renderRecommendations(recommendations, 'Best matches');
+  if (recSection) { block.appendChild(recSection); hasAnyCards = true; }
+  const safeSection = renderRecommendations(safeOptions, 'Safe options');
+  if (safeSection) { block.appendChild(safeSection); hasAnyCards = true; }
+  const diffSection = renderRecommendations(difficultOptions, 'Difficult but possible');
+  if (diffSection) { block.appendChild(diffSection); hasAnyCards = true; }
   const notEligibleSection = renderRecommendations(notEligible, 'Not eligible right now');
-  if (notEligibleSection) block.appendChild(notEligibleSection);
+  if (notEligibleSection) { block.appendChild(notEligibleSection); hasAnyCards = true; }
+
+  if (hasAnyCards && data.checked_universities_count) {
+    const note = document.createElement('p');
+    note.className = 'checked-count-note';
+    note.textContent = `Checked ${data.checked_universities_count} universities from the project data.`;
+    block.appendChild(note);
+  }
+
   block.appendChild(renderNextSteps(data.next_steps || [], recommendations));
   const sourcesPanel = renderSources(data.sources || []);
   if (sourcesPanel) block.appendChild(sourcesPanel);
@@ -651,12 +688,27 @@ function addAssistantTurn(data) {
   block.appendChild(createMessage('bot', `<div class="answer-content">${formatMarkdown(data.answer || 'I could not generate an answer for this request.')}</div>`));
 
   const recommendations = data.recommended_universities || [];
+  const safeOptions = data.safe_options || [];
+  const difficultOptions = data.difficult_options || [];
   const notEligible = data.not_eligible_options || [];
 
-  const recSection = renderRecommendations(recommendations);
-  if (recSection) block.appendChild(recSection);
+  let hasAnyCards = false;
+  const recSection = renderRecommendations(recommendations, 'Best matches');
+  if (recSection) { block.appendChild(recSection); hasAnyCards = true; }
+  const safeSection = renderRecommendations(safeOptions, 'Safe options');
+  if (safeSection) { block.appendChild(safeSection); hasAnyCards = true; }
+  const diffSection = renderRecommendations(difficultOptions, 'Difficult but possible');
+  if (diffSection) { block.appendChild(diffSection); hasAnyCards = true; }
   const notEligibleSection = renderRecommendations(notEligible, 'Not eligible right now');
-  if (notEligibleSection) block.appendChild(notEligibleSection);
+  if (notEligibleSection) { block.appendChild(notEligibleSection); hasAnyCards = true; }
+
+  if (hasAnyCards && data.checked_universities_count) {
+    const note = document.createElement('p');
+    note.className = 'checked-count-note';
+    note.textContent = `Checked ${data.checked_universities_count} universities from the project data.`;
+    block.appendChild(note);
+  }
+
   block.appendChild(renderNextSteps(data.next_steps || [], recommendations));
   const sourcesPanel = renderSources(data.sources || []);
   if (sourcesPanel) block.appendChild(sourcesPanel);
@@ -801,71 +853,11 @@ async function requestAISummaryOnly(question, recommendData, selectedId) {
   }
 }
 
-async function handleSplitSend(question) {
-  const selectedId = activeSelectedUniversityId();
-
-  if (!lastRecommendationData || needsFreshRecommendations(question)) {
-    showTyping(recommendStatusLines);
-    try {
-      const response = await fetch(`${BACKEND_URL}/recommend`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestPayload(question, selectedId)),
-      });
-
-      hideTyping();
-      if (!response.ok) {
-        throw new Error(`Backend returned HTTP ${response.status}`);
-      }
-
-      const data = await response.json();
-      backendOnline = true;
-      lastRecommendationData = data;
-      setBackendStatus('online', 'Backend connected', 'Data recommendations are ready. Writing a short AI summary.');
-      const summaryHandle = addRecommendationTurn(data);
-      setBusy(false);
-      requestAISummary(question, data, summaryHandle, data.selected_university || selectedId);
-    } catch (error) {
-      hideTyping();
-      backendOnline = false;
-      setBackendStatus(
-        'offline',
-        'Backend offline',
-        'The frontend is working, but the local FastAPI backend is not reachable on port 8000.'
-      );
-      addSystemMessage('I cannot reach the local counselling backend. Start FastAPI on port 8000, then try again.', 'error');
-      setBusy(false);
-    }
-  } else {
-    showTyping(['Writing a short answer']);
-    try {
-      const data = await requestAISummaryOnly(question, lastRecommendationData, selectedId);
-      hideTyping();
-      if (data && data.answer) {
-        backendOnline = true;
-        addSummaryOnlyMessage(data);
-      } else {
-        backendOnline = false;
-        setBackendStatus(
-          'offline',
-          'Backend offline',
-          'The frontend is working, but the local FastAPI backend is not reachable on port 8000.'
-        );
-        addSystemMessage('I could not complete the answer. Try asking a different question.', 'error');
-      }
-    } catch (error) {
-      hideTyping();
-      backendOnline = false;
-      setBackendStatus(
-        'offline',
-        'Backend offline',
-        'The frontend is working, but the local FastAPI backend is not reachable on port 8000.'
-      );
-      addSystemMessage('I could not complete the answer. Try asking a different question.', 'error');
-    } finally {
-      setBusy(false);
-    }
-  }
+function addGreetingReply(name) {
+  const displayName = name || 'there';
+  const msg = createMessage('bot', `Hi ${escapeHtml(displayName)}, I am ready. Ask me which universities are best for you, or ask about eligibility, fees, or admission steps.`);
+  chatBox.appendChild(msg);
+  scrollChatToBottom();
 }
 
 async function handleSend(questionOverride = '') {
@@ -880,12 +872,85 @@ async function handleSend(questionOverride = '') {
 
   userInput.value = '';
   addUserMessage(question);
+
+  const intent = detectIntent(question);
+  if (intent === 'greeting') {
+    addGreetingReply(studentProfile.name);
+    setBusy(false);
+    return;
+  }
+
   setBusy(true);
 
-  if (fastDemoMode) {
-    await handleSplitSend(question);
+  if (intent === 'recommendation') {
+    showTyping(recommendStatusLines);
+    try {
+      const response = await fetch(`${BACKEND_URL}/recommend`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestPayload(question)),
+      });
+      hideTyping();
+      if (!response.ok) throw new Error(`Backend returned HTTP ${response.status}`);
+      const data = await response.json();
+      backendOnline = true;
+      lastRecommendationData = data;
+      setBackendStatus('online', 'Backend connected', 'Data recommendations are ready. Writing a short AI summary.');
+      const summaryHandle = addRecommendationTurn(data);
+      setBusy(false);
+      requestAISummary(question, data, summaryHandle, data.selected_university || '');
+    } catch (error) {
+      hideTyping();
+      backendOnline = false;
+      setBackendStatus('offline', 'Backend offline', 'The frontend is working, but the local FastAPI backend is not reachable on port 8000.');
+      addSystemMessage('I cannot reach the local counselling backend. Start FastAPI on port 8000, then try again.', 'error');
+      setBusy(false);
+    }
+    return;
+  }
+
+  const selectedId = activeSelectedUniversityId();
+  if (lastRecommendationData) {
+    showTyping(['Writing a short answer']);
+    try {
+      const data = await requestAISummaryOnly(question, lastRecommendationData, selectedId);
+      hideTyping();
+      if (data && data.answer) {
+        backendOnline = true;
+        addSummaryOnlyMessage(data);
+      } else {
+        backendOnline = false;
+        addSystemMessage('I could not complete the answer. Try asking a different question.', 'error');
+      }
+    } catch (error) {
+      hideTyping();
+      backendOnline = false;
+      addSystemMessage('I could not complete the answer. Try asking a different question.', 'error');
+    } finally {
+      setBusy(false);
+    }
   } else {
-    await handleCombinedSend(question);
+    showTyping(recommendStatusLines);
+    try {
+      const response = await fetch(`${BACKEND_URL}/recommend`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestPayload(question)),
+      });
+      hideTyping();
+      if (!response.ok) throw new Error(`Backend returned HTTP ${response.status}`);
+      const data = await response.json();
+      backendOnline = true;
+      lastRecommendationData = data;
+      const summaryHandle = addRecommendationTurn(data);
+      setBusy(false);
+      requestAISummary(question, data, summaryHandle, data.selected_university || '');
+    } catch (error) {
+      hideTyping();
+      backendOnline = false;
+      addSystemMessage('I cannot reach the local counselling backend. Start FastAPI on port 8000, then try again.', 'error');
+      setBusy(false);
+    }
   }
 }
 

@@ -231,6 +231,9 @@ class RecommendResponse(BaseModel):
     provider_used: str = "data"
     selected_model: str = "structured scoring"
     selected_university: str = ""
+    checked_universities_count: int = 0
+    eligible_universities_count: int = 0
+    not_eligible_count: int = 0
     timing: TimingInfo | None = None
 
 class AISummaryRequest(BaseModel):
@@ -248,6 +251,24 @@ class AISummaryResponse(BaseModel):
     provider_used: str = ""
     selected_model: str = ""
     timing: TimingInfo | None = None
+
+GREETING_WORDS = frozenset({
+    "hey", "hello", "hi", "salam", "assalam", "alaikum",
+    "thanks", "thankyou", "thank you", "ok", "okay",
+    "yes", "no", "thx", "thank u",
+})
+
+def is_greeting(text: str) -> bool:
+    if not text:
+        return True
+    cleaned = text.strip().lower().rstrip(".!?, ")
+    if cleaned in GREETING_WORDS:
+        return True
+    return False
+
+def greeting_answer(profile: Profile) -> str:
+    name = profile.name or "there"
+    return f"Hi {name}, I am ready. Ask me which universities are best for you, or ask about eligibility, fees, or admission steps."
 
 def model_dict(model: BaseModel) -> dict:
     if hasattr(model, "model_dump"):
@@ -712,7 +733,7 @@ def build_recommendation_item(score: dict, profile: Profile, chunks: list[dict],
     )
 
 def build_recommendation_lists(profile: Profile, normalized: dict, chunks: list[dict],
-                               question: str, selected_university: str = "") -> tuple[list[RecommendationItem], list[RecommendationItem], list[RecommendationItem], list[RecommendationItem], str]:
+                               question: str, selected_university: str = "") -> tuple:
     effective_city = profile.city_preference
     if not effective_city or effective_city.lower() == "any city":
         inferred_city = infer_city_from_text(question)
@@ -729,22 +750,26 @@ def build_recommendation_lists(profile: Profile, normalized: dict, chunks: list[
         scores = [selected_score] + [s for s in scores if s.get("university_id") != selected_id]
     eligible_scores = [s for s in scores if s.get("fit_level") != "Not eligible"]
     not_eligible_scores = [s for s in scores if s.get("fit_level") == "Not eligible"]
-    recommendations = [build_recommendation_item(s, profile, chunks, effective_city) for s in eligible_scores[:5]]
+    group_size = 6
+    recommendations = [build_recommendation_item(s, profile, chunks, effective_city) for s in eligible_scores[:group_size]]
     safe = [
         build_recommendation_item(s, profile, chunks, effective_city)
         for s in eligible_scores
         if s.get("fit_level") in ("Safe", "Backup")
-    ][:3]
+    ][:group_size]
     difficult = [
         build_recommendation_item(s, profile, chunks, effective_city)
         for s in eligible_scores
         if s.get("fit_level") == "Difficult"
-    ][:3]
+    ][:group_size]
     not_eligible = [
         build_recommendation_item(s, profile, chunks, effective_city)
-        for s in not_eligible_scores[:4]
+        for s in not_eligible_scores[:group_size]
     ]
-    return recommendations, safe, difficult, not_eligible, selected_id
+    checked_count = len(candidate_ids)
+    eligible_count = len(eligible_scores)
+    not_eligible_count = len(not_eligible_scores)
+    return recommendations, safe, difficult, not_eligible, selected_id, checked_count, eligible_count, not_eligible_count
 
 def build_next_steps(recommendations: list[RecommendationItem], selected_id: str = "") -> list[str]:
     if selected_id and recommendations:
@@ -916,7 +941,8 @@ def build_master_prompt(profile: Profile, question: str, context: str,
                         difficult_options: list[RecommendationItem],
                         not_eligible_options: list[RecommendationItem],
                         normalized: dict, selected_id: str = "",
-                        fast_mode: bool = FAST_MODE) -> str:
+                        fast_mode: bool = FAST_MODE,
+                        prompt_mode: str = "recommendation") -> str:
     field = normalize_field(profile.preferred_field)
     city = profile.city_preference or "any city"
     budget_str = profile.budget or "not specified"
@@ -928,6 +954,40 @@ def build_master_prompt(profile: Profile, question: str, context: str,
     matric_pct = normalized["matric_equivalent_pct"]
 
     rec_limit = 3 if fast_mode else 5
+    selected_line = f"Selected university focus: {selected_id}" if selected_id else "Selected university focus: none"
+
+    student_block = (
+        f"STUDENT:\n"
+        f"Name: {profile.name}\n"
+        f"Marks: {level_label} — {matric_pct}% / {inter_pct}%\n"
+        f"Field: {field} | City: {city} | Budget: {budget_str} | University type: {profile.university_type}\n"
+        f"Entry Test: {profile.entry_test or 'not specified'}\n"
+        f"{selected_line}"
+    )
+
+    base_prompt = (
+        f"You are DigiCounsellor, a university counsellor for Pakistani students applying to CS or Software Engineering.\n\n"
+        f"{student_block}\n\n"
+        f"QUESTION:\n{question}\n"
+    )
+
+    if prompt_mode == "follow_up":
+        if selected_id and recommendations:
+            focused = next((r for r in recommendations if r.university_id == selected_id), recommendations[0])
+            base_prompt += (
+                f"\nFOCUSED UNIVERSITY:\n"
+                f"{focused.short_name} ({focused.city}) — {focused.fit_level}\n"
+                f"Eligibility: {focused.eligibility_summary}\n"
+                f"Reason: {focused.match_reason}\n"
+            )
+        base_prompt += (
+            f"\nDATA NOTES:\n{context if context else '(No additional data)'}\n\n"
+            f"Answer the question directly and concisely. Do not repeat the full list of universities. "
+            f"Keep it under 80 words. Never guarantee admission. "
+            f"End with: 'Eligibility depends on official policy and merit each year.'"
+        )
+        return base_prompt
+
     rec_lines = []
     for rec in recommendations[:rec_limit]:
         rec_lines.append(
@@ -938,91 +998,41 @@ def build_master_prompt(profile: Profile, question: str, context: str,
     safe_section = ", ".join([r.short_name for r in safe_options]) or "None identified"
     difficult_section = ", ".join([r.short_name for r in difficult_options]) or "None identified"
     not_eligible_txt = ", ".join([f"{r.short_name} ({r.match_reason})" for r in not_eligible_options]) or "None identified"
-    selected_line = f"Selected university focus: {selected_id}" if selected_id else "Selected university focus: none"
 
     if fast_mode:
-        return f"""You are DigiCounsellor, a university counsellor for Pakistani students applying to CS or Software Engineering.
+        return base_prompt + (
+            f"\n\nSTRUCTURED SHORTLIST:\n{rec_section}\n\n"
+            f"SAFE OPTIONS:\n{safe_section}\n\n"
+            f"DIFFICULT OPTIONS:\n{difficult_section}\n\n"
+            f"NOT ELIGIBLE RIGHT NOW:\n{not_eligible_txt}\n\n"
+            f"DATA NOTES:\n{context}\n\n"
+            f"Write a short counselling answer in 4 small sections:\n"
+            f"Summary\nBest option\nSafe option\nNext step\n\n"
+            f"Use simple English.\nDo not write a letter.\nDo not repeat all source text.\n"
+            f"Keep it between 100 and 160 words.\n"
+            f"Use the structured shortlist as the main truth.\n"
+            f"Never guarantee admission. Mention that eligibility depends on official policy and merit each year.\n"
+            f"Finish the Next step section with one complete sentence and a full stop."
+        )
 
-STUDENT:
-Name: {profile.name}
-Marks: {level_label} — {matric_pct}% / {inter_pct}%
-Field: {field} | City: {city} | Budget: {budget_str} | University type: {profile.university_type}
-Entry Test: {profile.entry_test or "not specified"}
-{selected_line}
-
-QUESTION:
-{question}
-
-STRUCTURED SHORTLIST:
-{rec_section}
-
-SAFE OPTIONS:
-{safe_section}
-
-DIFFICULT OPTIONS:
-{difficult_section}
-
-NOT ELIGIBLE RIGHT NOW:
-{not_eligible_txt}
-
-DATA NOTES:
-{context}
-
-Write a short counselling answer in 4 small sections:
-Summary
-Best option
-Safe option
-Next step
-
-Use simple English.
-Do not write a letter.
-Do not repeat all source text.
-Keep it between 100 and 160 words.
-Use the structured shortlist as the main truth.
-Never guarantee admission. Mention that eligibility depends on official policy and merit each year.
-Finish the Next step section with one complete sentence and a full stop."""
-
-    return f"""You are DigiCounsellor, a university counsellor for Pakistani students applying to CS or Software Engineering. Write a concise, complete answer.
-
-STUDENT:
-Name: {profile.name}
-Marks: {level_label} — {matric_pct}% / {inter_pct}%
-Entry Test: {profile.entry_test}
-Field: {field} | City: {city} | Budget: {budget_str} | University type: {profile.university_type}
-{("Note: " + academic_notes) if academic_notes else ""}
-
-QUESTION:
-{question}
-{selected_line}
-
-DATA:
-{context}
-
-STRUCTURED SHORTLIST:
-{rec_section}
-
-SAFE OPTIONS:
-{safe_section}
-
-DIFFICULT OPTIONS:
-{difficult_section}
-
-NOT ELIGIBLE RIGHT NOW:
-{not_eligible_txt}
-
-Write exactly 5 short sections. Do not write a letter or greeting. Do not mention JSON, retrieval, embeddings, or internal scores unless useful to the student.
-
-1. **Summary** — 2 short sentences
-2. **Best matches** — 2-3 universities with a clear reason for each
-3. **Safe options** — practical safer choices from the shortlist
-4. **Difficult options** — stronger or higher-merit choices to treat carefully
-5. **Next steps** — 3 practical actions
-
-Rules:
-- Never guarantee admission. Include: "Eligibility depends on official policy and merit each year."
-- If budget is under 200,000 PKR, recommend public universities.
-- End with: "Please verify all details from official university admission pages before applying."
-- Keep it under 450 words. Finish every section."""
+    return base_prompt + (
+        f"\n{('Note: ' + academic_notes) if academic_notes else ''}\n\n"
+        f"DATA:\n{context}\n\n"
+        f"STRUCTURED SHORTLIST:\n{rec_section}\n\n"
+        f"SAFE OPTIONS:\n{safe_section}\n\n"
+        f"DIFFICULT OPTIONS:\n{difficult_section}\n\n"
+        f"Write exactly 5 short sections. Do not write a letter or greeting. Do not mention JSON, retrieval, embeddings, or internal scores unless useful to the student.\n\n"
+        f"1. **Summary** — 2 short sentences\n"
+        f"2. **Best matches** — 2-3 universities with a clear reason for each\n"
+        f"3. **Safe options** — practical safer choices from the shortlist\n"
+        f"4. **Difficult options** — stronger or higher-merit choices to treat carefully\n"
+        f"5. **Next steps** — 3 practical actions\n\n"
+        f"Rules:\n"
+        f"- Never guarantee admission. Include: \"Eligibility depends on official policy and merit each year.\"\n"
+        f"- If budget is under 200,000 PKR, recommend public universities.\n"
+        f"- End with: \"Please verify all details from official university admission pages before applying.\"\n"
+        f"- Keep it under 450 words. Finish every section."
+    )
 
 # ──────────────────────────────────────────────
 # GET /health
@@ -1287,9 +1297,11 @@ def build_recommendation_result(profile: Profile, question: str,
     retrieved_count = len(chunks)
 
     scoring_start = time.perf_counter()
-    recommendations, safe_options, difficult_options, not_eligible_options, selected_id = build_recommendation_lists(
+    rec_tuple = build_recommendation_lists(
         profile, normalized, chunks, question, selected_id
     )
+    recommendations, safe_options, difficult_options, not_eligible_options, selected_id = rec_tuple[:5]
+    checked_count, eligible_count, not_eligible_count = rec_tuple[5:8]
     next_steps = build_next_steps(recommendations, selected_id)
     admission_links = collect_admission_links(recommendations)
     scoring_seconds = time.perf_counter() - scoring_start
@@ -1314,6 +1326,9 @@ def build_recommendation_result(profile: Profile, question: str,
         provider_used="data",
         selected_model="structured scoring",
         selected_university=selected_id,
+        checked_universities_count=checked_count,
+        eligible_universities_count=eligible_count,
+        not_eligible_count=not_eligible_count,
         timing=timing,
     )
     return {
@@ -1324,15 +1339,33 @@ def build_recommendation_result(profile: Profile, question: str,
         "selected_id": selected_id,
     }
 
+RECOMMENDATION_PHRASES = [
+    "recommend", "best match", "safe option", "universities in",
+    "options for me", "which universit", "suitable for me",
+    "good for me", "suggest", "compare universit",
+]
+
+def is_rec_question(question: str) -> bool:
+    lower = question.lower()
+    for phrase in RECOMMENDATION_PHRASES:
+        if phrase in lower:
+            return True
+    return False
+
 async def generate_ai_summary(profile: Profile, question: str, selected_id: str,
                               recommendations: list[RecommendationItem],
                               safe_options: list[RecommendationItem],
                               difficult_options: list[RecommendationItem],
                               not_eligible_options: list[RecommendationItem],
                               normalized: dict, context: str) -> tuple[str, str, str, float]:
+    if is_greeting(question):
+        return greeting_answer(profile), "fallback", "rule-based guidance", 0.0
+
+    prompt_mode = "recommendation" if is_rec_question(question) else "follow_up"
     prompt = build_master_prompt(
         profile, question, context, recommendations, safe_options,
-        difficult_options, not_eligible_options, normalized, selected_id, True
+        difficult_options, not_eligible_options, normalized, selected_id, True,
+        prompt_mode
     )
     llm_start = time.perf_counter()
     answer = ""
@@ -1484,6 +1517,14 @@ async def ai_summary(request: AISummaryRequest):
 @app.post("/counsel")
 async def counsel(request: CounselRequest):
     total_start = time.perf_counter()
+    if is_greeting(request.question):
+        total_seconds = time.perf_counter() - total_start
+        return CounselResponse(
+            answer=greeting_answer(request.profile),
+            provider_used="fallback",
+            selected_model="rule-based guidance",
+            timing=TimingInfo(total_seconds=round(total_seconds, 3), cached=False),
+        )
     selected_id = resolve_selected_id(request.selected_university)
     cache_key = counsel_cache_key(request.profile, request.question, selected_id)
     cached_response = cache_get(COUNSEL_CACHE, cache_key, CounselResponse)

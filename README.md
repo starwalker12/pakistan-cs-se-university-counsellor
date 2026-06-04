@@ -475,6 +475,7 @@ curl -X POST http://localhost:8000/counsel \
 | 13 | Product UI, branding, profile persistence, university cards, follow-up flow | Complete |
 | 17 | Natural chat flow — cards show only for recommendation questions, follow-ups skip card duplication | Complete |
 | 18 | Strict eligibility — "Not eligible right now" group, honest wording for weak grades, O/A Level labels, student name in AI prompts, no auto-focus | Complete |
+| 19 | Intent-based chat — greetings skip backend entirely, recommendation groups show "Best matches"/"Safe"/"Difficult"/"Not eligible", all 20 universities checked per request | Complete |
 
 ### Key achievements
 
@@ -487,6 +488,8 @@ curl -X POST http://localhost:8000/counsel \
 - **Natural chat flow** — recommendation cards appear for recommendation questions; follow-up questions (eligibility, fees, next steps) use stored data and do not repeat cards
 - **Honest eligibility grouping** — universities are grouped into "Best matches", "Safe", "Difficult", and "Not eligible right now" with blunt reasons for weak grades (D/E, low equivalence). Follow-up questions about a specific university skip the /recommend endpoint entirely
 - **O/A Level wording** — the app correctly uses "O/A Level" for O/A Level students and "Matric/Inter" for Matric/Inter students everywhere: AI prompts, saved profile display, and fallback answers
+- **Intent-based chat routing** — frontend detects greeting, recommendation, follow-up, and university-specific intents. Greetings never call the backend. Recommendations trigger /recommend + /ai-summary. Follow-ups and university-specific questions call only /ai-summary with stored data, avoiding card duplication
+- **All 20 universities checked** — every /recommend call scores all universities from the project data (universities.json, rankings, eligibility rules). Response includes `checked_universities_count` to prove full coverage
 
 ### Team
 
