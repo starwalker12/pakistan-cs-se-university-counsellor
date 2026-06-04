@@ -1,5 +1,6 @@
 const BACKEND_URL = window.DIGICOUNSELLOR_BACKEND_URL || 'http://localhost:8000';
 const PROFILE_KEY = 'digicounsellor.profile.v1';
+const FAST_MODE_KEY = 'digicounsellor.fastDemoMode.v1';
 
 const $ = (selector) => document.querySelector(selector);
 
@@ -24,6 +25,7 @@ const providerBadge = $('#providerBadge');
 const selectedUniversityBar = $('#selectedUniversityBar');
 const selectedUniversityName = $('#selectedUniversityName');
 const clearSelectedBtn = $('#clearSelectedBtn');
+const fastModeToggle = $('#fastModeToggle');
 
 let studentProfile = null;
 let selectedUniversity = null;
@@ -32,12 +34,19 @@ let typingTimer = null;
 let backendOnline = false;
 let isBusy = false;
 let restoringProfile = false;
+let fastDemoMode = localStorage.getItem(FAST_MODE_KEY) !== 'false';
 
 const loadingStatusLines = [
   'Searching university data',
   'Checking your profile',
   'Ranking suitable universities',
   'Asking local AI for a short explanation',
+];
+
+const recommendStatusLines = [
+  'Searching university data',
+  'Checking your profile',
+  'Ranking suitable universities',
 ];
 
 const gradePercentages = {
@@ -349,6 +358,7 @@ function setBackendStatus(state, label, detail) {
 }
 
 function providerLabel(provider, model) {
+  if (provider === 'data') return 'Data recommendations ready';
   if (provider === 'ollama') return 'Local AI connected';
   if (provider === 'lm_studio') return 'LM Studio connected';
   if (provider === 'fallback' || provider === 'fallback_after_incomplete') return 'Fast data mode';
@@ -386,21 +396,22 @@ function addSystemMessage(text, type = '') {
   scrollChatToBottom();
 }
 
-function showTyping() {
+function showTyping(lines = loadingStatusLines) {
   hideTyping();
   let statusIndex = 0;
+  const activeLines = lines.length ? lines : loadingStatusLines;
   typingEl = createMessage(
     'bot',
     `<span class="typing-progress" aria-live="polite">
-      <span class="typing-status">${loadingStatusLines[statusIndex]}</span>
+      <span class="typing-status">${activeLines[statusIndex]}</span>
       <span class="typing-dots" aria-label="DigiCounsellor is working"><span></span><span></span><span></span></span>
     </span>`
   );
   chatBox.appendChild(typingEl);
   const statusNode = typingEl.querySelector('.typing-status');
   typingTimer = window.setInterval(() => {
-    statusIndex = (statusIndex + 1) % loadingStatusLines.length;
-    if (statusNode) statusNode.textContent = loadingStatusLines[statusIndex];
+    statusIndex = (statusIndex + 1) % activeLines.length;
+    if (statusNode) statusNode.textContent = activeLines[statusIndex];
     scrollChatToBottom();
   }, 1400);
   scrollChatToBottom();
@@ -551,6 +562,54 @@ function renderSources(sources = []) {
   return details;
 }
 
+function activeSelectedUniversityId() {
+  return selectedUniversity ? selectedUniversity.university_id : '';
+}
+
+function requestPayload(question, selectedId = activeSelectedUniversityId()) {
+  return {
+    profile: studentProfile,
+    question,
+    selected_university: selectedId || '',
+  };
+}
+
+function setSummaryMessage(summaryBody, text, type = 'pending') {
+  if (!summaryBody) return;
+  summaryBody.innerHTML = `<div class="answer-content summary-${type}">${formatMarkdown(text)}</div>`;
+}
+
+function addRecommendationTurn(data) {
+  updateProviderBadge({ provider_used: 'data', selected_model: '' });
+  const block = document.createElement('section');
+  block.className = 'response-block split-response-block';
+
+  const summaryMessage = createMessage(
+    'bot',
+    '<div class="answer-content summary-pending"><strong>Recommendations are ready.</strong><br>Writing a short AI summary...</div>',
+    'summary-pending'
+  );
+  block.appendChild(summaryMessage);
+
+  const recommendations = data.recommended_universities || [];
+  const selectedFromResponse = recommendations.find((rec) => rec.university_id === data.selected_university);
+  if (selectedFromResponse && (!selectedUniversity || selectedUniversity.university_id !== selectedFromResponse.university_id)) {
+    setSelectedUniversity(selectedFromResponse, false);
+  }
+
+  const recSection = renderRecommendations(recommendations);
+  if (recSection) block.appendChild(recSection);
+  block.appendChild(renderNextSteps(data.next_steps || [], recommendations));
+  const sourcesPanel = renderSources(data.sources || []);
+  if (sourcesPanel) block.appendChild(sourcesPanel);
+  chatBox.appendChild(block);
+  scrollChatToBottom();
+  return {
+    block,
+    summaryBody: summaryMessage.querySelector('.message-body'),
+  };
+}
+
 function addAssistantTurn(data) {
   updateProviderBadge(data);
   const block = document.createElement('section');
@@ -584,6 +643,12 @@ function clearSelectedUniversity() {
   selectedUniversityBar.classList.add('hidden');
 }
 
+function setFastDemoMode(value, persist = true) {
+  fastDemoMode = Boolean(value);
+  if (fastModeToggle) fastModeToggle.checked = fastDemoMode;
+  if (persist) localStorage.setItem(FAST_MODE_KEY, fastDemoMode ? 'true' : 'false');
+}
+
 function setBusy(value) {
   isBusy = value;
   sendBtn.disabled = value || !studentProfile;
@@ -591,30 +656,13 @@ function setBusy(value) {
   updateChatStatus();
 }
 
-async function handleSend(questionOverride = '') {
-  const question = (questionOverride || userInput.value).trim();
-  if (!question || isBusy) return;
-
-  if (!studentProfile) {
-    showProfileNotice('Save your profile before asking a question.', 'error');
-    addSystemMessage('Save your profile first so the answer can be personalised.', 'error');
-    return;
-  }
-
-  userInput.value = '';
-  addUserMessage(question);
-  setBusy(true);
-  showTyping();
-
+async function handleCombinedSend(question) {
+  showTyping(loadingStatusLines);
   try {
     const response = await fetch(`${BACKEND_URL}/counsel`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        profile: studentProfile,
-        question,
-        selected_university: selectedUniversity ? selectedUniversity.university_id : '',
-      }),
+      body: JSON.stringify(requestPayload(question)),
     });
 
     hideTyping();
@@ -636,6 +684,110 @@ async function handleSend(questionOverride = '') {
     addSystemMessage('I cannot reach the local counselling backend. Start FastAPI on port 8000, then try again.', 'error');
   } finally {
     setBusy(false);
+  }
+}
+
+async function requestAISummary(question, recommendData, summaryHandle, selectedId) {
+  const slowTimer = window.setTimeout(() => {
+    setSummaryMessage(
+      summaryHandle.summaryBody,
+      'Recommendations are ready. AI summary is taking longer, but you can continue using the cards.',
+      'slow'
+    );
+  }, 12000);
+
+  try {
+    const response = await fetch(`${BACKEND_URL}/ai-summary`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        profile: studentProfile,
+        question,
+        selected_university: selectedId || null,
+        recommended_universities: recommendData.recommended_universities || [],
+        safe_options: recommendData.safe_options || [],
+        difficult_options: recommendData.difficult_options || [],
+        sources: recommendData.sources || [],
+      }),
+    });
+
+    window.clearTimeout(slowTimer);
+    if (!response.ok) {
+      throw new Error(`Backend returned HTTP ${response.status}`);
+    }
+    const data = await response.json();
+    backendOnline = true;
+    updateProviderBadge(data);
+    setBackendStatus('online', 'Backend connected', 'Local AI summary added to the recommendation cards.');
+    setSummaryMessage(
+      summaryHandle.summaryBody,
+      data.answer || 'Recommendations are ready. Use the cards to continue with eligibility, fees, and admission links.',
+      'ready'
+    );
+  } catch (error) {
+    window.clearTimeout(slowTimer);
+    updateProviderBadge({ provider_used: 'data', selected_model: '' });
+    setSummaryMessage(
+      summaryHandle.summaryBody,
+      'Recommendations are ready. AI summary is taking longer, but you can continue using the cards.',
+      'slow'
+    );
+  }
+}
+
+async function handleSplitSend(question) {
+  const selectedId = activeSelectedUniversityId();
+  showTyping(recommendStatusLines);
+
+  try {
+    const response = await fetch(`${BACKEND_URL}/recommend`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requestPayload(question, selectedId)),
+    });
+
+    hideTyping();
+    if (!response.ok) {
+      throw new Error(`Backend returned HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+    backendOnline = true;
+    setBackendStatus('online', 'Backend connected', 'Data recommendations are ready. Writing a short AI summary.');
+    const summaryHandle = addRecommendationTurn(data);
+    setBusy(false);
+    requestAISummary(question, data, summaryHandle, data.selected_university || selectedId);
+  } catch (error) {
+    hideTyping();
+    backendOnline = false;
+    setBackendStatus(
+      'offline',
+      'Backend offline',
+      'The frontend is working, but the local FastAPI backend is not reachable on port 8000.'
+    );
+    addSystemMessage('I cannot reach the local counselling backend. Start FastAPI on port 8000, then try again.', 'error');
+    setBusy(false);
+  }
+}
+
+async function handleSend(questionOverride = '') {
+  const question = (questionOverride || userInput.value).trim();
+  if (!question || isBusy) return;
+
+  if (!studentProfile) {
+    showProfileNotice('Save your profile before asking a question.', 'error');
+    addSystemMessage('Save your profile first so the answer can be personalised.', 'error');
+    return;
+  }
+
+  userInput.value = '';
+  addUserMessage(question);
+  setBusy(true);
+
+  if (fastDemoMode) {
+    await handleSplitSend(question);
+  } else {
+    await handleCombinedSend(question);
   }
 }
 
@@ -682,6 +834,12 @@ form.addEventListener('change', markProfileDirty);
 saveBtn.addEventListener('click', saveProfile);
 clearProfileBtn.addEventListener('click', clearProfile);
 clearSelectedBtn.addEventListener('click', clearSelectedUniversity);
+if (fastModeToggle) {
+  setFastDemoMode(fastDemoMode, false);
+  fastModeToggle.addEventListener('change', () => {
+    setFastDemoMode(fastModeToggle.checked);
+  });
+}
 
 chatForm.addEventListener('submit', (event) => {
   event.preventDefault();

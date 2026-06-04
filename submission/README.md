@@ -10,8 +10,9 @@ DigiCounsellor is a polished RAG-based student counselling web app for Pakistani
 2. Student asks a question or chooses a guided follow-up
 3. The backend retrieves relevant university admission information from a local Chroma vector database
 4. Ranking, eligibility, city, field, type, and budget logic produce structured recommendation cards
-5. The backend sends retrieved context plus the structured shortlist to Ollama first, then LM Studio if configured, then a rule-based guidance fallback
-6. The frontend renders a counselling answer, university cards, official links, sources, and next-step actions
+5. In split response mode, `/recommend` returns cards first without waiting for the local LLM
+6. `/ai-summary` then asks Ollama or LM Studio for a short counselling summary while the cards stay usable
+7. `/counsel` remains available as the older combined response endpoint
 
 ## Project Structure
 
@@ -72,7 +73,7 @@ cd /Users/sw12/Projects/ML-Project/backend
 FAST_MODE=true OLLAMA_MODEL=gemma4:latest python3 -m uvicorn app:app --port 8000
 ```
 
-`FAST_MODE=true` is recommended for department demos. The backend creates recommendation cards from structured scoring first, then asks the local model for a short counselling summary. It loads Chroma on startup, then tries Ollama first, LM Studio second, and a static guidance fallback last. Watch for:
+`FAST_MODE=true` is recommended for department demos. DigiCounsellor uses split response mode in the frontend: recommendation cards come back first from structured RAG/scoring, then the local AI summary arrives separately. The backend still supports combined `/counsel` responses for compatibility. Watch for:
 ```
 Chroma loaded with 21 documents
 Uvicorn running on http://localhost:8000
@@ -95,7 +96,52 @@ curl http://localhost:8000/health
 
 Expected response includes `status`, `chroma_docs`, `ollama`, `lm_studio`, `default_provider`, and `ollama_model`.
 
-### Step 6 — Full RAG counsel test
+### Step 6 — Fast split response tests
+
+Recommendation cards only, with no Ollama call:
+
+```bash
+curl -X POST http://localhost:8000/recommend \
+  -H "Content-Type: application/json" \
+  -d '{
+    "profile": {
+      "name": "Fardan",
+      "education_system": "matric_inter",
+      "matric_percentage": "80",
+      "intermediate_percentage": "90",
+      "preferred_field": "Computer Science",
+      "city_preference": "Lahore",
+      "budget": "500000"
+    },
+    "question": "Which universities are best for me?"
+  }'
+```
+
+Expected response: JSON with `recommended_universities`, `safe_options`, `difficult_options`, `next_steps`, `admission_links`, `sources`, `retrieved_count`, and `timing`. It should usually return much faster than `/counsel`.
+
+Short local AI summary only:
+
+```bash
+curl -X POST http://localhost:8000/ai-summary \
+  -H "Content-Type: application/json" \
+  -d '{
+    "profile": {
+      "name": "Fardan",
+      "education_system": "matric_inter",
+      "matric_percentage": "80",
+      "intermediate_percentage": "90",
+      "preferred_field": "Computer Science",
+      "city_preference": "Lahore",
+      "budget": "500000"
+    },
+    "question": "Which universities are best for me?",
+    "selected_university": null
+  }'
+```
+
+Expected response: JSON with `answer`, `provider_used`, `selected_model`, and `timing`.
+
+### Step 7 — Combined RAG counsel test
 
 ```bash
 curl -X POST http://localhost:8000/counsel \
@@ -119,7 +165,7 @@ curl -X POST http://localhost:8000/counsel \
 Expected response: JSON with `answer`, `recommended_universities`, `safe_options`, `difficult_options`, `next_steps`, `admission_links`, `sources`, `retrieved_count`, `provider_used`, and `selected_model`.
 In fast mode the response also includes a `timing` object with total, RAG, scoring, and LLM durations.
 
-### Step 7 — Debug provider detection
+### Step 8 — Debug provider detection
 
 Test if LM Studio or Ollama is reachable:
 

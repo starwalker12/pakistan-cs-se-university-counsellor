@@ -62,8 +62,12 @@ FAST_MODE = env_bool("FAST_MODE", True)
 OLLAMA_TIMEOUT = float(os.environ.get("OLLAMA_TIMEOUT", "45"))
 OLLAMA_NUM_PREDICT = min(env_int("OLLAMA_NUM_PREDICT", 700 if FAST_MODE else 900), 900)
 LM_STUDIO_MAX_TOKENS = min(env_int("LM_STUDIO_MAX_TOKENS", 700 if FAST_MODE else 900), 900)
+AI_SUMMARY_NUM_PREDICT = min(env_int("AI_SUMMARY_NUM_PREDICT", 450), OLLAMA_NUM_PREDICT)
+AI_SUMMARY_MAX_TOKENS = min(env_int("AI_SUMMARY_MAX_TOKENS", 450), LM_STUDIO_MAX_TOKENS)
 CACHE_MAX_ITEMS = env_int("COUNSEL_CACHE_MAX_ITEMS", 80)
 COUNSEL_CACHE: dict[str, dict] = {}
+RECOMMEND_CACHE: dict[str, dict] = {}
+AI_SUMMARY_CACHE: dict[str, dict] = {}
 
 # ──────────────────────────────────────────────
 # Chroma / RAG configuration
@@ -161,7 +165,7 @@ class Profile(BaseModel):
 class CounselRequest(BaseModel):
     profile: Profile
     question: str
-    selected_university: str = ""
+    selected_university: str | None = ""
 
 class SourceItem(BaseModel):
     university_name: str = ""
@@ -212,33 +216,83 @@ class CounselResponse(BaseModel):
     selected_university: str = ""
     timing: TimingInfo | None = None
 
+class RecommendResponse(BaseModel):
+    sources: list[SourceItem] = Field(default_factory=list)
+    recommended_universities: list[RecommendationItem] = Field(default_factory=list)
+    safe_options: list[RecommendationItem] = Field(default_factory=list)
+    difficult_options: list[RecommendationItem] = Field(default_factory=list)
+    next_steps: list[str] = Field(default_factory=list)
+    admission_links: list[AdmissionLink] = Field(default_factory=list)
+    retrieved_count: int = 0
+    provider_used: str = "data"
+    selected_model: str = "structured scoring"
+    selected_university: str = ""
+    timing: TimingInfo | None = None
+
+class AISummaryRequest(BaseModel):
+    profile: Profile
+    question: str
+    selected_university: str | None = ""
+    recommended_universities: list[RecommendationItem] = Field(default_factory=list)
+    safe_options: list[RecommendationItem] = Field(default_factory=list)
+    difficult_options: list[RecommendationItem] = Field(default_factory=list)
+    sources: list[SourceItem] = Field(default_factory=list)
+
+class AISummaryResponse(BaseModel):
+    answer: str = ""
+    provider_used: str = ""
+    selected_model: str = ""
+    timing: TimingInfo | None = None
+
 def model_dict(model: BaseModel) -> dict:
     if hasattr(model, "model_dump"):
         return model.model_dump()
     return model.dict()
 
-def counsel_cache_key(profile: Profile, question: str, selected_university: str) -> str:
+def request_cache_key(profile: Profile, question: str, selected_university: str | None,
+                      extra: dict | None = None) -> str:
     payload = {
         "profile": model_dict(profile),
         "question": (question or "").strip().lower(),
         "selected_university": (selected_university or "").strip().lower(),
         "fast_mode": FAST_MODE,
     }
+    if extra:
+        payload.update(extra)
     return json.dumps(payload, sort_keys=True, separators=(",", ":"))
 
-def cache_get_response(cache_key: str) -> CounselResponse | None:
-    cached = COUNSEL_CACHE.get(cache_key)
+def counsel_cache_key(profile: Profile, question: str, selected_university: str | None) -> str:
+    return request_cache_key(profile, question, selected_university, {"endpoint": "counsel"})
+
+def recommend_cache_key(profile: Profile, question: str, selected_university: str | None) -> str:
+    return request_cache_key(profile, question, selected_university, {"endpoint": "recommend"})
+
+def ai_summary_cache_key(request: AISummaryRequest, selected_university: str | None) -> str:
+    rec_ids = [r.university_id for r in request.recommended_universities[:5]]
+    return request_cache_key(
+        request.profile,
+        request.question,
+        selected_university,
+        {
+            "endpoint": "ai-summary",
+            "model": OLLAMA_MODEL,
+            "rec_ids": rec_ids,
+        }
+    )
+
+def cache_get(cache: dict[str, dict], cache_key: str, model_cls):
+    cached = cache.get(cache_key)
     if not cached:
         return None
-    if hasattr(CounselResponse, "model_validate"):
-        return CounselResponse.model_validate(cached)
-    return CounselResponse.parse_obj(cached)
+    if hasattr(model_cls, "model_validate"):
+        return model_cls.model_validate(cached)
+    return model_cls.parse_obj(cached)
 
-def cache_store_response(cache_key: str, response: CounselResponse) -> None:
-    COUNSEL_CACHE[cache_key] = model_dict(response)
-    while len(COUNSEL_CACHE) > CACHE_MAX_ITEMS:
-        oldest_key = next(iter(COUNSEL_CACHE))
-        COUNSEL_CACHE.pop(oldest_key, None)
+def cache_store(cache: dict[str, dict], cache_key: str, response: BaseModel) -> None:
+    cache[cache_key] = model_dict(response)
+    while len(cache) > CACHE_MAX_ITEMS:
+        oldest_key = next(iter(cache))
+        cache.pop(oldest_key, None)
 
 # ──────────────────────────────────────────────
 # Academic profile normalisation
@@ -688,7 +742,7 @@ def build_next_steps(recommendations: list[RecommendationItem], selected_id: str
 # LLM provider helpers
 # ──────────────────────────────────────────────
 
-async def call_lm_studio(prompt: str) -> str | None:
+async def call_lm_studio(prompt: str, max_tokens: int | None = None) -> str | None:
     try:
         async with httpx.AsyncClient(timeout=45.0) as client:
             resp = await client.post(LM_STUDIO_URL, json={
@@ -698,7 +752,7 @@ async def call_lm_studio(prompt: str) -> str | None:
                     {"role": "user", "content": prompt}
                 ],
                 "temperature": 0.2,
-                "max_tokens": LM_STUDIO_MAX_TOKENS,
+                "max_tokens": max_tokens or LM_STUDIO_MAX_TOKENS,
                 "stream": False
             })
             if resp.status_code != 200:
@@ -708,7 +762,7 @@ async def call_lm_studio(prompt: str) -> str | None:
     except Exception:
         return None
 
-async def call_ollama(prompt: str) -> str | None:
+async def call_ollama(prompt: str, num_predict: int | None = None) -> str | None:
     try:
         async with httpx.AsyncClient(timeout=OLLAMA_TIMEOUT) as client:
             resp = await client.post(OLLAMA_URL, json={
@@ -719,9 +773,10 @@ async def call_ollama(prompt: str) -> str | None:
                 ],
                 "options": {
                     "temperature": 0.2,
-                    "num_predict": OLLAMA_NUM_PREDICT
+                    "num_predict": num_predict or OLLAMA_NUM_PREDICT
                 },
                 "keep_alive": "10m",
+                "think": False,
                 "stream": False
             })
             if resp.status_code != 200:
@@ -877,9 +932,10 @@ Next step
 Use simple English.
 Do not write a letter.
 Do not repeat all source text.
-Keep it under 180 words.
+Keep it between 100 and 160 words.
 Use the structured shortlist as the main truth.
-Never guarantee admission. Mention that eligibility depends on official policy and merit each year."""
+Never guarantee admission. Mention that eligibility depends on official policy and merit each year.
+Finish the Next step section with one complete sentence and a full stop."""
 
     return f"""You are DigiCounsellor, a university counsellor for Pakistani students applying to CS or Software Engineering. Write a concise, complete answer.
 
@@ -1107,40 +1163,28 @@ def is_complete_answer(text: str) -> bool:
         return False
     return cleaned[-1] in (".", "!", "?")
 
+def normalize_summary_answer(text: str) -> str:
+    cleaned = (text or "").strip()
+    if not cleaned:
+        return ""
+    if cleaned[-1] not in (".", "!", "?"):
+        cleaned = cleaned.rstrip(" ,;:-") + "."
+    return cleaned
 
-# ──────────────────────────────────────────────
-# POST /counsel — main RAG counselling endpoint
-# ──────────────────────────────────────────────
+def is_usable_summary(text: str) -> bool:
+    cleaned = (text or "").strip()
+    if len(cleaned) < 90:
+        return False
+    lower = cleaned.lower()
+    return "summary" in lower and ("best" in lower or "safe" in lower or "next" in lower)
 
-@app.post("/counsel")
-async def counsel(request: CounselRequest):
-    total_start = time.perf_counter()
-    rag_seconds = 0.0
-    scoring_seconds = 0.0
-    llm_seconds = 0.0
-    profile = request.profile
-    question = request.question
-    selected_input = (request.selected_university or "").strip()
-    selected_id = selected_input if selected_input in UNIVERSITY_BY_ID else resolve_university_id(selected_input)
+def resolve_selected_id(selected_university: str | None) -> str:
+    selected_input = (selected_university or "").strip()
+    if not selected_input:
+        return ""
+    return selected_input if selected_input in UNIVERSITY_BY_ID else resolve_university_id(selected_input)
 
-    cache_key = counsel_cache_key(profile, question, selected_id)
-    cached_response = cache_get_response(cache_key)
-    if cached_response:
-        total_seconds = time.perf_counter() - total_start
-        cached_response.timing = TimingInfo(
-            total_seconds=round(total_seconds, 3),
-            rag_seconds=0.0,
-            scoring_seconds=0.0,
-            llm_seconds=0.0,
-            cached=True,
-        )
-        print(f"[counsel] cache hit total={total_seconds:.3f}s question={question[:80]!r}")
-        return cached_response
-
-    # Normalize academic profile
-    normalized = normalize_academic_profile(profile)
-
-    # Build a rich search query from profile + question
+def build_search_query(profile: Profile, question: str, normalized: dict, selected_id: str = "") -> str:
     search_parts = [
         f"field: {normalize_field(profile.preferred_field)}" if profile.preferred_field else "",
         f"city: {profile.city_preference}" if profile.city_preference else "",
@@ -1151,7 +1195,43 @@ async def counsel(request: CounselRequest):
         f"selected university: {UNIVERSITY_BY_ID.get(selected_id, {}).get('name', selected_id)}" if selected_id else "",
         question,
     ]
-    search_query = " ".join(p for p in search_parts if p)
+    return " ".join(p for p in search_parts if p)
+
+def collect_admission_links(recommendations: list[RecommendationItem]) -> list[AdmissionLink]:
+    admission_links = []
+    seen_link_urls = set()
+    for rec in recommendations[:4]:
+        for link in rec.admission_links:
+            if link.url and link.url not in seen_link_urls:
+                seen_link_urls.add(link.url)
+                admission_links.append(link)
+    return admission_links[:8]
+
+def build_context_from_chunks(chunks: list[dict]) -> str:
+    max_chunk_chars = 260 if FAST_MODE else 1200
+    context_lines = []
+    for c in chunks:
+        text_source = c.get("preview") if FAST_MODE else c.get("text", "")
+        truncated = (text_source or "")[:max_chunk_chars]
+        context_lines.append(f"[{c.get('university_name', '')} - {c.get('category', '')}]\n{truncated}")
+    return "\n\n---\n\n".join(context_lines) if context_lines else ""
+
+def build_context_from_sources(sources: list[SourceItem]) -> str:
+    if not sources:
+        return ""
+    lines = []
+    for source in sources[:3]:
+        preview = (source.preview or "")[:220]
+        lines.append(f"[{source.university_name}]\n{preview}")
+    return "\n\n---\n\n".join(lines)
+
+def build_recommendation_result(profile: Profile, question: str,
+                                selected_university: str | None = "") -> dict:
+    total_start = time.perf_counter()
+    selected_id = resolve_selected_id(selected_university)
+
+    normalized = normalize_academic_profile(profile)
+    search_query = build_search_query(profile, question, normalized, selected_id)
 
     rag_start = time.perf_counter()
     chunks = search_chroma_detailed(search_query, top_k=3 if FAST_MODE else 8)
@@ -1163,107 +1243,235 @@ async def counsel(request: CounselRequest):
         profile, normalized, chunks, question, selected_id
     )
     next_steps = build_next_steps(recommendations, selected_id)
-    admission_links = []
-    seen_link_urls = set()
-    for rec in recommendations[:4]:
-        for link in rec.admission_links:
-            if link.url and link.url not in seen_link_urls:
-                seen_link_urls.add(link.url)
-                admission_links.append(link)
-    admission_links = admission_links[:8]
+    admission_links = collect_admission_links(recommendations)
     scoring_seconds = time.perf_counter() - scoring_start
-
-    MAX_CHUNK_CHARS = 260 if FAST_MODE else 1200
-    context_lines = []
-    for c in chunks:
-        text_source = c.get("preview") if FAST_MODE else c.get("text", "")
-        truncated = (text_source or "")[:MAX_CHUNK_CHARS]
-        context_lines.append(f"[{c['university_name']} - {c['category']}]\n{truncated}")
-    context = "\n\n---\n\n".join(context_lines) if context_lines else ""
-
-    answer = ""
-    provider_used = "fallback"
-    selected_model = "rule-based guidance"
-
-    if context:
-        prompt = build_master_prompt(
-            profile, question, context, recommendations, safe_options,
-            difficult_options, normalized, selected_id, FAST_MODE
-        )
-
-        llm_start = time.perf_counter()
-        for provider in PROVIDER_ORDER:
-            provider = provider.strip()
-            if provider == "lm_studio":
-                result = await call_lm_studio(prompt)
-                if result and is_complete_answer(result):
-                    answer = result
-                    provider_used = "lm_studio"
-                    selected_model = LM_STUDIO_MODEL
-                    break
-            elif provider == "ollama":
-                result = await call_ollama(prompt)
-                if result and is_complete_answer(result):
-                    answer = result
-                    provider_used = "ollama"
-                    selected_model = OLLAMA_MODEL
-                    break
-                elif result and not is_complete_answer(result):
-                    answer = build_fallback_answer(
-                        recommendations, safe_options, difficult_options,
-                        profile, question, normalized, incomplete=True,
-                        fast_mode=FAST_MODE
-                    )
-                    provider_used = "fallback"
-                    selected_model = "rule-based guidance"
-                    break
-            elif provider == "fallback":
-                answer = build_fallback_answer(
-                    recommendations, safe_options, difficult_options,
-                    profile, question, normalized, fast_mode=FAST_MODE
-                )
-                provider_used = "fallback"
-                selected_model = "rule-based guidance"
-                break
-        llm_seconds = time.perf_counter() - llm_start
-
-    if not answer:
-        answer = build_fallback_answer(
-            recommendations, safe_options, difficult_options,
-            profile, question, normalized, fast_mode=FAST_MODE
-        )
-        provider_used = "fallback"
-        selected_model = "rule-based guidance"
-
-    sources = format_sources(chunks)
 
     total_seconds = time.perf_counter() - total_start
     timing = TimingInfo(
         total_seconds=round(total_seconds, 3),
         rag_seconds=round(rag_seconds, 3),
         scoring_seconds=round(scoring_seconds, 3),
-        llm_seconds=round(llm_seconds, 3),
+        llm_seconds=0.0,
         cached=False,
     )
-
-    response = CounselResponse(
-        answer=answer,
-        sources=sources,
+    response = RecommendResponse(
+        sources=format_sources(chunks),
         recommended_universities=recommendations,
         safe_options=safe_options,
         difficult_options=difficult_options,
         next_steps=next_steps,
         admission_links=admission_links,
         retrieved_count=retrieved_count,
-        provider_used=provider_used,
-        selected_model=selected_model,
+        provider_used="data",
+        selected_model="structured scoring",
         selected_university=selected_id,
         timing=timing,
     )
-    cache_store_response(cache_key, response)
+    return {
+        "response": response,
+        "normalized": normalized,
+        "chunks": chunks,
+        "context": build_context_from_chunks(chunks),
+        "selected_id": selected_id,
+    }
+
+async def generate_ai_summary(profile: Profile, question: str, selected_id: str,
+                              recommendations: list[RecommendationItem],
+                              safe_options: list[RecommendationItem],
+                              difficult_options: list[RecommendationItem],
+                              normalized: dict, context: str) -> tuple[str, str, str, float]:
+    prompt = build_master_prompt(
+        profile, question, context, recommendations, safe_options,
+        difficult_options, normalized, selected_id, True
+    )
+    llm_start = time.perf_counter()
+    answer = ""
+    provider_used = "fallback"
+    selected_model = "rule-based guidance"
+
+    for provider in PROVIDER_ORDER:
+        provider = provider.strip()
+        if provider == "lm_studio":
+            result = await call_lm_studio(prompt, max_tokens=AI_SUMMARY_MAX_TOKENS)
+            if result and (is_complete_answer(result) or is_usable_summary(result)):
+                answer = normalize_summary_answer(result)
+                provider_used = "lm_studio"
+                selected_model = LM_STUDIO_MODEL
+                break
+        elif provider == "ollama":
+            result = await call_ollama(prompt, num_predict=AI_SUMMARY_NUM_PREDICT)
+            if result and (is_complete_answer(result) or is_usable_summary(result)):
+                answer = normalize_summary_answer(result)
+                provider_used = "ollama"
+                selected_model = OLLAMA_MODEL
+                break
+            if result:
+                answer = build_fallback_answer(
+                    recommendations, safe_options, difficult_options,
+                    profile, question, normalized, incomplete=True,
+                    fast_mode=True
+                )
+                provider_used = "fallback"
+                selected_model = "rule-based guidance"
+                break
+        elif provider == "fallback":
+            answer = build_fallback_answer(
+                recommendations, safe_options, difficult_options,
+                profile, question, normalized, fast_mode=True
+            )
+            provider_used = "fallback"
+            selected_model = "rule-based guidance"
+            break
+
+    llm_seconds = time.perf_counter() - llm_start
+    if not answer:
+        answer = build_fallback_answer(
+            recommendations, safe_options, difficult_options,
+            profile, question, normalized, fast_mode=True
+        )
+        provider_used = "fallback"
+        selected_model = "rule-based guidance"
+    return answer, provider_used, selected_model, llm_seconds
+
+
+# ──────────────────────────────────────────────
+# POST /recommend — fast structured recommendation endpoint
+# ──────────────────────────────────────────────
+
+@app.post("/recommend")
+async def recommend(request: CounselRequest):
+    total_start = time.perf_counter()
+    selected_id = resolve_selected_id(request.selected_university)
+    cache_key = recommend_cache_key(request.profile, request.question, selected_id)
+    cached_response = cache_get(RECOMMEND_CACHE, cache_key, RecommendResponse)
+    if cached_response:
+        total_seconds = time.perf_counter() - total_start
+        cached_response.timing = TimingInfo(total_seconds=round(total_seconds, 3), cached=True)
+        print(f"[recommend] cache hit total={total_seconds:.3f}s question={request.question[:80]!r}")
+        return cached_response
+
+    result = build_recommendation_result(request.profile, request.question, selected_id)
+    response = result["response"]
+    cache_store(RECOMMEND_CACHE, cache_key, response)
+    timing = response.timing or TimingInfo()
+    print(
+        f"[recommend] timing fast_mode={FAST_MODE} "
+        f"rag={timing.rag_seconds:.3f}s scoring={timing.scoring_seconds:.3f}s "
+        f"total={timing.total_seconds:.3f}s"
+    )
+    return response
+
+# ──────────────────────────────────────────────
+# POST /ai-summary — local AI summary only
+# ──────────────────────────────────────────────
+
+@app.post("/ai-summary")
+async def ai_summary(request: AISummaryRequest):
+    total_start = time.perf_counter()
+    selected_id = resolve_selected_id(request.selected_university)
+    cache_key = ai_summary_cache_key(request, selected_id)
+    cached_response = cache_get(AI_SUMMARY_CACHE, cache_key, AISummaryResponse)
+    if cached_response:
+        total_seconds = time.perf_counter() - total_start
+        cached_response.timing = TimingInfo(total_seconds=round(total_seconds, 3), cached=True)
+        print(f"[ai-summary] cache hit total={total_seconds:.3f}s question={request.question[:80]!r}")
+        return cached_response
+
+    normalized = normalize_academic_profile(request.profile)
+    recommendations = request.recommended_universities
+    safe_options = request.safe_options
+    difficult_options = request.difficult_options
+    context = build_context_from_sources(request.sources)
+    rag_seconds = 0.0
+    scoring_seconds = 0.0
+
+    if not recommendations:
+        rec_result = build_recommendation_result(request.profile, request.question, selected_id)
+        rec_response = rec_result["response"]
+        normalized = rec_result["normalized"]
+        selected_id = rec_result["selected_id"]
+        recommendations = rec_response.recommended_universities
+        safe_options = rec_response.safe_options
+        difficult_options = rec_response.difficult_options
+        context = rec_result["context"]
+        rec_timing = rec_response.timing or TimingInfo()
+        rag_seconds = rec_timing.rag_seconds
+        scoring_seconds = rec_timing.scoring_seconds
+
+    answer, provider_used, selected_model, llm_seconds = await generate_ai_summary(
+        request.profile, request.question, selected_id, recommendations,
+        safe_options, difficult_options, normalized, context
+    )
+    total_seconds = time.perf_counter() - total_start
+    response = AISummaryResponse(
+        answer=answer,
+        provider_used=provider_used,
+        selected_model=selected_model,
+        timing=TimingInfo(
+            total_seconds=round(total_seconds, 3),
+            rag_seconds=round(rag_seconds, 3),
+            scoring_seconds=round(scoring_seconds, 3),
+            llm_seconds=round(llm_seconds, 3),
+            cached=False,
+        ),
+    )
+    cache_store(AI_SUMMARY_CACHE, cache_key, response)
+    print(
+        f"[ai-summary] timing provider={provider_used} "
+        f"llm={llm_seconds:.3f}s total={total_seconds:.3f}s"
+    )
+    return response
+
+# ──────────────────────────────────────────────
+# POST /counsel — combined compatibility endpoint
+# ──────────────────────────────────────────────
+
+@app.post("/counsel")
+async def counsel(request: CounselRequest):
+    total_start = time.perf_counter()
+    selected_id = resolve_selected_id(request.selected_university)
+    cache_key = counsel_cache_key(request.profile, request.question, selected_id)
+    cached_response = cache_get(COUNSEL_CACHE, cache_key, CounselResponse)
+    if cached_response:
+        total_seconds = time.perf_counter() - total_start
+        cached_response.timing = TimingInfo(total_seconds=round(total_seconds, 3), cached=True)
+        print(f"[counsel] cache hit total={total_seconds:.3f}s question={request.question[:80]!r}")
+        return cached_response
+
+    rec_result = build_recommendation_result(request.profile, request.question, selected_id)
+    rec_response = rec_result["response"]
+    answer, provider_used, selected_model, llm_seconds = await generate_ai_summary(
+        request.profile, request.question, rec_result["selected_id"],
+        rec_response.recommended_universities, rec_response.safe_options,
+        rec_response.difficult_options, rec_result["normalized"], rec_result["context"]
+    )
+
+    total_seconds = time.perf_counter() - total_start
+    rec_timing = rec_response.timing or TimingInfo()
+    response = CounselResponse(
+        answer=answer,
+        sources=rec_response.sources,
+        recommended_universities=rec_response.recommended_universities,
+        safe_options=rec_response.safe_options,
+        difficult_options=rec_response.difficult_options,
+        next_steps=rec_response.next_steps,
+        admission_links=rec_response.admission_links,
+        retrieved_count=rec_response.retrieved_count,
+        provider_used=provider_used,
+        selected_model=selected_model,
+        selected_university=rec_response.selected_university,
+        timing=TimingInfo(
+            total_seconds=round(total_seconds, 3),
+            rag_seconds=rec_timing.rag_seconds,
+            scoring_seconds=rec_timing.scoring_seconds,
+            llm_seconds=round(llm_seconds, 3),
+            cached=False,
+        ),
+    )
+    cache_store(COUNSEL_CACHE, cache_key, response)
     print(
         f"[counsel] timing fast_mode={FAST_MODE} provider={provider_used} "
-        f"rag={rag_seconds:.3f}s scoring={scoring_seconds:.3f}s "
+        f"rag={rec_timing.rag_seconds:.3f}s scoring={rec_timing.scoring_seconds:.3f}s "
         f"llm={llm_seconds:.3f}s total={total_seconds:.3f}s"
     )
     return response
