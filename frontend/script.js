@@ -20,6 +20,7 @@ const chatBox         = document.getElementById('chatBox');
 const userInput       = document.getElementById('userInput');
 const sendBtn         = document.getElementById('sendBtn');
 const statusDot       = document.getElementById('statusDot');
+const providerBadge   = document.getElementById('providerBadge');
 
 const BACKEND_URL = 'http://localhost:8000';
 
@@ -67,18 +68,40 @@ saveBtn.addEventListener('click', function () {
 
   userInput.disabled = false;
   sendBtn.disabled = false;
+  statusDot.classList.remove('offline');
   statusDot.classList.add('online');
 
   addMessage('bot', 'Profile saved! You can now ask me about university admissions.');
 });
 
 // =============================================
+// Format inline markdown: **text** -> <b>text</b>
+// Also escape HTML to prevent XSS, then re-add bold.
+// =============================================
+function formatMarkdown(text) {
+  // Escape HTML first
+  let s = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+  // Convert **text** to <b>text</b> (non-greedy across lines)
+  s = s.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+  // Convert newlines to <br> for display
+  s = s.replace(/\n/g, '<br>');
+  return s;
+}
+
+// =============================================
 // Add a message to the chat box
 // =============================================
-function addMessage(sender, text) {
+function addMessage(sender, text, isHTML) {
   const div = document.createElement('div');
   div.classList.add('message', sender);
-  div.textContent = text;
+  if (isHTML) {
+    div.innerHTML = text;
+  } else {
+    div.innerHTML = formatMarkdown(text);
+  }
   chatBox.appendChild(div);
   chatBox.scrollTop = chatBox.scrollHeight;
 }
@@ -102,6 +125,46 @@ function hideTyping() {
     typingEl = null;
   }
 }
+
+// =============================================
+// Add source card
+// =============================================
+function addSourceCard(source) {
+  const card = document.createElement('div');
+  card.classList.add('source-card');
+  let html = '<div class="source-name">' + formatMarkdown(source.university_name) + '</div>';
+  if (source.source_url) {
+    const url = source.source_url.split(';')[0];
+    html += '<div class="source-url">' + formatMarkdown(url) + '</div>';
+  }
+  if (source.preview) {
+    html += '<div style="font-size:0.75rem;color:#5f7a6f;margin-top:4px;">' + formatMarkdown(source.preview.slice(0, 120)) + '</div>';
+  }
+  card.innerHTML = html;
+  chatBox.appendChild(card);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+// =============================================
+// Add a backend offline banner
+// =============================================
+function addOfflineBanner() {
+  const div = document.createElement('div');
+  div.classList.add('backend-offline');
+  div.innerHTML = 'Backend is not running. Please start the local server and try again.';
+  chatBox.appendChild(div);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+// =============================================
+// Sample question buttons
+// =============================================
+document.querySelectorAll('.sample-btn').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    userInput.value = btn.getAttribute('data-q');
+    userInput.focus();
+  });
+});
 
 // =============================================
 // Handle sending a question to the backend
@@ -144,22 +207,26 @@ async function handleSend() {
 
     const data = await response.json();
     let msg = data.answer || 'Sorry, no answer was returned.';
+
+    // Show provider badge in header
     if (data.provider_used) {
-      msg += '\n\n---\n[Provider: ' + data.provider_used + ']';
+      providerBadge.textContent = data.provider_used;
+      providerBadge.classList.add('show');
     }
+
+    // Show answer
     addMessage('bot', msg);
+
+    // Show sources as cards
     if (data.sources && data.sources.length > 0) {
-      let srcText = 'Sources:\n';
       for (const s of data.sources) {
-        srcText += '• ' + s.university_name + '\n';
-        if (s.source_url) srcText += '  ' + s.source_url.split(';')[0] + '\n';
+        addSourceCard(s);
       }
-      addMessage('bot', srcText);
     }
 
   } catch (err) {
     hideTyping();
-    addMessage('bot', 'Could not reach the backend. Make sure the FastAPI server is running on http://localhost:8000');
+    addOfflineBanner();
   }
 }
 

@@ -15,6 +15,7 @@
     <!-- ========================================== -->
     <header class="hero">
       <div class="hero-content">
+        <span class="badge">RAG Based Admission Counsellor</span>
         <h1>Pakistan CS &amp; Software Engineering<br>University Counsellor</h1>
         <p class="hero-subtitle">
           Find suitable universities based on your marks, field, city, and budget
@@ -79,10 +80,23 @@
           <button type="button" id="saveProfileBtn">Save Profile</button>
         </form>
 
+        <!-- Steps -->
+        <div class="steps-box">
+          <h3>How to use</h3>
+          <div class="step"><span class="step-num">1</span> Enter your academic profile</div>
+          <div class="step"><span class="step-num">2</span> Ask your admission question</div>
+          <div class="step"><span class="step-num">3</span> Get university suggestions</div>
+        </div>
+
         <!-- RAG explanation -->
         <div class="rag-note">
           <strong>&#9432; How it works</strong>
           <p>This project uses RAG (Retrieval-Augmented Generation) with local university admission data and a local LLM (Gemma via Ollama) to give you personalised counselling.</p>
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="disclaimer">
+          This tool gives guidance only. Final admission depends on official university policy and merit.
         </div>
       </section>
 
@@ -91,12 +105,21 @@
         <div class="chat-header">
           <h2>Ask a Question</h2>
           <span class="status-dot" id="statusDot"></span>
+          <span class="provider-badge" id="providerBadge"></span>
         </div>
 
         <div class="chat-messages" id="chatBox">
           <div class="message bot">
             Welcome! Please fill in your profile on the left, then ask me about university admissions.
           </div>
+        </div>
+
+        <!-- Sample questions -->
+        <div class="sample-questions" id="sampleQuestions">
+          <button class="sample-btn" data-q="Which universities are best for me?">Which universities are best for me?</button>
+          <button class="sample-btn" data-q="Which universities offer CS in Lahore?">Which universities offer CS in Lahore?</button>
+          <button class="sample-btn" data-q="Am I eligible for FAST?">Am I eligible for FAST?</button>
+          <button class="sample-btn" data-q="What are safe options for me?">What are safe options for me?</button>
         </div>
 
         <div class="chat-input-area">
