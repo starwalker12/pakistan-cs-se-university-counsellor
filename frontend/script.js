@@ -35,6 +35,7 @@ let backendOnline = false;
 let isBusy = false;
 let restoringProfile = false;
 let fastDemoMode = localStorage.getItem(FAST_MODE_KEY) !== 'false';
+let lastRecommendationData = null;
 
 const loadingStatusLines = [
   'Searching university data',
@@ -118,6 +119,21 @@ function parsePercentage(value, label) {
 
 function gradeToPct(grade) {
   return gradePercentages[grade] || 0;
+}
+
+function needsFreshRecommendations(question) {
+  if (!question) return false;
+  const lower = question.toLowerCase().trim();
+  const freshPatterns = [
+    'best for me', 'recommend', 'best match', 'safe option',
+    'universities in', 'cs in', 'se in', 'options for me',
+    'compare universit', 'show me option', 'which universit',
+    'suitable for me', 'good for me', 'suggest',
+  ];
+  for (const pattern of freshPatterns) {
+    if (lower.includes(pattern)) return true;
+  }
+  return false;
 }
 
 function collectProfile() {
@@ -284,6 +300,9 @@ function clearProfile() {
   localStorage.removeItem(PROFILE_KEY);
   studentProfile = null;
   selectedUniversity = null;
+  lastRecommendationData = null;
+  const existingRecBlock = chatBox.querySelector('.split-response-block');
+  if (existingRecBlock) existingRecBlock.remove();
   resetProfileForm();
   setEducationFields(eduSystem.value);
   setProfileState('', 'Not saved');
@@ -581,6 +600,8 @@ function setSummaryMessage(summaryBody, text, type = 'pending') {
 
 function addRecommendationTurn(data) {
   updateProviderBadge({ provider_used: 'data', selected_model: '' });
+  const existingBlock = chatBox.querySelector('.split-response-block');
+  if (existingBlock) existingBlock.remove();
   const block = document.createElement('section');
   block.className = 'response-block split-response-block';
 
@@ -627,6 +648,15 @@ function addAssistantTurn(data) {
   block.appendChild(renderNextSteps(data.next_steps || [], recommendations));
   const sourcesPanel = renderSources(data.sources || []);
   if (sourcesPanel) block.appendChild(sourcesPanel);
+  chatBox.appendChild(block);
+  scrollChatToBottom();
+}
+
+function addSummaryOnlyMessage(data) {
+  updateProviderBadge(data);
+  const block = document.createElement('section');
+  block.className = 'response-block';
+  block.appendChild(createMessage('bot', `<div class="answer-content">${formatMarkdown(data.answer || 'I could not generate an answer for this request.')}</div>`));
   chatBox.appendChild(block);
   scrollChatToBottom();
 }
@@ -735,38 +765,92 @@ async function requestAISummary(question, recommendData, summaryHandle, selected
   }
 }
 
-async function handleSplitSend(question) {
-  const selectedId = activeSelectedUniversityId();
-  showTyping(recommendStatusLines);
-
+async function requestAISummaryOnly(question, recommendData, selectedId) {
   try {
-    const response = await fetch(`${BACKEND_URL}/recommend`, {
+    const response = await fetch(`${BACKEND_URL}/ai-summary`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestPayload(question, selectedId)),
+      body: JSON.stringify({
+        profile: studentProfile,
+        question,
+        selected_university: selectedId || null,
+        recommended_universities: recommendData.recommended_universities || [],
+        safe_options: recommendData.safe_options || [],
+        difficult_options: recommendData.difficult_options || [],
+        sources: recommendData.sources || [],
+      }),
     });
-
-    hideTyping();
-    if (!response.ok) {
-      throw new Error(`Backend returned HTTP ${response.status}`);
-    }
-
-    const data = await response.json();
-    backendOnline = true;
-    setBackendStatus('online', 'Backend connected', 'Data recommendations are ready. Writing a short AI summary.');
-    const summaryHandle = addRecommendationTurn(data);
-    setBusy(false);
-    requestAISummary(question, data, summaryHandle, data.selected_university || selectedId);
+    if (!response.ok) throw new Error(`Backend returned HTTP ${response.status}`);
+    return await response.json();
   } catch (error) {
-    hideTyping();
-    backendOnline = false;
-    setBackendStatus(
-      'offline',
-      'Backend offline',
-      'The frontend is working, but the local FastAPI backend is not reachable on port 8000.'
-    );
-    addSystemMessage('I cannot reach the local counselling backend. Start FastAPI on port 8000, then try again.', 'error');
-    setBusy(false);
+    return null;
+  }
+}
+
+async function handleSplitSend(question) {
+  const selectedId = activeSelectedUniversityId();
+
+  if (!lastRecommendationData || needsFreshRecommendations(question)) {
+    showTyping(recommendStatusLines);
+    try {
+      const response = await fetch(`${BACKEND_URL}/recommend`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestPayload(question, selectedId)),
+      });
+
+      hideTyping();
+      if (!response.ok) {
+        throw new Error(`Backend returned HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+      backendOnline = true;
+      lastRecommendationData = data;
+      setBackendStatus('online', 'Backend connected', 'Data recommendations are ready. Writing a short AI summary.');
+      const summaryHandle = addRecommendationTurn(data);
+      setBusy(false);
+      requestAISummary(question, data, summaryHandle, data.selected_university || selectedId);
+    } catch (error) {
+      hideTyping();
+      backendOnline = false;
+      setBackendStatus(
+        'offline',
+        'Backend offline',
+        'The frontend is working, but the local FastAPI backend is not reachable on port 8000.'
+      );
+      addSystemMessage('I cannot reach the local counselling backend. Start FastAPI on port 8000, then try again.', 'error');
+      setBusy(false);
+    }
+  } else {
+    showTyping(['Writing a short answer']);
+    try {
+      const data = await requestAISummaryOnly(question, lastRecommendationData, selectedId);
+      hideTyping();
+      if (data && data.answer) {
+        backendOnline = true;
+        addSummaryOnlyMessage(data);
+      } else {
+        backendOnline = false;
+        setBackendStatus(
+          'offline',
+          'Backend offline',
+          'The frontend is working, but the local FastAPI backend is not reachable on port 8000.'
+        );
+        addSystemMessage('I could not complete the answer. Try asking a different question.', 'error');
+      }
+    } catch (error) {
+      hideTyping();
+      backendOnline = false;
+      setBackendStatus(
+        'offline',
+        'Backend offline',
+        'The frontend is working, but the local FastAPI backend is not reachable on port 8000.'
+      );
+      addSystemMessage('I could not complete the answer. Try asking a different question.', 'error');
+    } finally {
+      setBusy(false);
+    }
   }
 }
 
