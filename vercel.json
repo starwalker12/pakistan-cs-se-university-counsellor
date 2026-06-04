@@ -1,8 +1,11 @@
 {
-  "name": "university-admission-chatbot",
+  "name": "pakistan-cs-se-university-counsellor",
   "version": 2,
   "public": true,
   "framework": null,
   "buildCommand": null,
-  "outputDirectory": "."
+  "outputDirectory": ".",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/frontend/index.html" }
+  ]
 }

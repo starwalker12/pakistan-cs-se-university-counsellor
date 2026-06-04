@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pakistan CS & SE University Counsellor</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="app-wrapper">
+
+    <!-- ========================================== -->
+    <!-- Hero / Header                              -->
+    <!-- ========================================== -->
+    <header class="hero">
+      <div class="hero-content">
+        <span class="badge">RAG Based Admission Counsellor</span>
+        <h1>Pakistan CS &amp; Software Engineering<br>University Counsellor</h1>
+        <p class="hero-subtitle">
+          Find suitable universities based on your marks, field, city, and budget
+        </p>
+        <p class="hero-tagline">
+          Powered by RAG &mdash; Retrieval-Augmented Generation with local university admission data
+        </p>
+      </div>
+    </header>
+
+    <!-- ========================================== -->
+    <!-- Main layout: form + chat                   -->
+    <!-- ========================================== -->
+    <div class="main-layout">
+
+      <!-- Left: Student Profile Form -->
+      <section class="profile-panel">
+        <h2>Student Profile</h2>
+        <p class="panel-hint">Fill in your details to get personalised advice.</p>
+
+        <form id="profileForm" autocomplete="off">
+
+          <div class="form-group">
+            <label for="studentName">Student Name</label>
+            <input type="text" id="studentName" placeholder="e.g. Ali Khan">
+          </div>
+
+          <div class="form-group">
+            <label for="matricMarks">Matric Percentage</label>
+            <input type="number" id="matricMarks" placeholder="e.g. 90.5" step="0.1" min="0" max="100">
+          </div>
+
+          <div class="form-group">
+            <label for="interMarks">Intermediate Percentage</label>
+            <input type="number" id="interMarks" placeholder="e.g. 80.0" step="0.1" min="0" max="100">
+          </div>
+
+          <div class="form-group">
+            <label for="entryTest">Entry Test Score <span class="optional">(optional)</span></label>
+            <input type="text" id="entryTest" placeholder="e.g. ECAT 150/200 or NTS 70">
+          </div>
+
+          <div class="form-group">
+            <label for="preferredField">Preferred Field</label>
+            <select id="preferredField">
+              <option value="">&mdash; Select &mdash;</option>
+              <option value="CS">Computer Science</option>
+              <option value="SE">Software Engineering</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="cityPref">Preferred City <span class="optional">(optional)</span></label>
+            <input type="text" id="cityPref" placeholder="e.g. Lahore, Islamabad, Karachi">
+          </div>
+
+          <div class="form-group">
+            <label for="budget">Budget Range (PKR) <span class="optional">(optional)</span></label>
+            <input type="text" id="budget" placeholder="e.g. 100000 &ndash; 500000">
+          </div>
+
+          <button type="button" id="saveProfileBtn">Save Profile</button>
+        </form>
+
+        <!-- Steps -->
+        <div class="steps-box">
+          <h3>How to use</h3>
+          <div class="step"><span class="step-num">1</span> Enter your academic profile</div>
+          <div class="step"><span class="step-num">2</span> Ask your admission question</div>
+          <div class="step"><span class="step-num">3</span> Get university suggestions</div>
+        </div>
+
+        <!-- RAG explanation -->
+        <div class="rag-note">
+          <strong>&#9432; How it works</strong>
+          <p>This project uses RAG (Retrieval-Augmented Generation) with local university admission data and a local LLM (Gemma via Ollama) to give you personalised counselling.</p>
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="disclaimer">
+          This tool gives guidance only. Final admission depends on official university policy and merit.
+        </div>
+      </section>
+
+      <!-- Right: Chat Section -->
+      <section class="chat-panel">
+        <div class="chat-header">
+          <h2>Ask a Question</h2>
+          <span class="status-dot" id="statusDot"></span>
+          <span class="provider-badge" id="providerBadge"></span>
+        </div>
+
+        <div class="chat-messages" id="chatBox">
+          <div class="message bot">
+            Welcome! Please fill in your profile on the left, then ask me about university admissions.
+          </div>
+        </div>
+
+        <!-- Sample questions -->
+        <div class="sample-questions" id="sampleQuestions">
+          <button class="sample-btn" data-q="Which universities are best for me?">Which universities are best for me?</button>
+          <button class="sample-btn" data-q="Which universities offer CS in Lahore?">Which universities offer CS in Lahore?</button>
+          <button class="sample-btn" data-q="Am I eligible for FAST?">Am I eligible for FAST?</button>
+          <button class="sample-btn" data-q="What are safe options for me?">What are safe options for me?</button>
+        </div>
+
+        <div class="chat-input-area">
+          <input type="text" id="userInput" placeholder="Type your question here..." disabled>
+          <button id="sendBtn" disabled>Send</button>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- Footer                                     -->
+    <!-- ========================================== -->
+    <footer class="app-footer">
+      <p>Raahim Adeel &bull; Fardan Aatir &bull; Muhammad Ismail</p>
+    </footer>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

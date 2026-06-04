@@ -1,0 +1,362 @@
+[
+  {
+    "university_id": "nuces-fast",
+    "university": "FAST NUCES",
+    "links": {
+      "admissions_homepage": {
+        "url": "https://nu.edu.pk/",
+        "note": "FAST NUCES homepage with admission links and program listings."
+      },
+      "eligibility_criteria": {
+        "url": "https://nu.edu.pk/Admissions/EligibilityCriteria",
+        "note": "Eligibility criteria for all undergraduate programs."
+      },
+      "fee_structure": {
+        "url": "https://nu.edu.pk/Admissions/FeeStructure",
+        "note": "Official fee structure page."
+      },
+      "entry_test": {
+        "url": "https://nu.edu.pk/Admissions/TestPattern",
+        "note": "NUCES entry test pattern and details."
+      },
+      "undergraduate_programs": {
+        "url": "https://nu.edu.pk/Degree-Programs",
+        "note": "Lists all undergraduate programs including BS(CS) and BS(SE)."
+      }
+    }
+  },
+  {
+    "university_id": "nust",
+    "university": "NUST",
+    "links": {
+      "admissions_homepage": {
+        "url": "https://nust.edu.pk/",
+        "note": "NUST homepage. The site blocks automated access to sub-pages. Needs manual review."
+      },
+      "entry_test": {
+        "url": "https://nust.edu.pk/",
+        "note": "NUST conducts NET (NUST Entry Test). Official sub-page blocked. Needs manual review."
+      }
+    }
+  },
+  {
+    "university_id": "comsats",
+    "university": "COMSATS",
+    "links": {
+      "admissions_portal": {
+        "url": "https://admissions.comsats.edu.pk/",
+        "note": "COMSATS admissions portal with program listings."
+      },
+      "fee_structure": {
+        "url": "https://comsats.edu.pk/fee-structure.aspx",
+        "note": "Official fee structure page."
+      }
+    }
+  },
+  {
+    "university_id": "lums",
+    "university": "LUMS",
+    "links": {
+      "admissions": {
+        "url": "https://lums.edu.pk/admissions",
+        "note": "Official LUMS admissions page with all programs."
+      },
+      "undergraduate_programs": {
+        "url": "https://lums.edu.pk/admissions/undergraduate",
+        "note": "TODO: Verify exact path."
+      },
+      "fee_structure": {
+        "url": "https://lums.edu.pk/admissions/fees",
+        "note": "TODO: Verify exact path."
+      },
+      "eligibility_criteria": {
+        "url": "https://lums.edu.pk/admissions/eligibility",
+        "note": "TODO: Verify exact path."
+      },
+      "entry_test": {
+        "url": "https://lums.edu.pk/admissions/entry-test",
+        "note": "LUMS uses SAT or LUMS SBASSE test for CS admission."
+      },
+      "merit_criteria": {
+        "url": "https://lums.edu.pk/admissions/merit",
+        "note": "TODO: Verify exact path."
+      }
+    }
+  },
+  {
+    "university_id": "giki",
+    "university": "GIKI",
+    "links": {
+      "admissions_homepage": {
+        "url": "https://giki.edu.pk/",
+        "note": "GIKI homepage. Site has SSL certificate issues with automated access. Needs manual review."
+      }
+    }
+  },
+  {
+    "university_id": "pieas",
+    "university": "PIEAS",
+    "links": {
+      "admissions": {
+        "url": "https://pieas.edu.pk/admissions",
+        "note": "Official PIEAS admissions page."
+      },
+      "undergraduate_programs": {
+        "url": "https://pieas.edu.pk/admissions/programs",
+        "note": "TODO: Verify exact path."
+      },
+      "fee_structure": {
+        "url": "https://pieas.edu.pk/admissions/fees",
+        "note": "TODO: Verify exact path."
+      },
+      "eligibility_criteria": {
+        "url": "https://pieas.edu.pk/admissions/eligibility",
+        "note": "TODO: Verify exact path."
+      },
+      "entry_test": {
+        "url": "https://pieas.edu.pk/admissions/entry-test",
+        "note": "PIEAS conducts PIEAS Entry Test (PIEAS-ET)."
+      },
+      "merit_criteria": {
+        "url": "https://pieas.edu.pk/admissions/merit",
+        "note": "TODO: Verify exact path."
+      }
+    }
+  },
+  {
+    "university_id": "uet-lahore",
+    "university": "UET Lahore",
+    "links": {
+      "admissions": {
+        "url": "https://uet.edu.pk/admissions",
+        "note": "Official UET Lahore admissions page."
+      },
+      "undergraduate_programs": {
+        "url": "https://uet.edu.pk/programs",
+        "note": "TODO: Verify exact path."
+      },
+      "fee_structure": {
+        "url": "https://uet.edu.pk/admissions/fees",
+        "note": "TODO: Verify exact path."
+      },
+      "eligibility_criteria": {
+        "url": "https://uet.edu.pk/admissions/eligibility",
+        "note": "TODO: Verify exact path."
+      },
+      "entry_test": {
+        "url": "https://uet.edu.pk/admissions/entry-test",
+        "note": "UET conducts its own entry test."
+      },
+      "merit_criteria": {
+        "url": "https://uet.edu.pk/admissions/merit",
+        "note": "TODO: Verify exact path."
+      }
+    }
+  },
+  {
+    "university_id": "itu-lahore",
+    "university": "ITU Lahore",
+    "links": {
+      "admissions": {
+        "url": "https://itu.edu.pk/admissions",
+        "note": "Official ITU Lahore admissions page."
+      },
+      "undergraduate_programs": {
+        "url": "https://itu.edu.pk/programs",
+        "note": "TODO: Verify exact path."
+      },
+      "fee_structure": {
+        "url": "https://itu.edu.pk/fees",
+        "note": "TODO: Verify exact path."
+      },
+      "eligibility_criteria": {
+        "url": "https://itu.edu.pk/admissions/eligibility",
+        "note": "TODO: Verify exact path."
+      },
+      "entry_test": {
+        "url": "https://itu.edu.pk/admissions/entry-test",
+        "note": "ITU conducts its own entry test."
+      },
+      "merit_criteria": {
+        "url": "https://itu.edu.pk/admissions/merit",
+        "note": "TODO: Verify exact path."
+      }
+    }
+  },
+  {
+    "university_id": "air-university",
+    "university": "Air University",
+    "links": {
+      "admissions_portal": {
+        "url": "https://portals.au.edu.pk/admissions",
+        "note": "Air University admissions portal."
+      },
+      "eligibility_criteria": {
+        "url": "https://webdata.au.edu.pk/Pages/Admission/eligibility_criteria.aspx",
+        "note": "Eligibility criteria for all programs."
+      },
+      "fee_structure": {
+        "url": "https://webdata.au.edu.pk/Pages/Admission/fees_financial.aspx",
+        "note": "Fee structure details."
+      },
+      "admission_schedule": {
+        "url": "https://webdata.au.edu.pk/Pages/Admission/admission_schedule.aspx",
+        "note": "Admission schedule and deadlines."
+      }
+    }
+  },
+  {
+    "university_id": "bahria-university",
+    "university": "Bahria University",
+    "links": {
+      "admissions": {
+        "url": "https://bahria.edu.pk/admissions",
+        "note": "Official Bahria University admissions page."
+      },
+      "undergraduate_programs": {
+        "url": "https://bahria.edu.pk/programs",
+        "note": "TODO: Verify exact path."
+      },
+      "fee_structure": {
+        "url": "https://bahria.edu.pk/fees",
+        "note": "TODO: Verify exact path."
+      },
+      "eligibility_criteria": {
+        "url": "https://bahria.edu.pk/admissions/eligibility",
+        "note": "TODO: Verify exact path."
+      },
+      "entry_test": {
+        "url": "https://bahria.edu.pk/admissions/entry-test",
+        "note": "Bahria University conducts its own entry test."
+      },
+      "merit_criteria": {
+        "url": "https://bahria.edu.pk/admissions/merit",
+        "note": "TODO: Verify exact path."
+      }
+    }
+  },
+  {
+    "university_id": "punjab-university",
+    "university": "Punjab University",
+    "links": {
+      "admissions": {
+        "url": "https://pu.edu.pk/home/more/4",
+        "note": "Punjab University admissions page with program listings."
+      },
+      "programs": {
+        "url": "https://pu.edu.pk/program",
+        "note": "All undergraduate and graduate programs."
+      },
+      "fee_structure": {
+        "url": "https://pu.edu.pk/fee",
+        "note": "Fee structure for all programs."
+      }
+    }
+  },
+  {
+    "university_id": "qau",
+    "university": "QAU",
+    "links": {
+      "admissions_portal": {
+        "url": "https://ugadmissions.qau.edu.pk/oas/app/index.aspx",
+        "note": "QAU undergraduate admissions portal."
+      },
+      "tuition_fees": {
+        "url": "https://qau.edu.pk/tuition-fees/",
+        "note": "QAU tuition and fees page."
+      },
+      "undergraduate_programs": {
+        "url": "https://qau.edu.pk/undergraduate-programme-qau/",
+        "note": "Undergraduate program listings at QAU."
+      }
+    }
+  },
+  {
+    "university_id": "ned-university",
+    "university": "NED University",
+    "links": {
+      "admissions": {
+        "url": "https://neduet.edu.pk/admissions",
+        "note": "TODO: Verify exact path."
+      }
+    }
+  },
+  {
+    "university_id": "uet-taxila",
+    "university": "UET Taxila",
+    "links": {
+      "admissions": {
+        "url": "https://uettaxila.edu.pk/admissions",
+        "note": "TODO: Verify exact path."
+      }
+    }
+  },
+  {
+    "university_id": "university-of-karachi",
+    "university": "University of Karachi",
+    "links": {
+      "admissions": {
+        "url": "https://uok.edu.pk/admissions/index.php",
+        "note": "University of Karachi admissions page with program listings."
+      }
+    }
+  },
+  {
+    "university_id": "ucp",
+    "university": "UCP",
+    "links": {
+      "admissions": {
+        "url": "https://ucp.edu.pk/admissions/",
+        "note": "UCP admissions page with program listings."
+      },
+      "fee_structure": {
+        "url": "https://ucp.edu.pk/admissions/fee-structure/",
+        "note": "UCP fee structure page."
+      }
+    }
+  },
+  {
+    "university_id": "virtual-university",
+    "university": "Virtual University",
+    "links": {
+      "admissions": {
+        "url": "https://vu.edu.pk/admissions",
+        "note": "TODO: Verify exact path."
+      }
+    }
+  },
+  {
+    "university_id": "szabist",
+    "university": "SZABIST",
+    "links": {
+      "admissions": {
+        "url": "https://szabist.edu.pk/admissions",
+        "note": "TODO: Verify exact path."
+      }
+    }
+  },
+  {
+    "university_id": "iba-karachi",
+    "university": "IBA Karachi",
+    "links": {
+      "admissions_schedule": {
+        "url": "https://admissions.iba.edu.pk/admissions_schedule.php",
+        "note": "IBA admissions schedule and program details."
+      },
+      "admissions_policy": {
+        "url": "https://admissions.iba.edu.pk/policies-and-details.php",
+        "note": "IBA admissions policy and eligibility details."
+      }
+    }
+  },
+  {
+    "university_id": "ist",
+    "university": "IST",
+    "links": {
+      "admissions": {
+        "url": "https://ist.edu.pk/admissions",
+        "note": "TODO: Verify exact path."
+      }
+    }
+  }
+]

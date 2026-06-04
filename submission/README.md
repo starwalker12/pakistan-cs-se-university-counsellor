@@ -149,32 +149,6 @@ OLLAMA_MODEL=gemma2:2b python3 -m uvicorn app:app --reload --port 8000
 - **Backend**: cannot run on Vercel — it needs local Python, Chroma, and an LLM provider
 - The full RAG + AI flow works only when everything runs locally on your laptop
 
-## Vercel Frontend Deployment
-
-The frontend can be deployed on Vercel as a static site. The `vercel.json` at the project root is configured to serve `frontend/index.html` from any route.
-
-### Manual deploy (no CLI needed)
-
-1. Go to https://vercel.com/new
-2. Import the GitHub repository `starwalker12/pakistan-cs-se-university-counsellor`
-3. Keep default settings:
-   - **Framework Preset**: Other
-   - **Root Directory**: ./
-   - **Build Command**: (none)
-   - **Output Directory**: . (or leave blank)
-4. Click **Deploy**
-
-### CLI deploy
-
-```bash
-npm install -g vercel
-vercel --prod
-```
-
-### Important
-
-The Vercel frontend shows the UI only. The backend, Chroma DB, and Ollama/LM Studio must run on your laptop for the full RAG counselling to work. The frontend will show "Backend is not running" if no local backend is detected.
-
 ## Phase 4 Data Plan
 
 The RAG system answers admission questions using data that ultimately comes from official university sources. Here is the data pipeline plan:
