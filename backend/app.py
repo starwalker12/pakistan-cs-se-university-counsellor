@@ -70,6 +70,7 @@ CACHE_MAX_ITEMS = env_int("COUNSEL_CACHE_MAX_ITEMS", 80)
 COUNSEL_CACHE: dict[str, dict] = {}
 RECOMMEND_CACHE: dict[str, dict] = {}
 AI_SUMMARY_CACHE: dict[str, dict] = {}
+LIVE_LOOKUP_CACHE: dict[str, str] = {}
 
 # ──────────────────────────────────────────────
 # Chroma / RAG configuration
@@ -274,6 +275,8 @@ class UniversityInfoResponse(BaseModel):
     links: list[AdmissionLink] = Field(default_factory=list)
     sources: list[SourceItem] = Field(default_factory=list)
     has_exact_data: bool = False
+    data_source: str = "missing"
+    source_url_used: str = ""
 
 GREETING_WORDS = frozenset({
     "hey", "hello", "hi", "salam", "assalam", "alaikum",
@@ -562,10 +565,40 @@ def is_valid_url(url: str) -> bool:
         return False
     return True
 
+def is_category_url_valid(key: str, url: str) -> bool:
+    if not is_valid_url(url):
+        return False
+    lower = url.lower()
+    is_fee = any(t in lower for t in ("fee", "tuition", "dues", "charges", "financial", "cost"))
+    is_eligibility = any(t in lower for t in ("eligibility", "criteria", "requirement"))
+    is_entry_test = any(t in lower for t in ("test", "nat", "net", "ecat", "sat", "pattern"))
+    is_admissions = any(t in lower for t in ("admission", "apply", "more/"))
+    is_program = any(t in lower for t in ("program", "degree"))
+    is_schedule = any(t in lower for t in ("schedule", "deadline", "date"))
+    key_lower = key.lower()
+    if key_lower == "official_website":
+        return True
+    if "fee" in key_lower or "tuition" in key_lower:
+        return is_fee
+    if "eligibility" in key_lower:
+        return is_eligibility
+    if "entry_test" in key_lower or "test" in key_lower:
+        return is_entry_test
+    if "admission" in key_lower:
+        if key_lower == "admissions_homepage":
+            return True
+        return is_admissions
+    if "program" in key_lower:
+        return is_program
+    if "schedule" in key_lower:
+        return is_schedule
+    return True
+
 def admission_links_for(uni_id: str) -> list[AdmissionLink]:
     record = SOURCE_LINKS_BY_ID.get(uni_id, {})
     links = record.get("links", {}) or {}
     label_map = {
+        "official_website": "Official website",
         "admissions_homepage": "Admissions",
         "admissions_portal": "Admissions portal",
         "admissions": "Admissions",
@@ -579,6 +612,7 @@ def admission_links_for(uni_id: str) -> list[AdmissionLink]:
         "programs": "Programs",
     }
     preferred_order = [
+        "official_website",
         "admissions", "admissions_homepage", "admissions_portal",
         "eligibility_criteria", "fee_structure", "tuition_fees",
         "entry_test", "admission_schedule", "admissions_schedule",
@@ -587,10 +621,10 @@ def admission_links_for(uni_id: str) -> list[AdmissionLink]:
     ordered_keys = [k for k in preferred_order if k in links]
     ordered_keys.extend(k for k in links if k not in ordered_keys)
     result = []
-    for key in ordered_keys[:8]:
+    for key in ordered_keys:
         item = links.get(key, {})
         url = (item.get("url") or "").strip()
-        if not is_valid_url(url):
+        if not is_category_url_valid(key, url):
             continue
         result.append(AdmissionLink(
             label=label_map.get(key, key.replace("_", " ").title()),
@@ -1685,82 +1719,152 @@ def find_processed_record(uni_id: str) -> dict | None:
             return rec
     return None
 
-def build_university_info_answer(question: str, profile: Profile,
-                                 uni_id: str, info_type: str) -> UniversityInfoResponse:
+async def fetch_official_page(url: str, timeout: float = 8.0) -> str | None:
+    try:
+        async with httpx.AsyncClient(timeout=timeout, follow_redirects=True) as client:
+            resp = await client.get(url, headers={"User-Agent": "Mozilla/5.0"})
+            if resp.status_code != 200:
+                return None
+            from bs4 import BeautifulSoup
+            soup = BeautifulSoup(resp.text, "html.parser")
+            for tag in soup(["script", "style", "nav", "footer", "header", "aside"]):
+                tag.decompose()
+            text = soup.get_text(separator=" ", strip=True)
+            cleaned = " ".join(text.split())
+            return cleaned[:900]
+    except Exception:
+        return None
+
+def live_cache_key(uni_id: str, info_type: str) -> str:
+    return f"{uni_id}:{info_type}"
+
+async def live_lookup_for(uni_id: str, info_type: str,
+                          links: list[AdmissionLink]) -> tuple[str | None, str]:
+    cache_key = live_cache_key(uni_id, info_type)
+    if cache_key in LIVE_LOOKUP_CACHE:
+        return LIVE_LOOKUP_CACHE[cache_key], ""
+    target_url = ""
+    link_label = ""
+    if info_type == "fee":
+        for ln in links:
+            if any(t in (ln.label or "").lower() for t in ("fee", "tuition")):
+                target_url = ln.url
+                link_label = ln.label
+                break
+    elif info_type == "eligibility":
+        for ln in links:
+            if "eligibility" in (ln.label or "").lower():
+                target_url = ln.url
+                link_label = ln.label
+                break
+    elif info_type == "entry_test":
+        for ln in links:
+            if "test" in (ln.label or "").lower():
+                target_url = ln.url
+                link_label = ln.label
+                break
+    elif info_type == "deadline":
+        for ln in links:
+            if "schedule" in (ln.label or "").lower() or "schedule" in (ln.note or "").lower():
+                target_url = ln.url
+                link_label = ln.label
+                break
+    if not target_url:
+        for ln in links:
+            if "admission" in (ln.label or "").lower():
+                target_url = ln.url
+                link_label = ln.label
+                break
+    if not target_url:
+        return None, ""
+    text = await fetch_official_page(target_url)
+    if text:
+        LIVE_LOOKUP_CACHE[cache_key] = text
+        return text, target_url
+    return None, ""
+
+async def build_university_info_answer(question: str, profile: Profile,
+                                       uni_id: str, info_type: str) -> UniversityInfoResponse:
     name = profile.name or ""
     university = UNIVERSITY_BY_ID.get(uni_id, {})
     uni_name = university.get("short_name", "") or university.get("name", uni_id)
     links = admission_links_for(uni_id)
     proc = find_processed_record(uni_id)
     has_exact = False
+    data_source = "missing"
+    source_url_used = ""
     answer_lines = []
     extracted = ""
 
     if name:
         answer_lines.append(f"{name},")
 
+    field_label_map = {"fee": "fee", "eligibility": "eligibility", "entry_test": "entry test",
+                       "deadline": "deadline", "admission_links": "admission links"}
+    f_label = field_label_map.get(info_type, info_type)
+
+    stored_text = ""
     if info_type == "fee":
-        fee_text = (proc or {}).get("fee_text", "")
-        if fee_text and "Needs" not in fee_text and "needs" not in fee_text.lower():
-            has_exact = True
-            extracted = truncate_text(fee_text)
-            answer_lines.append(f"here is what I found about {uni_name} fees from the stored data:")
-            answer_lines.append("")
-            answer_lines.append(extracted)
-            answer_lines.append("")
-            answer_lines.append("Please confirm the latest amount on the official fee page.")
-        else:
-            answer_lines.append(f"I do not have exact fee text stored for {uni_name} yet. Use the official fee page below to check current amounts.")
-
+        stored_text = (proc or {}).get("fee_text", "")
     elif info_type == "eligibility":
-        elig_text = (proc or {}).get("eligibility_text", "")
-        if elig_text and "Needs" not in elig_text and "needs" not in elig_text.lower():
-            has_exact = True
-            extracted = truncate_text(elig_text)
-            answer_lines.append(f"here is the {uni_name} eligibility information from the stored data:")
-            answer_lines.append("")
-            answer_lines.append(extracted)
-            answer_lines.append("")
-            answer_lines.append("Verify eligibility with the university before applying.")
-        else:
-            answer_lines.append(f"I do not have exact eligibility details stored for {uni_name} yet. Use the official eligibility page below.")
-
+        stored_text = (proc or {}).get("eligibility_text", "")
     elif info_type == "entry_test":
-        test_text = (proc or {}).get("entry_test_text", "")
-        rule = get_eligibility(uni_id, profile.preferred_field)
-        rule_test = (rule or {}).get("entry_test_name", "")
-        if test_text and "Needs" not in test_text and "needs" not in test_text.lower():
-            has_exact = True
-            extracted = truncate_text(test_text)
-            answer_lines.append(f"here is what I found about {uni_name} entry test from the stored data:")
-            answer_lines.append("")
-            answer_lines.append(extracted)
-            answer_lines.append("")
-            answer_lines.append("Check the official entry test page for the latest format and dates.")
-        elif rule_test:
-            has_exact = True
-            answer_lines.append(f"{uni_name} entry test: {rule_test}. Check the official page for the latest format and dates.")
-        else:
-            answer_lines.append(f"I do not have exact entry test details stored for {uni_name} yet. Use the official entry test page below.")
-
+        stored_text = (proc or {}).get("entry_test_text", "")
     elif info_type == "deadline":
-        deadline_text = (proc or {}).get("deadline_text", "")
-        if deadline_text and "Needs" not in deadline_text and "needs" not in deadline_text.lower():
+        stored_text = (proc or {}).get("deadline_text", "")
+
+    def is_stored_ok(t: str) -> bool:
+        if not t:
+            return False
+        cleaned = t.strip()
+        if not cleaned:
+            return False
+        lower = cleaned.lower()
+        if lower.startswith("needs official") or lower.startswith("needs "):
+            return False
+        return True
+
+    if info_type in ("fee", "eligibility", "entry_test", "deadline"):
+        if is_stored_ok(stored_text):
             has_exact = True
-            extracted = truncate_text(deadline_text)
-            answer_lines.append(f"here is deadline information for {uni_name} from the stored data:")
+            data_source = "stored"
+            extracted = truncate_text(stored_text)
+            answer_lines.append(f"here is what I found about {uni_name} {f_label} from stored official data:")
             answer_lines.append("")
             answer_lines.append(extracted)
             answer_lines.append("")
-            answer_lines.append("Confirm the exact deadline on the official admission page.")
+            answer_lines.append("Please confirm the latest details on the official page.")
         else:
-            answer_lines.append(f"I do not have exact deadline dates stored for {uni_name} yet. Check the official admission page below.")
+            answer_lines.append(f"I do not have exact {f_label} text stored for {uni_name} yet.")
+            live_text, live_url = await live_lookup_for(uni_id, info_type, links)
+            if live_text:
+                has_exact = True
+                data_source = "live"
+                source_url_used = live_url
+                extracted = truncate_text(live_text)
+                answer_lines.append("I found this from the official page during this session:")
+                answer_lines.append("")
+                answer_lines.append(extracted)
+                answer_lines.append("")
+                answer_lines.append("Confirm the latest details on the official page above.")
+            elif info_type == "entry_test":
+                rule = get_eligibility(uni_id, profile.preferred_field)
+                rule_test = (rule or {}).get("entry_test_name", "")
+                if rule_test:
+                    has_exact = True
+                    data_source = "stored"
+                    answer_lines.append(f"{uni_name} entry test: {rule_test}. Check the official page for the latest format and dates.")
+                else:
+                    answer_lines.append("I also could not fetch it live from the official site right now. Use the link below to check directly.")
 
     elif info_type == "admission_links":
         if links:
             has_exact = True
+            data_source = "stored"
             answer_lines.append(f"here are the official {uni_name} admission links I have:")
             answer_lines.append("")
+            btn_label = next((l.label for l in links if "admission" in (l.label or "").lower()), "")
+            source_url_used = next((l.url for l in links if "admission" in (l.label or "").lower()), "")
             for link in links[:5]:
                 answer_lines.append(f"- {link.label}: {link.url}")
         else:
@@ -1787,6 +1891,8 @@ def build_university_info_answer(question: str, profile: Profile,
         links=links[:5],
         sources=[],
         has_exact_data=has_exact,
+        data_source=data_source,
+        source_url_used=source_url_used,
     )
 
 # ──────────────────────────────────────────────
@@ -1800,21 +1906,35 @@ async def data_status():
         uid = uni.get("id", "")
         proc = find_processed_record(uid)
         uni_links = SOURCE_LINKS_BY_ID.get(uid, {})
-        links = uni_links.get("links", {}) or {}
+        slinks = uni_links.get("links", {}) or {}
         website = uni.get("website", "")
 
         has_eligibility_link = any(
-            "eligibility" in (k or "").lower() for k in links
+            "eligibility" in (k or "").lower() for k in slinks
         )
         has_fee_link = any(
-            k in ("fee_structure", "tuition_fees") for k in links
+            k in ("fee_structure", "tuition_fees") for k in slinks
         )
         has_entry_test_link = any(
-            "entry_test" in (k or "").lower() for k in links
+            "entry_test" in (k or "").lower() for k in slinks
         )
         has_admissions_link = any(
-            k in ("admissions", "admissions_homepage", "admissions_portal") for k in links
+            k in ("admissions", "admissions_homepage", "admissions_portal") for k in slinks
         )
+        has_official_website = any(
+            k == "official_website" for k in slinks
+        )
+
+        valid_count = sum(
+            1 for k, v in slinks.items()
+            if is_category_url_valid(k, (v or {}).get("url", ""))
+        ) if slinks else 0
+
+        possibly_wrong = []
+        for k, v in slinks.items():
+            url = (v or {}).get("url", "")
+            if is_valid_url(url) and not is_category_url_valid(k, url):
+                possibly_wrong.append({"key": k, "url": url})
 
         def text_ok(field: str) -> bool:
             val = (proc or {}).get(field, "")
@@ -1828,7 +1948,9 @@ async def data_status():
         records.append({
             "university_id": uid,
             "university_name": uni.get("short_name", uni.get("name", uid)),
+            "valid_links_count": valid_count,
             "has_website": bool(website),
+            "has_official_website": has_official_website,
             "has_admissions_link": has_admissions_link,
             "has_eligibility_link": has_eligibility_link,
             "has_fee_link": has_fee_link,
@@ -1837,6 +1959,7 @@ async def data_status():
             "has_fee_text": text_ok("fee_text"),
             "has_entry_test_text": text_ok("entry_test_text"),
             "has_deadline_text": text_ok("deadline_text"),
+            "possibly_wrong_links": possibly_wrong,
         })
 
     return {
@@ -1863,4 +1986,4 @@ async def university_info(request: UniversityInfoRequest):
     if not info_type:
         info_type = "general"
 
-    return build_university_info_answer(question, profile, uni_id, info_type)
+    return await build_university_info_answer(question, profile, uni_id, info_type)

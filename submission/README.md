@@ -478,6 +478,7 @@ curl -X POST http://localhost:8000/counsel \
 | 19 | Intent-based chat — greetings skip backend entirely, recommendation groups show "Best matches"/"Safe"/"Difficult"/"Not eligible", all 20 universities checked per request | Complete |
 | 20 | Chat scroll fix (scroll to new message/block, not page bottom), link validation (backend + frontend filter empty/TODO/placeholder/invalid URLs), clean university source links | Complete |
 | 21 | Source-based answers — /university-info endpoint answers specific questions (fee, eligibility, entry test, deadline, admission links) using stored data first; /data-status endpoint proves data coverage for all 20 universities; frontend detects specific info intents and routes to /university-info without recommendation cards; never invents data when exact info is missing | Complete |
+| 22 | Correct link categories — buttons only show when their URL matches the type (fee_structure opens a real fee page, eligibility opens a real eligibility page, etc.); is_category_url_valid() ensures no mislabeled links; live official data lookup via httpx+BeautifulSoup when stored text is missing; /data-status adds valid_links_count and possibly_wrong_links for auditing | Complete |
 
 ### Key achievements
 
@@ -497,6 +498,9 @@ curl -X POST http://localhost:8000/counsel \
 - **Source-first specific answers** — when a user asks a specific question about a named university (fee, eligibility, entry test, deadline, admission links), the frontend detects this intent and calls `/university-info`. The backend returns exact stored data if available, or an honest "I do not have exact stored data for this yet" with the official link. No guessing, no invented fees, no recommendation card duplication
 - **Data coverage report** — `GET /data-status` returns a per-university breakdown of which links and scraped text fields (eligibility, fee, entry test, deadline) exist across all 20 universities. This proves the app checks each university's available data before answering
 - **20 universities with source links** — every university has at minimum an official website link. Source link files have had all TODO/unverified URLs replaced
+- **Category-validated link buttons** — each link button only shows if its URL matches the button type. Fee buttons open fee pages, eligibility buttons open eligibility pages, etc. `is_category_url_valid()` checks URL content against the category label so a "Fee structure" button never opens a general admissions page
+- **Live official data lookup** — when stored data is missing for a specific question, `/university-info` tries to fetch the matching official page via httpx+BeautifulSoup. Results are cached in memory, and the response shows "Live official lookup" or "Stored official data" as the data source
+- **Data status audit** — `/data-status` now tracks `valid_links_count` and `possibly_wrong_links` to help detect mis-categorized link entries
 
 ### Team
 

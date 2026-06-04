@@ -901,6 +901,12 @@ function renderInfoLinks(links = []) {
   return div;
 }
 
+function dataSourceLabel(data) {
+  if (data.data_source === 'live') return 'Live official lookup';
+  if (data.data_source === 'stored') return 'Stored official data';
+  return 'No exact stored data found';
+}
+
 function addInfoTurn(data) {
   const block = document.createElement('section');
   block.className = 'response-block';
@@ -908,12 +914,15 @@ function addInfoTurn(data) {
   block.appendChild(msg);
   const linkRow = renderInfoLinks(data.links || []);
   if (linkRow) block.appendChild(linkRow);
-  if (!data.has_exact_data) {
-    const note = document.createElement('p');
-    note.className = 'no-exact-data-note';
-    note.textContent = 'Note: Official source links are provided; exact stored data was not available for this question.';
-    block.appendChild(note);
+  const sourceLine = document.createElement('p');
+  sourceLine.className = 'data-source-line';
+  const label = dataSourceLabel(data);
+  if (data.source_url_used) {
+    sourceLine.innerHTML = `Source used: <strong>${escapeHtml(label)}</strong> &middot; <a href="${escapeHtml(data.source_url_used)}" target="_blank" rel="noopener noreferrer">Open source</a>`;
+  } else {
+    sourceLine.innerHTML = `Source used: <strong>${escapeHtml(label)}</strong>`;
   }
+  block.appendChild(sourceLine);
   chatBox.appendChild(block);
   scrollToElement(block);
 }

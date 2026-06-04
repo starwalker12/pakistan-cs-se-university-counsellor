@@ -919,6 +919,17 @@ a:focus-visible {
   margin-top: 12px;
 }
 
+.data-source-line {
+  font-size: 0.82em;
+  color: var(--muted);
+  margin-top: 10px;
+}
+
+.data-source-line a {
+  color: var(--emerald-600);
+  text-decoration: underline;
+}
+
 .no-exact-data-note {
   font-size: 0.85em;
   color: var(--muted);

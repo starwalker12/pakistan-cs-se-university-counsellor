@@ -3,6 +3,10 @@
     "university_id": "nuces-fast",
     "university": "FAST NUCES",
     "links": {
+      "official_website": {
+        "url": "https://nu.edu.pk/",
+        "note": "FAST NUCES official homepage."
+      },
       "admissions_homepage": {
         "url": "https://nu.edu.pk/",
         "note": "FAST NUCES homepage with admission links and program listings."
@@ -29,13 +33,13 @@
     "university_id": "nust",
     "university": "NUST",
     "links": {
+      "official_website": {
+        "url": "https://nust.edu.pk/",
+        "note": "NUST official homepage."
+      },
       "admissions_homepage": {
         "url": "https://nust.edu.pk/",
-        "note": "NUST homepage. The site blocks automated access to sub-pages. Needs manual review."
-      },
-      "entry_test": {
-        "url": "https://nust.edu.pk/",
-        "note": "NUST conducts NET (NUST Entry Test). Official sub-page blocked. Needs manual review."
+        "note": "NUST homepage. The site blocks automated access to sub-pages."
       }
     }
   },
@@ -43,6 +47,10 @@
     "university_id": "comsats",
     "university": "COMSATS",
     "links": {
+      "official_website": {
+        "url": "https://comsats.edu.pk/",
+        "note": "COMSATS official homepage."
+      },
       "admissions_portal": {
         "url": "https://admissions.comsats.edu.pk/",
         "note": "COMSATS admissions portal with program listings."
@@ -57,21 +65,13 @@
     "university_id": "lums",
     "university": "LUMS",
     "links": {
+      "official_website": {
+        "url": "https://lums.edu.pk/",
+        "note": "LUMS official homepage."
+      },
       "admissions": {
         "url": "https://lums.edu.pk/admissions",
         "note": "Official LUMS admissions page with all programs."
-      },
-      "undergraduate_programs": {
-        "url": "https://lums.edu.pk/admissions",
-        "note": "LUMS admissions page with all program information."
-      },
-      "fee_structure": {
-        "url": "https://lums.edu.pk/admissions",
-        "note": "Fee details available on the LUMS admissions page."
-      },
-      "eligibility_criteria": {
-        "url": "https://lums.edu.pk/admissions",
-        "note": "Eligibility criteria detailed on the LUMS admissions page."
       },
       "entry_test": {
         "url": "https://lums.edu.pk/admissions/entry-test",
@@ -83,9 +83,13 @@
     "university_id": "giki",
     "university": "GIKI",
     "links": {
+      "official_website": {
+        "url": "https://giki.edu.pk/",
+        "note": "GIKI official homepage."
+      },
       "admissions_homepage": {
         "url": "https://giki.edu.pk/",
-        "note": "GIKI homepage. Site has SSL certificate issues with automated access. Needs manual review."
+        "note": "GIKI homepage. Site has SSL certificate issues with automated access."
       }
     }
   },
@@ -93,21 +97,13 @@
     "university_id": "pieas",
     "university": "PIEAS",
     "links": {
+      "official_website": {
+        "url": "https://pieas.edu.pk/",
+        "note": "PIEAS official homepage."
+      },
       "admissions": {
         "url": "https://pieas.edu.pk/admissions",
         "note": "Official PIEAS admissions page."
-      },
-      "undergraduate_programs": {
-        "url": "https://pieas.edu.pk/admissions",
-        "note": "PIEAS admissions page with program listings."
-      },
-      "fee_structure": {
-        "url": "https://pieas.edu.pk/admissions",
-        "note": "Fee details available on the PIEAS admissions page."
-      },
-      "eligibility_criteria": {
-        "url": "https://pieas.edu.pk/admissions",
-        "note": "Eligibility criteria detailed on the PIEAS admissions page."
       },
       "entry_test": {
         "url": "https://pieas.edu.pk/admissions/entry-test",
@@ -119,21 +115,13 @@
     "university_id": "uet-lahore",
     "university": "UET Lahore",
     "links": {
+      "official_website": {
+        "url": "https://uet.edu.pk/",
+        "note": "UET Lahore official homepage."
+      },
       "admissions": {
         "url": "https://uet.edu.pk/admissions",
         "note": "Official UET Lahore admissions page."
-      },
-      "undergraduate_programs": {
-        "url": "https://uet.edu.pk/admissions",
-        "note": "UET Lahore admissions page with program listings."
-      },
-      "fee_structure": {
-        "url": "https://uet.edu.pk/admissions",
-        "note": "Fee details available on the UET Lahore admissions page."
-      },
-      "eligibility_criteria": {
-        "url": "https://uet.edu.pk/admissions",
-        "note": "Eligibility criteria detailed on the UET Lahore admissions page."
       },
       "entry_test": {
         "url": "https://uet.edu.pk/admissions/entry-test",
@@ -145,21 +133,13 @@
     "university_id": "itu-lahore",
     "university": "ITU Lahore",
     "links": {
+      "official_website": {
+        "url": "https://itu.edu.pk/",
+        "note": "ITU Lahore official homepage."
+      },
       "admissions": {
         "url": "https://itu.edu.pk/admissions",
         "note": "Official ITU Lahore admissions page."
-      },
-      "undergraduate_programs": {
-        "url": "https://itu.edu.pk/admissions",
-        "note": "ITU Lahore admissions page with program listings."
-      },
-      "fee_structure": {
-        "url": "https://itu.edu.pk/admissions",
-        "note": "Fee details available on the ITU Lahore admissions page."
-      },
-      "eligibility_criteria": {
-        "url": "https://itu.edu.pk/admissions",
-        "note": "Eligibility criteria detailed on the ITU Lahore admissions page."
       },
       "entry_test": {
         "url": "https://itu.edu.pk/admissions/entry-test",
@@ -171,6 +151,10 @@
     "university_id": "air-university",
     "university": "Air University",
     "links": {
+      "official_website": {
+        "url": "https://au.edu.pk/",
+        "note": "Air University official homepage."
+      },
       "admissions_portal": {
         "url": "https://portals.au.edu.pk/admissions",
         "note": "Air University admissions portal."
@@ -193,21 +177,13 @@
     "university_id": "bahria-university",
     "university": "Bahria University",
     "links": {
+      "official_website": {
+        "url": "https://bahria.edu.pk/",
+        "note": "Bahria University official homepage."
+      },
       "admissions": {
         "url": "https://bahria.edu.pk/admissions",
         "note": "Official Bahria University admissions page."
-      },
-      "undergraduate_programs": {
-        "url": "https://bahria.edu.pk/admissions",
-        "note": "Bahria University admissions page with program listings."
-      },
-      "fee_structure": {
-        "url": "https://bahria.edu.pk/admissions",
-        "note": "Fee details available on the Bahria University admissions page."
-      },
-      "eligibility_criteria": {
-        "url": "https://bahria.edu.pk/admissions",
-        "note": "Eligibility criteria detailed on the Bahria University admissions page."
       },
       "entry_test": {
         "url": "https://bahria.edu.pk/admissions/entry-test",
@@ -219,6 +195,10 @@
     "university_id": "punjab-university",
     "university": "Punjab University",
     "links": {
+      "official_website": {
+        "url": "https://pu.edu.pk/",
+        "note": "Punjab University official homepage."
+      },
       "admissions": {
         "url": "https://pu.edu.pk/home/more/4",
         "note": "Punjab University admissions page with program listings."
@@ -237,6 +217,10 @@
     "university_id": "qau",
     "university": "QAU",
     "links": {
+      "official_website": {
+        "url": "https://qau.edu.pk/",
+        "note": "QAU official homepage."
+      },
       "admissions_portal": {
         "url": "https://ugadmissions.qau.edu.pk/oas/app/index.aspx",
         "note": "QAU undergraduate admissions portal."
@@ -255,9 +239,9 @@
     "university_id": "ned-university",
     "university": "NED University",
     "links": {
-      "admissions": {
+      "official_website": {
         "url": "https://neduet.edu.pk",
-        "note": "NED University homepage with admissions information."
+        "note": "NED University official homepage."
       }
     }
   },
@@ -265,9 +249,9 @@
     "university_id": "uet-taxila",
     "university": "UET Taxila",
     "links": {
-      "admissions": {
+      "official_website": {
         "url": "https://uettaxila.edu.pk",
-        "note": "UET Taxila homepage with admissions information."
+        "note": "UET Taxila official homepage."
       }
     }
   },
@@ -275,6 +259,10 @@
     "university_id": "university-of-karachi",
     "university": "University of Karachi",
     "links": {
+      "official_website": {
+        "url": "https://uok.edu.pk/",
+        "note": "University of Karachi official homepage."
+      },
       "admissions": {
         "url": "https://uok.edu.pk/admissions/index.php",
         "note": "University of Karachi admissions page with program listings."
@@ -285,6 +273,10 @@
     "university_id": "ucp",
     "university": "UCP",
     "links": {
+      "official_website": {
+        "url": "https://ucp.edu.pk/",
+        "note": "UCP official homepage."
+      },
       "admissions": {
         "url": "https://ucp.edu.pk/admissions/",
         "note": "UCP admissions page with program listings."
@@ -299,9 +291,9 @@
     "university_id": "virtual-university",
     "university": "Virtual University",
     "links": {
-      "admissions": {
+      "official_website": {
         "url": "https://vu.edu.pk",
-        "note": "Virtual University homepage with admissions information."
+        "note": "Virtual University official homepage."
       }
     }
   },
@@ -309,9 +301,9 @@
     "university_id": "szabist",
     "university": "SZABIST",
     "links": {
-      "admissions": {
+      "official_website": {
         "url": "https://szabist.edu.pk",
-        "note": "SZABIST homepage with admissions information."
+        "note": "SZABIST official homepage."
       }
     }
   },
@@ -319,6 +311,10 @@
     "university_id": "iba-karachi",
     "university": "IBA Karachi",
     "links": {
+      "official_website": {
+        "url": "https://iba.edu.pk/",
+        "note": "IBA Karachi official homepage."
+      },
       "admissions_schedule": {
         "url": "https://admissions.iba.edu.pk/admissions_schedule.php",
         "note": "IBA admissions schedule and program details."
@@ -333,9 +329,9 @@
     "university_id": "ist",
     "university": "IST",
     "links": {
-      "admissions": {
+      "official_website": {
         "url": "https://ist.edu.pk",
-        "note": "IST homepage with admissions information."
+        "note": "IST official homepage."
       }
     }
   }
