@@ -1,0 +1,407 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>QAU Admissions Fall 2026 | Official Portal</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    
+    <link href="assets_new/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="assets_new/dist/css/AdminLTE.min.css" rel="stylesheet" type="text/css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --qau-blue: #003366;
+            --qau-blue-dark: #002244;
+            --qau-gold: #c5a059;
+            --qau-gold-dark: #a68545;
+            --bg-body: #f4f7f9;
+            --deadline-red: #d63031;
+            --usat-amber: #f39c12;
+        }
+
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-body); color: #2d3436; }
+
+        .topnav { background-color: var(--qau-blue); overflow: hidden; padding: 5px 0; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .topnav a { float: left; display: block; color: #f2f2f2; text-align: center; padding: 14px 20px; text-decoration: none; font-size: 14px; transition: 0.3s; }
+        .topnav a:hover { background-color: var(--qau-blue-dark); color: white; }
+        .topnav .active { background-color: var(--qau-gold); color: white; font-weight: bold; }
+        
+        @media screen and (max-width: 600px) {
+          .topnav a:not(:first-child) {display: none;}
+          .topnav a.icon { float: right; display: block; }
+          .topnav.responsive {position: relative;}
+          .topnav.responsive .icon { position: absolute; right: 0; top: 0; }
+          .topnav.responsive a { float: none; display: block; text-align: left; }
+        }
+
+        .hero-banner { background: white;  border-radius: 0 0 25px 25px; box-shadow: 0 2px 20px rgba(0,0,0,0.06); margin-bottom: 35px; border-bottom: 4px solid var(--qau-gold); }
+        .hero-title { color: var(--qau-blue); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin: 0; font-size: 24px; }
+
+        .glass-card { background: #fff; border-radius: 12px; border: 1px solid #e1e8ef; box-shadow: 0 8px 24px rgba(149, 157, 165, 0.1); padding: 30px; margin-bottom: 30px; }
+        
+        .section-header { border-left: 5px solid var(--qau-blue); padding-left: 15px; margin-bottom: 30px; }
+        .section-header h3 { margin: 0; color: var(--qau-blue); font-weight: 700; font-size: 20px; }
+
+        /* Mobile Responsive Table Logic */
+        .table-qau { width: 100%; border-collapse: separate; border-spacing: 0 12px; margin-top: -10px; }
+        .table-qau th { padding: 12px 15px; color: #8e9aaf; font-weight: 600; text-transform: uppercase; font-size: 11px; border: none; }
+        .table-qau td { padding: 18px 15px; background: #fff; border-top: 1px solid #f1f4f8; border-bottom: 1px solid #f1f4f8; vertical-align: middle !important; font-size: 14px; }
+        .table-qau tr td:first-child { border-left: 1px solid #f1f4f8; border-radius: 10px 0 0 10px; }
+        .table-qau tr td:last-child { border-right: 1px solid #f1f4f8; border-radius: 0 10px 10px 0; }
+
+        @media (max-width: 768px) {
+            .table-responsive { border: none; }
+            .table-qau, .table-qau thead, .table-qau tbody, .table-qau th, .table-qau td, .table-qau tr { display: block; }
+            .table-qau thead tr { position: absolute; top: -9999px; left: -9999px; }
+            .table-qau tr { border: 1px solid #eee; margin-bottom: 15px; border-radius: 12px; padding: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+            .table-qau td { 
+                border: none !important; 
+                position: relative; 
+                padding-left: 45% !important; 
+                text-align: right; 
+                border-bottom: 1px solid #f9f9f9 !important; 
+                display: flex;
+                justify-content: flex-end;
+                align-items: center;
+                min-height: 45px;
+            }
+            .table-qau td:last-child { border-bottom: 0 !important; }
+            .table-qau td:before { 
+                position: absolute; 
+                left: 15px; 
+                width: 40%; 
+                padding-right: 10px; 
+                white-space: nowrap; 
+                content: attr(data-label); 
+                text-align: left; 
+                font-weight: 700; 
+                color: var(--qau-blue); 
+            }
+            .badge-type, .badge-date {
+                display: inline-block;
+                word-wrap: break-word;
+                font-size: 11px;
+            }
+        }
+        
+        .badge-date { background: #fff5f5; color: var(--deadline-red); padding: 6px 14px; border-radius: 6px; font-weight: 700; border: 1px solid #feb2b2; }
+        .badge-type { background: #e6f7ff; color: #0984e3; padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+
+        .btn-view { background: var(--qau-blue); color: white !important; font-size: 11px; padding: 10px 18px; border-radius: 6px; font-weight: 600; text-decoration: none !important; transition: 0.3s; }
+        .btn-view:hover { background: var(--qau-gold); transform: translateY(-2px); }
+
+        .step-box { position: relative; padding-left: 60px; margin-bottom: 30px; }
+        .step-num { position: absolute; left: 0; top: 0; width: 40px; height: 40px; background: var(--qau-blue); color: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+        .step-text h4 { margin: 0 0 6px 0; color: var(--qau-blue); font-weight: 700; font-size: 17px; }
+        .step-text p { margin: 0; font-size: 14px; color: #636e72; line-height: 1.5; }
+
+        .usat-card { border-left: 6px solid var(--usat-amber); background: #fffcf4; }
+        .usat-card h4 { color: #a35200; font-weight: 800; font-size: 16px; margin-bottom: 12px; }
+        .usat-card p { font-size: 14px; color: #7d4d1e; margin-bottom: 10px; }
+        .usat-highlight { color: #d35400; font-weight: 700; text-decoration: underline; }
+
+        /* FLEXBOX SYSTEM FOR MOBILE REORDERING */
+        .flex-wrapper { display: flex; flex-wrap: wrap; }
+        .left { width: 68%; margin-right: 2%; }
+        .right { width: 30%; }
+
+        @media (max-width: 992px) {
+            .left, .right { width: 100% !important; margin-right: 0 !important; }
+            .right { order: -1; } /* Moves Mandatory Requirements to the top */
+        }
+    </style>
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+<style>
+    .hero-banner {
+        background: #ffffff;
+        padding: 20px 20px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        margin: 30px auto;
+        max-width: 80%;
+        border-bottom: 4px solid var(--qau-gold);
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Decorative background icon */
+    .hero-banner::before {
+        content: '\f19d'; /* Graduation cap icon */
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        position: absolute;
+        font-size: 150px;
+        color: rgba(0, 51, 102, 0.03);
+        right: -20px;
+        bottom: -30px;
+        transform: rotate(-15deg);
+    }
+
+    .hero-title {
+        color: var(--qau-blue);
+        font-weight: 800;
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        letter-spacing: -0.5px;
+    }
+
+    .highlight-year {
+        background: var(--qau-gold);
+        color: white;
+        padding: 0 15px;
+        border-radius: 8px;
+        display: inline-block;
+    }
+
+    .hero-subtitle {
+        color: #636e72;
+        font-weight: 500;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .hero-subtitle i {
+        color: var(--qau-gold);
+        font-size: 14px;
+    }
+
+    .badge-qau {
+        display: inline-block;
+        background: rgba(0, 51, 102, 0.1);
+        color: var(--qau-blue);
+        padding: 5px 15px;
+        border-radius: 50px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 15px;
+    }
+
+    @media (max-width: 768px) {
+        .hero-title { font-size: 1.8rem; }
+    }
+</style>
+</head>
+<body class="hold-transition">
+
+    <nav class="topnav" id="myTopnav">
+        <a class="active" href="http://qau.edu.pk"><i class="fa fa-university"></i> QUAID-I-AZAM UNIVERSITY</a>
+        <a href="index.aspx"><i class="fa fa-home"></i> Home</a>
+        <a href="signin.aspx"><i class="fa fa-sign-in-alt"></i> Sign In</a>
+        <a href="register.aspx"><i class="fa fa-user-plus"></i> <span style="color:var(--qau-gold)">Apply Online</span></a>
+        <a href="Aggregate_Calculator.html" target="_blank"><i class="fa fa-calculator"></i> Aggregate Calculator</a>
+		<a href="https://ugadmissions.qau.edu.pk/oas/app/HowtoApply.html" target="_blank">
+        <i class="fa fa-question-circle"></i> <span style="color:#00d2d3">How to Apply</span>
+    </a>
+        <a href="forgetpwd.aspx"><i class="fa fa-key"></i> Forgot Password?</a>
+        <a href="javascript:void(0);" class="icon" onClick="myFunction()" style="font-size:20px; padding-top:12px">
+            <i class="fa fa-bars"></i>
+        </a>
+    </nav>
+
+  <div class="container-fluid hero-banner text-center">
+    
+    <h2 class="hero-title">
+        <i class="fa-solid fa-university" style="font-size: 0.8em; margin-right: 10px; opacity: 0.8;"></i>
+        Admission Portal <span class="highlight-year">Fall 2026</span>
+    </h2>
+    
+    <div class="hero-subtitle">
+        <span><i class="fa-solid fa-star"></i></span>
+        Pakistan's Top Ranked University
+        <span><i class="fa-solid fa-star"></i></span>
+    </div>
+    
+    <div style="margin-top: 20px; height: 3px; width: 60px; background: var(--qau-gold); margin-left: auto; margin-right: auto; border-radius: 2px;"></div>
+
+    <div style="margin-top: 30px;">
+        <a href="https://ugadmissions.qau.edu.pk/oas/app/register.aspx" class="apply-now-btn">
+            APPLY NOW
+        </a>
+    </div>
+
+    <style>
+        .apply-now-btn {
+            display: inline-block;
+            padding: 12px 40px;
+            background-color: #b22222; /* Classic urgency red, or change to var(--qau-gold) */
+            color: white !important;
+            text-decoration: none !important;
+            font-weight: bold;
+            font-size: 1.1em;
+            border-radius: 5px;
+            transition: transform 0.2s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            /* The Blinking Animation */
+            animation: blinker 1.5s linear infinite;
+        }
+
+        .apply-now-btn:hover {
+            transform: scale(1.05);
+            animation: none; /* Stops blinking on hover for better visibility */
+            background-color: #8b0000;
+        }
+
+        @keyframes blinker {
+            50% {
+                opacity: 0.6;
+            }
+        }
+    </style>
+</div>
+
+    <div class="container-fluid" style="padding: 0 40px;">
+        <div class="flex-wrapper">
+            
+            <div class="right">
+                <div class="glass-card usat-card">
+                    <h4><i class="fa fa-exclamation-triangle"></i> Mandatory Test Requirements</h4>
+                    <p>
+                        The <span class="usat-highlight">HEC Undergraduate Studies Admission Test (USAT)</span> is compulsory for admission in all <strong>BS and Pharm-D</strong> programs.
+                    </p>
+                    <hr style="margin: 10px 0; border-top: 1px dashed #ebd4a4;">
+                    <p>
+                        For <strong>LLB</strong> applicants, the <span class="usat-highlight">HEC Law Admission Test (LAT)</span> is strictly required. No application will be processed without a valid result.
+                    </p>
+                </div>
+
+                <div class="list-group shadow-sm" style="border-radius: 12px; overflow: hidden; border: 1px solid #e1e8ed; margin-bottom: 25px;">
+                    <a href="https://etc.hec.gov.pk" target="_blank" class="list-group-item list-group-item-action" style="padding: 15px; font-size: 14px;">
+                        <i class="fa fa-external-link-alt text-info" style="margin-right: 10px;"></i> Register for HEC USAT
+                    </a>
+                    <a href="https://etc.hec.gov.pk" target="_blank" class="list-group-item list-group-item-action" style="padding: 15px; font-size: 14px;">
+                        <i class="fa fa-external-link-alt text-info" style="margin-right: 10px;"></i> Register for Law Test (LAT)
+                    </a>
+                </div>
+
+                <div class="glass-card" style="background: var(--qau-blue); color: white; border: none;">
+                    <h4 style="font-weight: 700; margin-bottom: 20px;"><i class="fa fa-headset"></i> Support Desk</h4>
+                  <!--  <p style="margin-bottom: 12px;"><i class="fa fa-phone" style="width: 20px; color: var(--qau-gold);"></i> +92-51-90644218</p>-->
+                    <p style="margin-bottom: 12px;"><i class="fa fa-envelope" style="width: 20px; color: var(--qau-gold);"></i> admissions2026fall@qau.edu.pk</p>
+                    <p style="margin-bottom: 0;"><i class="fa fa-clock" style="width: 20px; color: var(--qau-gold);"></i> 09:00 AM - 03:00 PM (Mon-Fri)</p>
+                </div>
+            </div>
+
+            <div class="left">
+                <div class="glass-card">
+                    <div class="section-header">
+                        <h3><i class="fa fa-calendar-alt"></i> Official Admission Deadlines & Notices</h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table-qau">
+                            <thead>
+                                <tr>
+                                    <th>Program Category</th>
+                                    <th>Application Type</th>
+                                    <th>Closing Date</th>
+                                    <th>Official Notice</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td data-label="Category"><i class="fa fa-graduation-cap text-primary"></i> <strong>BS & LLB</strong></td>
+                                    <td data-label="Type"><span class="badge-type">Regular / Self-Finance</span></td>
+                                    <td data-label="Deadline"><span class="badge-date">10-08-2026</span></td>
+                                    <td data-label="Action"><a href="https://qau.edu.pk/admissions-for-undergraduate-bs-ba-llb-pharm-d-morning-programme-on-regular-self-finance-basis-fall-semester-2026/" target="_blank" class="btn-view"><i class="fa fa-file-pdf"></i> VIEW</a></td>
+                                </tr>
+                                <tr>
+                                    <td data-label="Category"><i class="fa fa-briefcase text-success"></i> <strong>BS & LLB</strong></td>
+                                    <td data-label="Type"><span class="badge-type" style="background:#f6ffed; color:#52c41a;">Self-Support Basis</span></td>
+                                    <td data-label="Deadline"><span class="badge-date">18-08-2026</span></td>
+                                    <td data-label="Action"><a href="https://qau.edu.pk/admissions-notice-for-undergraduate-bs-pharm-d-programme-on-self-support-basis-fall-semester-2026/" target="_blank" class="btn-view"><i class="fa fa-file-pdf"></i> VIEW</a></td>
+                                </tr>
+                                <tr>
+                                    <td data-label="Category"><i class="fa fa-book-open text-info"></i> <strong>M.Phil / MS</strong></td>
+                                    <td data-label="Type"><span class="badge-type">Regular / Self-Finance</span></td>
+                                    <td data-label="Deadline"><span class="badge-date">21-08-2026</span></td>
+                                    <td data-label="Action"><a href="https://qau.edu.pk/admission-notice-for-mphil-ms-programme-fall-semester-2026/" target="_blank" class="btn-view"><i class="fa fa-file-pdf"></i> VIEW</a></td>
+                                </tr>
+                                <tr>
+                                    <td data-label="Category"><i class="fa fa-user-tie text-danger"></i> <strong>Ph.D Programs</strong></td>
+                                    <td data-label="Type"><span class="badge-type">Regular Only</span></td>
+                                    <td data-label="Deadline"><span class="badge-date">21-08-2026</span></td>
+                                    <td data-label="Action"><a href="https://qau.edu.pk/admission-notice-for-phd-programme-fall-semester-2026/" target="_blank" class="btn-view"><i class="fa fa-file-pdf"></i> VIEW</a></td>
+                                </tr>
+                                <tr>
+                                    <td data-label="Category"><i class="fa fa-flask text-warning"></i> <strong>Pharm.D</strong></td>
+                                    <td data-label="Type"><span class="badge-type">Regular / Self-Finance</span></td>
+                                    <td data-label="Deadline"><span class="badge-date">22-09-2026</span></td>
+                                    <td data-label="Action"><a href="https://qau.edu.pk/admissions-for-undergraduate-bs-ba-llb-pharm-d-morning-programme-on-regular-self-finance-basis-fall-semester-2026/" target="_blank" class="btn-view"><i class="fa fa-file-pdf"></i> VIEW</a></td>
+                                </tr>
+                                <tr>
+                                    <td data-label="Category"><i class="fa fa-flask text-warning"></i> <strong>Pharm.D</strong></td>
+                                    <td data-label="Type"><span class="badge-type" style="background:#f6ffed; color:#52c41a;">Self-Support Basis</span></td>
+                                    <td data-label="Deadline"><span class="badge-date">29-09-2026</span></td>
+                                    <td data-label="Action"><a href="https://qau.edu.pk/admissions-notice-for-undergraduate-bs-pharm-d-programme-on-self-support-basis-fall-semester-2026/" target="_blank" class="btn-view"><i class="fa fa-file-pdf"></i> VIEW</a></td>
+                                </tr>
+                                <tr>
+                                    <td data-label="Category"><i class="fa fa-certificate text-muted"></i> <strong>PG Diploma (Psychology)</strong></td>
+                                    <td data-label="Type"><span class="badge-type">One Year Programme</span></td>
+                                    <td data-label="Deadline"><span class="badge-date">21-08-2026</span></td>
+                                    <td data-label="Action"><a href="https://qau.edu.pk/post-graduate-diploma-evening-programmes-fall-2026/" target="_blank" class="btn-view"><i class="fa fa-file-pdf"></i> VIEW</a></td>
+                                </tr>
+								<tr>
+                                    <td data-label="Category"><i class="fa fa-certificate text-muted"></i> <strong>Diploma in Cyber Security</strong></td>
+                                    <td data-label="Type"><span class="badge-type">One Year</span></td>
+                                    <td data-label="Deadline"><span class="badge-date">06-06-2026</span></td>
+                                    <td data-label="Action"><a href="https://qau.edu.pk/diploma-in-cyber-security/" target="_blank" class="btn-view"><i class="fa fa-file-pdf"></i> VIEW</a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="glass-card">
+                    <div class="section-header">
+                        <h3><i class="fa fa-stream"></i> Application Process</h3>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">1</div>
+                        <div class="step-text">
+                            <h4><i class="fa fa-user-edit" style="font-size: 14px;"></i> Online Registration</h4>
+                            <p>Create your profile on the <a href="register.aspx" style="color:var(--qau-blue); font-weight:600;">Online Admissions Portal</a>.</p>
+                        </div>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">2</div>
+                        <div class="step-text">
+                            <h4><i class="fa fa-file-upload" style="font-size: 14px;"></i> Upload Documents</h4>
+                            <p>Scan and upload all required academic transcripts and your CNIC/B-Form.</p>
+                        </div>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">3</div>
+                        <div class="step-text">
+                            <h4><i class="fa fa-receipt" style="font-size: 14px;"></i> Application Fee</h4>
+                            <p>Generate the challan of <strong>Rs. 2860/-</strong> and pay via 1-Bill, Kuickpay, or bank.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="text/javascript" src="assets_new/plugins/jQuery/jQuery-2.1.4.min.js"></script>
+    <script type="text/javascript" src="assets_new/bootstrap/js/bootstrap.min.js"></script>
+    <script>
+        function myFunction() {
+            var x = document.getElementById("myTopnav");
+            if (x.className === "topnav") {
+                x.className += " responsive";
+            } else {
+                x.className = "topnav";
+            }
+        }
+    </script>
+</body>
+</html>

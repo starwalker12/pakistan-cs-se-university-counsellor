@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <meta name="description" content="Explore opportunities at COMSATS University Islamabad! Learn about our diverse range of undergraduate and graduate programs. Find admission requirements, Your gateway to education, application deadlines, and how to apply for your desired academic journey.">
+    <meta name="keywords" content="COMSATS, CUI, Computer Science, Architecture, Engineering, CIIT, Promotin Quality Education, HEC, Higher Education, CS, Data Science, Design, Management Sciences, Artificial Intelligence, Networks, International Relations, Chemistry, Pharmacy, BioSciences, Top University, COMSATS University Islamabad, CUI Admissions, Undergraduate Programs, Graduate Programs, Admission Requirements, Application Process, Apply to COMSATS, Application Deadlines, Scholarships at CUI, Academic Excellence, Faculty and Research, Campus Life at COMSATS, International Students Admission, Engineering Admissions, Business Studies Admission, Computer Science Programs">
+
+    <title>CUI Admission System</title>
+    <link href="/Content/css?v=Bhu8QH4eClK8xCUMcnxZroPUtnN0IwSsLiw3Dv2CmgA1" rel="stylesheet"/>
+
+    <script src="/bundles/modernizr?v=wBEWDufH_8Md-Pbioxomt90vm6tJN2Pyy9u9zHtWsPo1"></script>
+
+    <link href="/Content/adminlte?v=YdlDMRQmg0lUX7EGKi1SN3bpWnBLgyPiTuUKFb7Ec1g1" rel="stylesheet"/>
+
+
+    
+    
+    <link href="/Content/campusSliderstyle?v=HCEEWIdOS9hjTBsEYnofJGOD_n3HA9htvAfQUZ6ecEY1" rel="stylesheet"/>
+
+
+    <style>
+        /*.main_container_bg{background-image:  url("/Content/images/newstyle/bg11.png");  float: left; width: 100%;}*/
+        .cap_img {
+            float: left;
+            height: 40px;
+            margin-bottom: 5px;
+            width: 100%;
+        }
+
+        .meritCheck {
+            background: url(/Content/images/newstyle/go.png) no-repeat scroll right -1px #f05323;
+            border: medium none;
+            border-radius: 2px 0 0 2px;
+            height: 25px;
+            color: white;
+            padding: 0 30px 0 10px;
+            position: relative;
+            top: 1px
+        }
+    </style>
+
+
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <link rel="shortcut icon" href="/Content/images/newstyle/favicon.png">
+
+</head>
+<body>
+    <div id="loading">
+        <div class="loadingin"></div>
+    </div>
+    <header>
+        <div class="row clearfix header_bg">
+            <div class="container">
+
+                <div class="row clearfix top_admin_login">
+                    
+    <a href="/AdminLogin">Admin Login Here</a>
+
+                </div>
+
+                <div class="row clearfix second_row">
+                    <div class="col-md-12 column">
+
+                        <div class="col-md-4 column logo">
+                            <a href="/home/index">
+                                <img src="/Content/images/comsats.png" title="COMSATS Admission System" />
+
+                            </a>
+                        </div>
+
+
+                        <div class="col-md-4 column login_area top_form1">
+                            <img src="/Content/images/Admission.png" alt="" title="" />
+                            <!--<form action="" method="post">
+                            <input type="text" name="roll_no" id="roll_no" placeholder="Enter Roll Number" />
+                            <input type="submit" name="btn_submit" id="btn_submit" class="btn_submit" value="Check Merit Result" />
+                            </form>-->
+                        </div>
+
+
+
+                        <div class="col-md-4 column login_area top_form2">
+                            
+    <div id="loginBox">
+        <form data-bind="with: loginObj">
+            <input type="text" id="emailaddress" name="login" placeholder="User Name" data-bind="value: Login" />
+            <input type="password" id="password" name="password" placeholder="Password" data-bind="value: Password" />
+            <input type="submit" name="btn_submit" id="btn_submit" class="btn_submit" value="Sign In" data-bind="click: $root.Login" />
+            <div class="clearfix"></div>
+
+        </form>
+        <a href="/Home/ForgetPassword" title="forget password" style="font-size:small">Forgot Your Password?</a>
+                <!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog" data-bind="with: loginResultVM">
+    <div class="modal-dialog modal-sm ">
+        <!-- Modal content-->
+        <div class="modal-content applycampuspopup">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"></button>
+                <h4 data-bind="ifnot: ErrorMsg">Welcome <span data-bind="text: Name"></span>!</h4>
+                <h4 data-bind="if: ErrorMsg">Error!</h4>
+            </div>
+            <div class="modal-body" data-bind="ifnot: ErrorMsg">
+                <h4>Choose Your Applied Campus</h4>
+                <div data-bind="foreach: LstAppliedCampuses">
+                    <div class="applybtncontainer">
+                        <input type="button" class="applybtnmain" data-bind="attr:{disabled: ApplicationStatus=='AdmissionClosed'}, click: function(data, event) { $root.applyInCampus(CampusID, ApplicationStatus) }, value: CampusTitle, css: {'formadmissionclosed':ApplicationStatus=='AdmissionClosed','formincomplete':ApplicationStatus=='InComplete', 'formsubmitted':ApplicationStatus=='Submitted', 'feeverified':ApplicationStatus=='FeeVerified', 'formverified':(ApplicationStatus=='Verified' || ApplicationStatus=='OnMerit' ||  ApplicationStatus=='NotOnMerit'), 'formrejected':ApplicationStatus=='ObjectionRaised'}" />
+                       
+                        <div class="txtComplete" data-bind="if: ApplicationStatus=='Submitted'">Application Complete</div>
+                        <div class="txtFeeVerified" data-bind="if: ApplicationStatus=='FeeVerified'">Fee Verified</div>
+                        <div class="txtVerified" data-bind="if: ApplicationStatus=='Verified'">Application Verified</div>
+                        <div class="txtOnMerit" data-bind="if: ApplicationStatus=='OnMerit'">Merit</div>
+                        <div class="txtNotOnMerit" data-bind="if: ApplicationStatus=='NotOnMerit'">Not On Merit</div>
+						 <div class="txtAdmissionClosed" data-bind="if: ApplicationStatus=='AdmissionClosed'">Admission Closed</div>
+                        <div class="txtObjectionRaised" data-bind="if: ApplicationStatus=='ObjectionRaised'">Object Raised</div>
+                    </div>
+                </div>
+
+                <div data-bind="if: LstNotAppliedCampuses && LstNotAppliedCampuses.length > 0">
+                    <h5>To apply in other campuses click below</h5>
+                    <div class="othercampuscontainer" data-bind="foreach: LstNotAppliedCampuses">
+                        <input type="button" class="othercampusbtn" value="Attock" data-bind="click: function(data, event) { $root.selectNewCampus(CampusID) }, value: CampusTitle" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body" data-bind="if: ErrorMsg">
+                <h5 style="color:red;" data-bind="text: ErrorMsg"></h5>
+            </div>
+        </div>
+
+    </div>
+</div>
+    </div>
+
+                            
+                        </div>
+
+
+                    </div>
+                </div>
+                <span class="spacer10"></span>
+
+
+            </div>
+        </div>
+
+        <div class="row clearfix menu_bg">
+            <div class="container">
+                <div class="col-md-12 column">
+                    <nav class="navbar navbar-default" role="navigation">
+                        <div class="navbar-header">
+                            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                                <span class="sr-only">Toggle navigation</span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                            </button>
+                        </div>
+
+                        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                            <ul class="nav navbar-nav custom_ul">
+                                <li><a href="/Home/Index">Home</a></li>
+                                <li><a href="/Home/AboutComsats">Why CUI?</a></li>
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Programs<strong class="caret"></strong></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="/Home/ProgramDetails#panel-undergrad">Under Graduation</a></li>
+                                        <li><a href="/Home/ProgramDetails#panel-grad">Graduation</a></li>
+                                        <li><a href="/Home/ProgramDetails#panel-phd">PHD</a></li>
+                                    </ul>
+                                </li>
+
+                                <li><a href="http://cuonline.comsats.edu.pk/publicaccess/" target="_blank">Scheme of Studies</a></li>
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Prospectus<strong class="caret"></strong></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="http://ww2.comsats.edu.pk/ro/Undergraduate.aspx" target="_blank">UnderGraduate Programs</a></li>
+                                        <li><a href="http://ww2.comsats.edu.pk/ro/Graduate.aspx" target="_blank">Graduate Programs</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="https://ww2.comsats.edu.pk/scholarships/" target="_blank">Scholarships</a></li>
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Downloads / Notifications<strong class="caret"></strong></a>
+                                    <ul class="dropdown-menu">
+                                        
+                                        <li><a href="/Content/files/MS_admission_criteria.pdf" target="_blank">MS Admission Criteria</a></li>
+                                        <li><a href="/Content/files/PhD_admission_criteria.pdf" target="_blank">PhD Admission Criteria</a></li>
+                                        <li><a href="http://ww2.comsats.edu.pk/ro/Graduate.aspx" target="_blank">Graduate Admission Guideline</a></li>
+                                        <li><a href="http://ww2.comsats.edu.pk/ro/Undergraduate.aspx" target="_blank">Under Graduate Admission Guideline</a></li>
+                                        <li><a href="/Content/files/udertaking_speciman.doc" target="_blank">Specimen of Undertaking</a></li>
+                                        <li><a href="/Content/files/SpecimenofAffidavit.doc" target="_blank">Specimen of Hope Certificate for Under Graduate Students</a></li>
+                                        <li><a href="/Content/files/Notification No 2879 REVISED ELIGIBILITY CRITERIA FOR MS PHD PROGRAMS .pdf" target="_blank">Revised Criteria for MS/PhD Programs</a></li>
+										 <li><a href="/Content/files/Notification HEC National Fee Refund Policy Revised 2024.pdf" target="_blank">HEC National Fee Refund Policy 2024</a></li>
+										 <li><a href="/Content/files/Fee-Structure-Fall-2026 (2).pdf" target="_blank">Fee Structure Fall 2026</a></li>
+                                    </ul>
+                                </li>
+                                <li><a  style="margin: 15px 5px 8px"  href="/Home/ContactUs">Contact Us</a></li>
+								 <li class="intl_stds"><a href="/Home/Keydates">Key Dates</a></li>
+								 <li class="intl_stds"><a href="/Home/GetCandidateDetails">Merit Calculator</a></li> 
+							
+                                <li class="intl_stds"><a href="https://internationaladmissions.comsats.edu.pk/" target="_blank">International Students</a></li>
+                               <!-- <li class="intl_stds"><a href="https://admissions.comsats.edu.pk:5069/" target="_blank">PhD scholarships & MS AI</a></li>-->
+								<!-- <li class="intl_stds"><a href="https://admissions.comsats.edu.pk:8087/" target="_blank">PhD Fully Funded Admissions</a></li>
+									<li class="intl_stds"><a href="/Home/GetCandidateDetails">Key Dates</a></li> -->
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <div id="random_classes" class="row clearfix main_container_bg">
+        <span class="spacer40"></span>
+        <span class="dotted_overlay"></span>
+        <div class="container">
+            
+
+
+<!-- Modal -->
+ <!--<div class="modal" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModal2Label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+		
+		
+            <div class="modal-header text-center">
+
+                    <h3 class="modal-title" id="exampleModalLabel">Announcement</h3>
+                    <button type="button" class="close" data-bs-dismiss="modal">×</button>
+                </div>
+                <div class="modal-body text-center">
+                    <p>
+                        <span class="h2">Admissions to the pioneering batch of</span><br>
+                        <span class="h4">MS in Al Engineering currently open for Fall 2025</span><br>
+						 Islamabad, Lahore, Abbottabad  and Wah Campus Last date to apply 15th August 2025
+						
+                    </p>
+                   
+					<p><a href="https://admissions.comsats.edu.pk:5069/" class="btn btn-primary">Please Click here</a></p>
+                </div>
+			
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+			
+			
+        </div>
+    </div>
+</div>
+
+--!>
+
+	
+
+
+
+
+<div class="homepagecontent">
+
+    <span class="dotted_overlay"></span>
+
+    <div class="col-md-8 column main_left">
+
+        <div class="row clearfix">
+            <div class="col-md-7 column admissions">
+
+                
+
+               
+
+
+                <h2>Admissions</h2>
+
+                <div class="programe_container">
+                    <div class="single_programe">
+                        <img src="/content/images/newstyle/d1.png" />
+                        <h3 class="title">Undergraduate Program</h3>
+                        <p>Undergraduate Programs offered by CUI</p>
+                        <a class="orange_btn" href="/Home/ProgramDetails#panel-undergrad">View Details</a>
+                        <a class="eligibilty" href="/Home/EligibilityCriteria?pt=BS">Eligibility Criteria</a>
+                        <a class="eligibilty" href="/Home/ListOfMinors">Department Specific List of Minors</a>
+                    </div>
+
+                    <div class="single_programe">
+                        <img src="/content/images/newstyle/d2.png" />
+                        <h3 class="title">Graduate Program</h3>
+                        <p>Graduate Programs offered by CUI</p>
+                        <a class="orange_btn" href="/Home/ProgramDetails#panel-grad">View Details</a>
+                        <a class="eligibilty" href="/Home/EligibilityCriteria?pt=MS">Eligibility Criteria</a>
+                    </div>
+
+                    <div class="single_programe">
+                        <img src="/content/images/newstyle/d3.png" />
+                        <h3 class="title">PHD</h3>
+                        <p>PHD Programs offered by CUI</p>
+                        <a class="orange_btn" href="/Home/ProgramDetails#panel-phd">View Details</a>
+                        <a class="eligibilty" href="/Home/EligibilityCriteria?pt=PHD">Eligibility Criteria</a>
+                        <a class="eligibilty" href="/Home/Termsandconditions" target="_blank">Terms and Conditions</a>
+                    </div>
+                </div>
+
+                
+            </div>
+
+            <div class="col-md-5 column departments">
+                
+                <div class="clearfix"></div>
+                <h2 style="margin-bottom: 25px;    margin-top: 14px;">Why CUI?</h2>
+                <div class="clearfix"></div>
+                <a class="pak" href="http://www.natureindex.com/country-outputs/Pakistan"><strong>Ranked # 1 </strong><br /> by Nature Index</a>
+                <a class="cs" href="javascript:void(0);">115 + Degree <br />Programs</a>
+                <a class="mgt" href="javascript:void(0);">34,500 +<br />Students</a>
+                <a class="arc" href="javascript:void(0);">1109+<br />PHD Faculty</a>
+                
+                <a class="bio" href="javascript:void(0);">1063<br />PHD Students</a>
+                <a class="mgt2" href="javascript:void(0);">3892<br />MS Students</a>
+                <a class="maths" href="javascript:void(0);">Ranked #2 <br />in Research</a>
+                <a class="physics" href="javascript:void(0);">Ranked #1 <br />in IT </a>
+
+                <h2>Useful Links</h2>
+
+                <a title="View All Programs" class="vap" href="/Home/ProgramDetails#panel-undergrad">View All<br />Programs</a>
+                <a title="International Students" class="dl" href="http://ww2.comsats.edu.pk/internationalstudents/" target="_blank">International Students</a>
+                <a title="Need Based Scholar ship" class="nbss" href="https://ww2.comsats.edu.pk/scholarships/" target="_blank">Need Based<br />Scholar ship</a>
+                <a title="International Rankings" class="ia" href="https://comsats.edu.pk/AboutUs.aspx" target="_blank">International<br />Rankings</a>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="signupForm" class="col-md-4 column main_right" data-bind="with: register">
+        <h2>Signup for Admission <small><strong>(Fall 2026)</strong></small></h2>
+        <form>
+            <div id="errormsg" class="alert alert-danger alert-dismissable">
+                <p id="errormsgin"></p>
+            </div>
+            <div id="successmsg" class="alert alert-success alert-dismissable">
+                <p id="successmsgin"></p>
+            </div>
+            <fieldset>
+                <p>Applying For</p>
+                <select id="ddlPorgam" data-bind="options: programTypesArr, optionsText: 'ProgramType', optionsValue: 'ProgramType', optionsCaption:'Choose Program', value: ApplyingFor"></select>
+            </fieldset>
+            <fieldset data-bind="if: $root.campusArr().length > 0">
+
+                <div style="background-color:#fff; border:solid 1px #ccc; padding:10px;" data-bind="foreach: $root.campusArr">
+                    <label>
+                        <input type="checkbox" data-bind="value: CampusID, checked: IsChecked" /> <span data-bind="text: CampusTitle"></span>
+                    </label>
+                </div>
+            </fieldset>
+            <fieldset>
+                <p>Name</p>
+                <input id="txtName" type="text" class="popoverboxgroup" data-bind="value: Name" placeholder="enter your name here" />
+            </fieldset>
+            <fieldset>
+                <p>Login</p>
+                <input id="txtLogin" type="text" class="popoverboxgroup" data-bind="value: Login" placeholder="enter login name for signin" />
+            </fieldset>
+            <fieldset>
+                <p>Email Address</p>
+                <input id="txtEmail" type="text" class="popoverboxgroup" data-bind="value: EmailAddress" placeholder="enter valid email here" />
+            </fieldset>
+            <fieldset>
+                <p>Password:</p>
+                <input id="txtPassword" type="password" class="popoverboxgroup" data-bind="value: Password" placeholder="enter password here" />
+            </fieldset>
+            <fieldset>
+                <p>Retype Password:</p>
+                <input type="password" data-bind="value: ConfirmPassword" placeholder="confirm password" />
+            </fieldset>
+
+
+            <fieldset>
+                <p><img class="cap_img" src="/home/ShowCaptchaImage" width="" height="" /></p>
+                <input id="textCaptcha" type="text" data-bind="value: Captcha" placeholder="enter above word" />
+            </fieldset>
+            <fieldset>
+                <input type="submit" name="submit" id="submit" value="Get Registered" data-bind="click: $root.CreateNewSubmit" />
+            </fieldset>
+        </form>
+    </div>
+</div>
+
+
+
+
+        </div>
+        
+    <div class="campus_slider">
+        <span class="white_overlay"></span>
+        <div class="campus_slider_container">
+            <div class=" jcarousel-skin-tango">
+                <div class="jcarousel-container jcarousel-container-horizontal" style="position: relative; display: block;">
+                    <div class="jcarousel-clip jcarousel-clip-horizontal" style="position: relative;">
+                        <ul class="jcarousel-list jcarousel-list-horizontal" id="mycarousel" style="overflow: hidden; position: relative; top: 0px; margin: 0px; padding: 0px; left: -1480px; width: 2690px;">
+                            <li class="jcarousel-item jcarousel-item-horizontal jcarousel-item-1 jcarousel-item-1-horizontal" style="float: left; list-style: outside none none;" jcarouselindex="1"><a href="http://CUI-isb.edu.pk/default2.aspx" target="_blank"><img width="161" height="93" title="" alt="" src="/content/images/newstyle/campus1.png"></a>islamabad</li>
+                            <li class="jcarousel-item jcarousel-item-horizontal jcarousel-item-2 jcarousel-item-2-horizontal" style="float: left; list-style: outside none none;" jcarouselindex="2"><a href="http://CUI-atd.edu.pk/" target="_blank"><img width="161" height="93" title="" alt="" src="/content/images/newstyle/campus2.png"></a>abbotabad</li>
+                            <li class="jcarousel-item jcarousel-item-horizontal jcarousel-item-3 jcarousel-item-3-horizontal" style="float: left; list-style: outside none none;" jcarouselindex="3"><a href="http://www.CUIlahore.edu.pk/index.aspx" target="_blank"><img width="161" height="93" title="" alt="" src="/content/images/newstyle/campus3.png"></a>lahore</li>
+                            <li class="jcarousel-item jcarousel-item-horizontal jcarousel-item-4 jcarousel-item-4-horizontal" style="float: left; list-style: outside none none;" jcarouselindex="4"><a href="http://www.CUIsahiwal.edu.pk/index.php" target="_blank"><img width="161" height="93" title="" alt="" src="/content/images/newstyle/campus4.png"></a>sahiwal</li>
+                            <li class="jcarousel-item jcarousel-item-horizontal jcarousel-item-5 jcarousel-item-5-horizontal" style="float: left; list-style: outside none none;" jcarouselindex="5"><a href="http://www.CUIwah.edu.pk/home/" target="_blank"><img width="161" height="93" title="" alt="" src="/content/images/newstyle/campus5.png"></a>wah</li>
+                            <li class="jcarousel-item jcarousel-item-horizontal jcarousel-item-6 jcarousel-item-6-horizontal" style="float: left; list-style: outside none none;" jcarouselindex="6"><a href="http://www.CUI-attock.edu.pk/HOME_CUI_Attock.htm" target="_blank"><img width="161" height="93" title="" alt="" src="/content/images/newstyle/campus6.png"></a>attock</li>
+                            <li class="jcarousel-item jcarousel-item-horizontal jcarousel-item-7 jcarousel-item-7-horizontal" style="float: left; list-style: outside none none;" jcarouselindex="7"><a href="http://apply.vcomsats.edu.pk/" target="_blank"><img width="161" height="93" title="" alt="" src="/content/images/newstyle/campus9.png"></a>Virtual Campus</li>
+                            <li class="jcarousel-item jcarousel-item-horizontal jcarousel-item-8 jcarousel-item-8-horizontal" style="float: left; list-style: outside none none;" jcarouselindex="8"><a href="http://vehari.comsats.edu.pk/" target="_blank"><img width="161" height="93" title="" alt="" src="/content/images/newstyle/campus7.jpg"></a>vehari</li>
+                        </ul>
+                    </div>
+                    <div class="jcarousel-prev jcarousel-prev-horizontal" style="display: block;" disabled="false">
+                    </div>
+                    <div class="jcarousel-next jcarousel-next-horizontal" style="display: block;" disabled="false">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </div>
+
+    <footer>
+        <div class="row clearfix footer_bg">
+            <div class="container">
+                <div class="col-md-2 column footer_logo">
+                    <a href="/home/index"><img src="/content/images/LogoBottom.png" title="COMSATS Admission System" /></a>
+                </div>
+
+                <div class="col-md-10 column">
+
+                    <div class="col-md-3 column footer_boxes explore">
+                        <h3>Explore</h3>
+                        
+                        <a href="/Content/images/admission_advertisementFA26.jpeg" target="_blank">Admissions Advertisement</a>
+						<!-- <a href="/Content/images/IRCBM.JPEG" target="_blank">IRCBM Scholarships</a> -->
+                        <a href="https://ww2.comsats.edu.pk/scholarships/" target="_blank">Scholarships</a>
+                        <a href="/Home/FacultiesDepartments">Faculties &amp; Departments</a>
+                        <a href="/Home/GraduatesOutput">Graduates</a>
+                        <a href="http://ww2.comsats.edu.pk/internationalstudents/" target="_blank">International Admissions</a>
+                    </div>
+
+                    <div class="col-md-3 column footer_boxes address">
+                        <h3>Address</h3>
+                        <p>
+                            Park Road, Tarlai Kalan <br />
+                            Islamabad 45550, PAKISTAN.
+                        </p>
+                    </div>
+
+                    
+
+                    <div class="col-md-3 column footer_boxes social">
+                        <h3>Join</h3>
+                        <ul>
+                            <li><a href="https://www.facebook.com/cuiofficial/" target="_blank"><img src="/content/images/newstyle/fb.png" /></a></li>
+                            <li><a href="https://twitter.com/cuiofficial" target="_blank"><img src="/content/images/newstyle/tw.png" /></a></li>
+                            <li><a href="https://www.instagram.com/cuinews" target="_blank"><img src="/content/images/newstyle/insta.png" /></a></li>
+                            <li><a href="https://www.youtube.com/@cuiofficial" target="_blank"><img src="/content/images/newstyle/youtube.png" /></a></li>
+                        </ul>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="copyrights">
+                <div class="copyrights_container">
+                    <span class="copy_span">Copyright &copy; 2022, All Rights Reserved</span>
+                    <span class="dev_by">Developed by <a href="#">Cu-Online</a></span>
+                </div>
+            </div>
+
+        </div>
+    </footer>
+
+    <script src="/bundles/jquery?v=7J-BVZfjOtVmgsij9oGTppovhlfVh535nCbwXaZyt_s1"></script>
+
+    <script src="/bundles/jqueryui?v=zmGjYUgpSsR_O-JS8swLbqBTxZ50vscjN8N9nbJB8ck1"></script>
+
+    <script src="/bundles/knockout?v=JOEBRecOx57xjzOj_eXmIRL3YPU7PAElLqp8GiNK40c1"></script>
+
+    <script src="/bundles/bootstrap?v=UXHfLrRNaVak8HRUD4FuC4OL2YJwDimt8dxjhSg-7ko1"></script>
+
+    <script src="/bundles/utiljs?v=s6xRoc8GVcdOgtbdgeW09r086DqZS6W5mpnW9U0HYyU1"></script>
+
+    
+    <script type="text/javascript" src="/Scripts/Register/mvvm.js"></script>
+    <script type="text/javascript" src="/Scripts/campusSlider/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="/Scripts/Register/loginvm.js"></script>
+    <script src="/bundles/campusSlider?v=Pb0HwIx0j2DKfVs2fcb-YNO0h3GpCi7iYOHhr2KD6ms1"></script>
+
+    
+    
+
+    <script type="text/javascript">
+        $.noConflict();
+
+       // var campusArr = 
+        let programTypesArr = [{"ProgramType":"BS","LstCampuses":[{"CampusID":1,"CampusTitle":"Islamabad","Address":"COMSATS University Islamabad, Park Road, Tarlai Kalan, Islamabad","Phone":"051-9049 5032-5","AdmissionOpenDate":"\/Date(1780167600000)\/","AdmissionCloseDate":"\/Date(1783537140000)\/"},{"CampusID":2,"CampusTitle":"Abbottabad","Address":"COMSATS University Islamabad, Abbottabad Campus University Road, Tobe Camp Postal Code 22060 Abbottabad","Phone":"+92-992-383591-6","AdmissionOpenDate":"\/Date(1780167600000)\/","AdmissionCloseDate":"\/Date(1786042740000)\/"},{"CampusID":3,"CampusTitle":"Lahore","Address":"COMSATS University Islamabad, 1.5 KM Defence Road, Off Raiwind Road, Lahore","Phone":"+92-42-111001007","AdmissionOpenDate":"\/Date(1780167600000)\/","AdmissionCloseDate":"\/Date(1784919540000)\/"},{"CampusID":4,"CampusTitle":"Vehari","Address":"COMSATS University Islamabad, Mailsi Road, Off Multan Road, Vehari","Phone":"+92-67-3362774 ","AdmissionOpenDate":"\/Date(1780167600000)\/","AdmissionCloseDate":"\/Date(1786733940000)\/"},{"CampusID":5,"CampusTitle":"Sahiwal","Address":"COMSATS University Islamabad, COMSATS Road, Off GT Road, Sahiwal","Phone":"+92-40-4305005","AdmissionOpenDate":"\/Date(1780167600000)\/","AdmissionCloseDate":"\/Date(1786733940000)\/"},{"CampusID":6,"CampusTitle":"Attock","Address":"COMSATS University Islamabad, Near Officers colony, Kamra Road Attock","Phone":"+92-57-9316330-1","AdmissionOpenDate":"\/Date(1780167600000)\/","AdmissionCloseDate":"\/Date(1786705140000)\/"},{"CampusID":7,"CampusTitle":"Wah","Address":"COMSATS University Islamabad, Near Barrier no 5, GT Road Wah Cantt, Pakistan","Phone":"+92-51-9314482-4","AdmissionOpenDate":"\/Date(1780167600000)\/","AdmissionCloseDate":"\/Date(1786474740000)\/"}]},{"ProgramType":"MS","LstCampuses":[{"CampusID":1,"CampusTitle":"Islamabad","Address":"COMSATS University Islamabad, Park Road, Tarlai Kalan, Islamabad","Phone":"051-9049 5032-5","AdmissionOpenDate":"\/Date(1780167600000)\/","AdmissionCloseDate":"\/Date(1783537140000)\/"},{"CampusID":2,"CampusTitle":"Abbottabad","Address":"COMSATS University Islamabad, Abbottabad Campus University Road, Tobe Camp Postal Code 22060 Abbottabad","Phone":"+92-992-383591-6","AdmissionOpenDate":"\/Date(1780167600000)\/","AdmissionCloseDate":"\/Date(1786042740000)\/"},{"CampusID":3,"CampusTitle":"Lahore","Address":"COMSATS University Islamabad, 1.5 KM Defence Road, Off Raiwind Road, Lahore","Phone":"+92-42-111001007","AdmissionOpenDate":"\/Date(1780167600000)\/","AdmissionCloseDate":"\/Date(1784919540000)\/"},{"CampusID":4,"CampusTitle":"Vehari","Address":"COMSATS University Islamabad, Mailsi Road, Off Multan Road, Vehari","Phone":"+92-67-3362774 ","AdmissionOpenDate":"\/Date(1780167600000)\/","AdmissionCloseDate":"\/Date(1786733940000)\/"},{"CampusID":5,"CampusTitle":"Sahiwal","Address":"COMSATS University Islamabad, COMSATS Road, Off GT Road, Sahiwal","Phone":"+92-40-4305005","AdmissionOpenDate":"\/Date(1780167600000)\/","AdmissionCloseDate":"\/Date(1786733940000)\/"},{"CampusID":6,"CampusTitle":"Attock","Address":"COMSATS University Islamabad, Near Officers colony, Kamra Road Attock","Phone":"+92-57-9316330-1","AdmissionOpenDate":"\/Date(1780167600000)\/","AdmissionCloseDate":"\/Date(1786705140000)\/"},{"CampusID":7,"CampusTitle":"Wah","Address":"COMSATS University Islamabad, Near Barrier no 5, GT Road Wah Cantt, Pakistan","Phone":"+92-51-9314482-4","AdmissionOpenDate":"\/Date(1780167600000)\/","AdmissionCloseDate":"\/Date(1786474740000)\/"}]},{"ProgramType":"PHD","LstCampuses":[{"CampusID":1,"CampusTitle":"Islamabad","Address":"COMSATS University Islamabad, Park Road, Tarlai Kalan, Islamabad","Phone":"051-9049 5032-5","AdmissionOpenDate":"\/Date(1780167600000)\/","AdmissionCloseDate":"\/Date(1783537140000)\/"},{"CampusID":2,"CampusTitle":"Abbottabad","Address":"COMSATS University Islamabad, Abbottabad Campus University Road, Tobe Camp Postal Code 22060 Abbottabad","Phone":"+92-992-383591-6","AdmissionOpenDate":"\/Date(1780167600000)\/","AdmissionCloseDate":"\/Date(1786042740000)\/"},{"CampusID":3,"CampusTitle":"Lahore","Address":"COMSATS University Islamabad, 1.5 KM Defence Road, Off Raiwind Road, Lahore","Phone":"+92-42-111001007","AdmissionOpenDate":"\/Date(1780167600000)\/","AdmissionCloseDate":"\/Date(1784919540000)\/"},{"CampusID":4,"CampusTitle":"Vehari","Address":"COMSATS University Islamabad, Mailsi Road, Off Multan Road, Vehari","Phone":"+92-67-3362774 ","AdmissionOpenDate":"\/Date(1780167600000)\/","AdmissionCloseDate":"\/Date(1786733940000)\/"},{"CampusID":5,"CampusTitle":"Sahiwal","Address":"COMSATS University Islamabad, COMSATS Road, Off GT Road, Sahiwal","Phone":"+92-40-4305005","AdmissionOpenDate":"\/Date(1780167600000)\/","AdmissionCloseDate":"\/Date(1786733940000)\/"},{"CampusID":6,"CampusTitle":"Attock","Address":"COMSATS University Islamabad, Near Officers colony, Kamra Road Attock","Phone":"+92-57-9316330-1","AdmissionOpenDate":"\/Date(1780167600000)\/","AdmissionCloseDate":"\/Date(1786705140000)\/"},{"CampusID":7,"CampusTitle":"Wah","Address":"COMSATS University Islamabad, Near Barrier no 5, GT Road Wah Cantt, Pakistan","Phone":"+92-51-9314482-4","AdmissionOpenDate":"\/Date(1780167600000)\/","AdmissionCloseDate":"\/Date(1786474740000)\/"}]}];
+        InitLoginVM();
+        InitVM();
+
+        function callMe() {
+            $(".jcarousel-next").trigger('click');
+        }
+
+        jQuery(document).ready(function () {
+            $("#myModal2").modal('show');
+            //$(".modal").show();
+            //$("button[data-dismiss=modal]").click(function () {
+            //    $("#myModal2").modal('hide');
+            //});
+            //alert("ABC");
+            nIntervId = setInterval('callMe()', 3000);
+
+            if (!document.cookie) {
+                setCookie("bgcookie", "bg1", 1);
+                jQuery('#random_classes').addClass(getCookie("bgcookie"));
+                setCookie("bgcookie", "bg2", 1);
+            }
+
+            else if (getCookie("bgcookie") == 'bg1') {
+                jQuery('#random_classes').addClass(getCookie("bgcookie"));
+                setCookie("bgcookie", "bg2", 1);
+            }
+
+            else if (getCookie("bgcookie") == 'bg2') {
+                jQuery('#random_classes').addClass(getCookie("bgcookie"));
+                setCookie("bgcookie", "bg1", 1);
+            }
+            else {
+
+                jQuery('#random_classes').addClass("bg1");
+                setCookie("bgcookie", "bg1", 1);
+            }
+        });
+
+    </script>
+
+ 	<!--<script type="module">
+  import Chatbot from "https://cdn.jsdelivr.net/npm/flowise-embed/dist/web.js"
+  Chatbot.init({
+    // chatflowid: "51c85cad-2785-4229-9488-54f1d5df74df",
+    chatflowid: "58ceb470-3d6c-45c8-b96d-ce0f8017b060",
+    //apiHost: "http://203.124.40.68",
+	apiHost: "https://aibot.comsats.edu.pk",
+    theme: {
+      button: {
+                backgroundColor: '#572c81',
+                // right: 20,
+                // bottom: 20,
+                // size: 48,
+                // dragAndDrop: true,
+                // iconColor: 'white',
+                // customIconSrc: 'https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/google-messages.svg',
+                autoWindowOpen: {
+                    autoOpen: true,
+                    openDelay: 2,
+                    autoOpenOnMobile: false
+                }
+            },
+            tooltip: {
+                showTooltip: true,
+                tooltipMessage: 'Hi There 👋!',
+                tooltipBackgroundColor: '#572c81',
+                tooltipTextColor: 'white',
+                tooltipFontSize: 16
+            },
+            // disclaimer: {
+            //     title: 'Disclaimer',
+            //     message: "By using this chatbot, you agree to the <a target=\"_blank\" href=\"https://flowiseai.com/terms\">Terms & Condition</a>",
+            //     textColor: 'black',
+            //     buttonColor: '#3b82f6',
+            //     buttonText: 'Start Chatting',
+            //     buttonTextColor: 'white',
+            //     blurredBackgroundColor: 'rgba(0, 0, 0, 0.4)',
+            //     backgroundColor: 'white'
+            // },
+            chatWindow: {
+                showTitle: true,
+                showAgentMessages: true,
+                title: 'CUI ChatBot (BETA)',
+                titleAvatarSrc: 'https://comsats.edu.pk/assets/img/COMSATS-logo.png',
+                //welcomeMessage: 'Hello! Welcome to CUI Bot',
+				welcomeMessage: 'Hello! welcome to the admission query assistant',
+                errorMessage: 'Server is busy. Please try later!',
+                backgroundColor: '#ffffff',
+                // backgroundImage: 'enter image path or link',
+                // height: 700,
+                // width: 400,
+                fontSize: 16,
+                starterPrompts: [
+                    //"Help me Admission?",
+                   // "Fee Structure of CUI Islamabad?",
+                    //"Fee Structure of UnderGraduate CUI Islamabad?"
+					"What other disciplines can pre-medical students apply to?",
+					"Does CUI have a merit calculator?",
+					"How will I be informed of objections?"
+                ],
+                starterPromptFontSize: 15,
+                clearChatOnReload: false,
+                sourceDocsTitle: 'Sources:',
+                renderHTML: true,
+                botMessage: {
+                    backgroundColor: '#f7f8ff',
+                    textColor: '#303235',
+                    showAvatar: true,
+                    avatarSrc: 'https://comsats.edu.pk/assets/img/COMSATS-logo.png'
+                },
+                userMessage: {
+                    backgroundColor: '#3B81F6',
+                    textColor: '#ffffff',
+                    showAvatar: true,
+                    avatarSrc: 'https://raw.githubusercontent.com/zahidkhawaja/langchain-chat-nextjs/main/public/usericon.png'
+                },
+                textInput: {
+                    placeholder: 'Type your queries...',
+                    backgroundColor: '#ffffff',
+                    textColor: '#303235',
+                    sendButtonColor: '#3B81F6',
+                    maxChars: 500,
+                    maxCharsWarningMessage: 'You exceeded the characters limit. Please input less than 50 characters.',
+                    autoFocus: true,
+                    sendMessageSound: true,
+                    // sendSoundLocation: 'send_message.mp3',
+                    receiveMessageSound: true,
+                    // receiveSoundLocation: 'receive_message.mp3'
+                },
+                dateTimeToggle: {
+                    date: true,
+                    time: true
+                },
+                footer: {
+                    textColor: '#303235',
+                    text: 'Powered by',
+                    company: 'CUI, CUOnline',
+                    companyLink: 'https://comsats.edu.pk/'
+                }
+            }
+        }
+  })
+</script>-->
+<script async type='module' src='https://interfaces.zapier.com/assets/web-components/zapier-interfaces/zapier-interfaces.esm.js'></script>
+<zapier-interfaces-chatbot-embed is-popup='true' chatbot-id='cmbc3k77l003i5x0n75drt7jb'></zapier-interfaces-chatbot-embed>
+
+
+</body>
+</html>
