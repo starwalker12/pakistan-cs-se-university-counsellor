@@ -2,24 +2,35 @@
 
 ## 1. Irrelevant question blocking (frontend)
 
+Broad phrases like "how to", "tell me about", "what should I" are not enough by themselves — the question must contain an admission keyword, university name, or greeting.
+
 | Test | Expected | Result |
 |------|----------|--------|
 | Type "teach me c++" | Blocked message appears | |
-| Type "Who is Elon Musk?" | Blocked message appears | |
+| Type "teach me python" | Blocked message appears | |
+| Type "How to cook biryani?" | Blocked message appears | |
+| Type "Tell me about Elon Musk" | Blocked message appears | |
+| Type "What should I wear today?" | Blocked message appears | |
 | Type "What is the weather today?" | Blocked message appears | |
 | Type "Tell me a joke" | Blocked message appears | |
-| Type "How to cook biryani?" | Blocked message appears | |
 | Type "Write a love poem" | Blocked message appears | |
-| Type "teach me python" | Blocked message appears | |
+| Type "Explain loops" | Blocked message appears | |
+| Type "What is OOP?" | Blocked message appears | |
+| Type "Who is Elon Musk?" | Blocked message appears | |
 
 **Exact blocked message:**
 > I can only help with Computer Science and Software Engineering university admissions in Pakistan. Please ask about universities, eligibility, fees, merit, deadlines, entry tests, or admission steps.
 
 ## 2. Valid admission questions (frontend → backend)
 
+"how to apply" is allowed (contains "apply"). "tell me about FAST" is allowed (contains "fast" — university name).
+
 | Test | Expected | Result |
 |------|----------|--------|
+| Type "How to apply?" | Counselling response | |
 | Type "How can I get admission?" | Counselling response | |
+| Type "Tell me about FAST" | Info about FAST | |
+| Type "Tell me about NUST CS" | Info about NUST CS | |
 | Type "Which CS universities are best for me?" | Recommendation cards | |
 | Type "Am I eligible for FAST?" | Eligibility info | |
 | Type "What are NUST CS fees?" | Fee info for NUST | |

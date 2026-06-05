@@ -299,16 +299,21 @@ def greeting_answer(profile: Profile) -> str:
 BLOCKED_REPLY = "I can only help with Computer Science and Software Engineering university admissions in Pakistan. Please ask about universities, eligibility, fees, merit, deadlines, entry tests, or admission steps."
 
 ADMISSION_KEYWORDS = [
-    "admission", "university", "universities", "eligibility", "eligible",
+    "admission", "admissions", "university", "universities", "eligibility", "eligible",
     "fee", "fees", "merit", "deadline", "scholarship", "hostel", "campus",
     "entry test", "nts", "nat", "ecat", "net", "admission test",
-    "cs", "se", "computer science", "software engineering",
-    "apply", "recommend", "suggest", "option",
-    "how to", "tell me about", "what should i",
+    "computer science", "software engineering", "cs", "se",
+    "apply", "application", "recommend", "suggest",
     "lahore", "islamabad", "karachi", "pakistan",
     "program", "degree", "bs", "bachelor",
     "matric", "intermediate", "a level", "o level",
     "percentage", "marks", "score",
+]
+
+BLOCKED_TOPICS = [
+    "cook", "recipe", "weather", "elon musk", "joke", "poem",
+    "love poem", "teach me", "programming", "coding", "python",
+    "c++", "javascript", "oop", "loop", "variables", "calculator",
 ]
 
 UNIVERSITY_NAME_ALIASES = [
@@ -333,6 +338,9 @@ def is_admission_related(text: str) -> bool:
     for alias in UNIVERSITY_NAME_ALIASES:
         if alias in lower:
             return True
+    for topic in BLOCKED_TOPICS:
+        if topic in lower:
+            return False
     return False
 
 def model_dict(model: BaseModel) -> dict:

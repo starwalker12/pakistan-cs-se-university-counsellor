@@ -176,16 +176,21 @@ const INFO_PHRASES = {
 const INFO_KEYS = Object.keys(INFO_PHRASES);
 
 const ADMISSION_KEYWORDS = [
-  'admission', 'university', 'universities', 'eligibility', 'eligible',
+  'admission', 'admissions', 'university', 'universities', 'eligibility', 'eligible',
   'fee', 'fees', 'merit', 'deadline', 'scholarship', 'hostel', 'campus',
   'entry test', 'nts', 'nat', 'ecat', 'net', 'admission test',
-  'cs', 'se', 'computer science', 'software engineering',
-  'apply', 'recommend', 'suggest',
-  'how to', 'tell me about', 'what should i',
+  'computer science', 'software engineering', 'cs', 'se',
+  'apply', 'application', 'recommend', 'suggest',
   'lahore', 'islamabad', 'karachi', 'pakistan',
   'program', 'degree', 'bs', 'bachelor',
   'matric', 'intermediate', 'a level', 'o level',
   'percentage', 'marks', 'score',
+];
+
+const BLOCKED_TOPICS = [
+  'cook', 'recipe', 'weather', 'elon musk', 'joke', 'poem',
+  'love poem', 'teach me', 'programming', 'coding', 'python',
+  'c++', 'javascript', 'oop', 'loop', 'variables', 'calculator',
 ];
 
 function isAdmissionRelated(question) {
@@ -194,8 +199,7 @@ function isAdmissionRelated(question) {
   if (GREETINGS.has(cleaned)) return true;
   if (UNI_NAMES.some(name => lower.includes(name))) return true;
   if (ADMISSION_KEYWORDS.some(kw => lower.includes(kw))) return true;
-  if (FOLLOW_UP_PHRASES.some(phrase => lower.includes(phrase))) return true;
-  if (REC_PHRASES.some(phrase => lower.includes(phrase))) return true;
+  if (BLOCKED_TOPICS.some(topic => lower.includes(topic))) return false;
   return false;
 }
 
