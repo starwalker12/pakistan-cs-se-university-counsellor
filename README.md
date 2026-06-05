@@ -451,9 +451,22 @@ curl -X POST http://localhost:8000/counsel \
 | LLM | Ollama (primary) / LM Studio (optional) / rule-based fallback |
 | Embeddings | sentence-transformers (all-MiniLM-L6-v2) |
 | Vector DB | Chroma (local) |
-| Scraping | httpx, BeautifulSoup, pdfplumber |
+| Scraping | Playwright, httpx, BeautifulSoup, pdfplumber |
 
 ---
+
+## Vector Database
+
+- **Engine**: Chroma (local vector database)
+- **Storage path**: `backend/chroma_db/`
+- **Collection name**: `pakistan_university_admissions`
+- **Embedding model**: `sentence-transformers/all-MiniLM-L6-v2`
+- **Rebuild command**: `python backend/build_vector_db.py`
+- **Documents**: Chunks of admission data (eligibility, fee, entry test, merit, deadline) per university
+
+---
+
+## Project Summary
 
 ## Project Summary
 

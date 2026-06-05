@@ -296,6 +296,45 @@ def greeting_answer(profile: Profile) -> str:
     name = profile.name or "there"
     return f"Hi {name}, I am ready. Ask me which universities are best for you, or ask about eligibility, fees, or admission steps."
 
+BLOCKED_REPLY = "I can only help with Computer Science and Software Engineering university admissions in Pakistan. Please ask about universities, eligibility, fees, merit, deadlines, entry tests, or admission steps."
+
+ADMISSION_KEYWORDS = [
+    "admission", "university", "universities", "eligibility", "eligible",
+    "fee", "fees", "merit", "deadline", "scholarship", "hostel", "campus",
+    "entry test", "nts", "nat", "ecat", "net", "admission test",
+    "cs", "se", "computer science", "software engineering",
+    "apply", "recommend", "suggest", "option",
+    "how to", "tell me about", "what should i",
+    "lahore", "islamabad", "karachi", "pakistan",
+    "program", "degree", "bs", "bachelor",
+    "matric", "intermediate", "a level", "o level",
+    "percentage", "marks", "score",
+]
+
+UNIVERSITY_NAME_ALIASES = [
+    "fast", "nuces", "nust", "comsats", "lums", "giki",
+    "pieas", "uet", "itu", "air university", "bahria",
+    "punjab university", "qau", "ned", "karachi university",
+    "university of karachi", "ucp", "virtual university",
+    "szabist", "iba", "ist", "habib", "pims", "lse", "nca",
+    "beaconhouse",
+]
+
+def is_admission_related(text: str) -> bool:
+    if not text:
+        return False
+    lower = text.strip().lower()
+    cleaned = lower.rstrip(".!?, ")
+    if cleaned in GREETING_WORDS:
+        return True
+    for keyword in ADMISSION_KEYWORDS:
+        if keyword in lower:
+            return True
+    for alias in UNIVERSITY_NAME_ALIASES:
+        if alias in lower:
+            return True
+    return False
+
 def model_dict(model: BaseModel) -> dict:
     if hasattr(model, "model_dump"):
         return model.model_dump()
@@ -1503,6 +1542,25 @@ async def generate_ai_summary(profile: Profile, question: str, selected_id: str,
 @app.post("/recommend")
 async def recommend(request: CounselRequest):
     total_start = time.perf_counter()
+    if not is_admission_related(request.question):
+        return RecommendResponse(
+            answer=BLOCKED_REPLY,
+            recommended_universities=[],
+            safe_options=[],
+            difficult_options=[],
+            not_eligible_options=[],
+            next_steps=[],
+            admission_links=[],
+            sources=[],
+            retrieved_count=0,
+            provider_used="fallback",
+            selected_model="rule-based guidance",
+            selected_university="",
+            checked_universities_count=0,
+            eligible_universities_count=0,
+            not_eligible_count=0,
+            timing=TimingInfo(total_seconds=0.0, cached=False),
+        )
     selected_id = resolve_selected_id(request.selected_university)
     cache_key = recommend_cache_key(request.profile, request.question, selected_id)
     cached_response = cache_get(RECOMMEND_CACHE, cache_key, RecommendResponse)
@@ -1530,6 +1588,13 @@ async def recommend(request: CounselRequest):
 @app.post("/ai-summary")
 async def ai_summary(request: AISummaryRequest):
     total_start = time.perf_counter()
+    if not is_admission_related(request.question):
+        return AISummaryResponse(
+            answer=BLOCKED_REPLY,
+            provider_used="fallback",
+            selected_model="rule-based guidance",
+            timing=TimingInfo(total_seconds=round(time.perf_counter() - total_start, 3), cached=False),
+        )
     selected_id = resolve_selected_id(request.selected_university)
     cache_key = ai_summary_cache_key(request, selected_id)
     cached_response = cache_get(AI_SUMMARY_CACHE, cache_key, AISummaryResponse)
@@ -1597,6 +1662,14 @@ async def counsel(request: CounselRequest):
         total_seconds = time.perf_counter() - total_start
         return CounselResponse(
             answer=greeting_answer(request.profile),
+            provider_used="fallback",
+            selected_model="rule-based guidance",
+            timing=TimingInfo(total_seconds=round(total_seconds, 3), cached=False),
+        )
+    if not is_admission_related(request.question):
+        total_seconds = time.perf_counter() - total_start
+        return CounselResponse(
+            answer=BLOCKED_REPLY,
             provider_used="fallback",
             selected_model="rule-based guidance",
             timing=TimingInfo(total_seconds=round(total_seconds, 3), cached=False),
@@ -1999,6 +2072,9 @@ async def data_status():
 async def university_info(request: UniversityInfoRequest):
     question = request.question
     profile = request.profile
+
+    if not is_admission_related(question):
+        return UniversityInfoResponse(answer=BLOCKED_REPLY)
 
     uni_id = request.university_id or detect_university_in_question(question)
     if not uni_id:

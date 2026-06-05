@@ -140,6 +140,8 @@ const GREETINGS = new Set([
   'yes', 'no', 'thx',
 ]);
 
+const BLOCKED_MESSAGE = 'I can only help with Computer Science and Software Engineering university admissions in Pakistan. Please ask about universities, eligibility, fees, merit, deadlines, entry tests, or admission steps.';
+
 const REC_PHRASES = [
   'best for me', 'recommend', 'best match', 'safe option',
   'universities in', 'cs in', 'se in', 'options for me',
@@ -172,6 +174,30 @@ const INFO_PHRASES = {
 };
 
 const INFO_KEYS = Object.keys(INFO_PHRASES);
+
+const ADMISSION_KEYWORDS = [
+  'admission', 'university', 'universities', 'eligibility', 'eligible',
+  'fee', 'fees', 'merit', 'deadline', 'scholarship', 'hostel', 'campus',
+  'entry test', 'nts', 'nat', 'ecat', 'net', 'admission test',
+  'cs', 'se', 'computer science', 'software engineering',
+  'apply', 'recommend', 'suggest',
+  'how to', 'tell me about', 'what should i',
+  'lahore', 'islamabad', 'karachi', 'pakistan',
+  'program', 'degree', 'bs', 'bachelor',
+  'matric', 'intermediate', 'a level', 'o level',
+  'percentage', 'marks', 'score',
+];
+
+function isAdmissionRelated(question) {
+  const lower = question.toLowerCase().trim();
+  const cleaned = lower.replace(/[.!?,]+$/, '').trim();
+  if (GREETINGS.has(cleaned)) return true;
+  if (UNI_NAMES.some(name => lower.includes(name))) return true;
+  if (ADMISSION_KEYWORDS.some(kw => lower.includes(kw))) return true;
+  if (FOLLOW_UP_PHRASES.some(phrase => lower.includes(phrase))) return true;
+  if (REC_PHRASES.some(phrase => lower.includes(phrase))) return true;
+  return false;
+}
 
 function detectIntent(question) {
   if (!question) return 'unknown';
@@ -946,6 +972,12 @@ async function handleSend(questionOverride = '') {
 
   userInput.value = '';
   addUserMessage(question);
+
+  if (!isAdmissionRelated(question)) {
+    addSystemMessage(BLOCKED_MESSAGE, 'error');
+    setBusy(false);
+    return;
+  }
 
   const intent = detectIntent(question);
   if (intent === 'greeting') {

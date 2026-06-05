@@ -6,3 +6,4 @@ chromadb>=0.5.5
 beautifulsoup4==4.12.3
 pdfplumber==0.11.0
 pydantic==2.9.2
+playwright>=1.48.0
