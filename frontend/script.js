@@ -140,14 +140,14 @@ const GREETINGS = new Set([
   'yes', 'no', 'thx',
 ]);
 
-const BLOCKED_MESSAGE = 'I can only help with Computer Science and Software Engineering university admissions in Pakistan. Please ask about universities, eligibility, fees, merit, deadlines, entry tests, or admission steps.';
-
 const REC_PHRASES = [
   'best for me', 'recommend', 'best match', 'safe option',
   'universities in', 'cs in', 'se in', 'options for me',
-  'show me option', 'which universit',
+  'show me option', 'which universit', 'best matches',
+  'show safe', 'show safe options', 'safe options',
+  'difficult options', 'backup options', 'not eligible',
   'suitable for me', 'good for me', 'suggest',
-  'apply to',
+  'apply to', 'shortlist',
 ];
 
 const UNI_NAMES = [
@@ -162,7 +162,9 @@ const FOLLOW_UP_PHRASES = [
   'tell me about', 'tell me more', 'check eligibility',
   'fees for', 'admission requirement', 'admission link',
   'what should i do next', 'how to apply', 'entry test',
-  'deadline', 'requirements for', 'compare',
+  'deadline', 'requirements for', 'compare', 'compare options',
+  'best matches', 'safe options', 'show safe options',
+  'what next', 'next step', 'next steps',
 ];
 
 const INFO_PHRASES = {
@@ -175,32 +177,12 @@ const INFO_PHRASES = {
 
 const INFO_KEYS = Object.keys(INFO_PHRASES);
 
-const ADMISSION_KEYWORDS = [
-  'admission', 'admissions', 'university', 'universities', 'eligibility', 'eligible',
-  'fee', 'fees', 'merit', 'deadline', 'scholarship', 'hostel', 'campus',
-  'entry test', 'nts', 'nat', 'ecat', 'net', 'admission test',
-  'computer science', 'software engineering', 'cs', 'se',
-  'apply', 'application', 'recommend', 'suggest',
-  'lahore', 'islamabad', 'karachi', 'pakistan',
-  'program', 'degree', 'bs', 'bachelor',
-  'matric', 'intermediate', 'a level', 'o level',
-  'percentage', 'marks', 'score',
-];
-
-const BLOCKED_TOPICS = [
-  'cook', 'recipe', 'weather', 'elon musk', 'joke', 'poem',
-  'love poem', 'teach me', 'programming', 'coding', 'python',
-  'c++', 'javascript', 'oop', 'loop', 'variables', 'calculator',
-];
-
-function isAdmissionRelated(question) {
+function isContextualFollowUp(question) {
   const lower = question.toLowerCase().trim();
   const cleaned = lower.replace(/[.!?,]+$/, '').trim();
-  if (GREETINGS.has(cleaned)) return true;
-  if (UNI_NAMES.some(name => lower.includes(name))) return true;
-  if (ADMISSION_KEYWORDS.some(kw => lower.includes(kw))) return true;
-  if (BLOCKED_TOPICS.some(topic => lower.includes(topic))) return false;
-  return false;
+  if (FOLLOW_UP_PHRASES.some((phrase) => lower.includes(phrase))) return true;
+  if (REC_PHRASES.some((phrase) => lower.includes(phrase))) return true;
+  return ['tell me more', 'best matches', 'safe options', 'compare options', 'what next'].includes(cleaned);
 }
 
 function detectIntent(question) {
@@ -211,6 +193,7 @@ function detectIntent(question) {
   const hasUni = UNI_NAMES.some((name) => lower.includes(name));
   const isFollowUp = FOLLOW_UP_PHRASES.some((phrase) => lower.includes(phrase));
   const isRec = REC_PHRASES.some((phrase) => lower.includes(phrase));
+  if ((lastRecommendationData || selectedUniversity) && isContextualFollowUp(question)) return 'follow_up';
   if (isRec) return 'recommendation';
   if (isFollowUp && hasUni) return 'university_info';
   if (isFollowUp) return 'follow_up';
@@ -221,7 +204,6 @@ function detectIntent(question) {
     if (hasInfo) return 'university_info';
     return 'university_specific';
   }
-  if (cleaned.length < 10) return 'greeting';
   return 'follow_up';
 }
 
@@ -682,6 +664,17 @@ function renderSources(sources = []) {
   return details;
 }
 
+function hasStructuredRecommendations(data = {}) {
+  return Boolean(
+    (data.recommended_universities || []).length ||
+    (data.safe_options || []).length ||
+    (data.difficult_options || []).length ||
+    (data.not_eligible_options || []).length ||
+    (data.next_steps || []).length ||
+    (data.sources || []).length
+  );
+}
+
 function activeSelectedUniversityId() {
   return selectedUniversity ? selectedUniversity.university_id : '';
 }
@@ -691,6 +684,7 @@ function requestPayload(question, selectedId = activeSelectedUniversityId()) {
     profile: studentProfile,
     question,
     selected_university: selectedId || '',
+    recent_context: Boolean(lastRecommendationData || selectedUniversity),
   };
 }
 
@@ -863,6 +857,7 @@ async function requestAISummary(question, recommendData, summaryHandle, selected
         profile: studentProfile,
         question,
         selected_university: selectedId || null,
+        recent_context: true,
         recommended_universities: recommendData.recommended_universities || [],
         safe_options: recommendData.safe_options || [],
         difficult_options: recommendData.difficult_options || [],
@@ -904,6 +899,7 @@ async function requestAISummaryOnly(question, recommendData, selectedId) {
         profile: studentProfile,
         question,
         selected_university: selectedId || null,
+        recent_context: true,
         recommended_universities: recommendData.recommended_universities || [],
         safe_options: recommendData.safe_options || [],
         difficult_options: recommendData.difficult_options || [],
@@ -944,15 +940,17 @@ function addInfoTurn(data) {
   block.appendChild(msg);
   const linkRow = renderInfoLinks(data.links || []);
   if (linkRow) block.appendChild(linkRow);
-  const sourceLine = document.createElement('p');
-  sourceLine.className = 'data-source-line';
-  const label = dataSourceLabel(data);
-  if (data.source_url_used) {
-    sourceLine.innerHTML = `Source used: <strong>${escapeHtml(label)}</strong> &middot; <a href="${escapeHtml(data.source_url_used)}" target="_blank" rel="noopener noreferrer">Open source</a>`;
-  } else {
-    sourceLine.innerHTML = `Source used: <strong>${escapeHtml(label)}</strong>`;
+  if (data.data_source !== 'relevance') {
+    const sourceLine = document.createElement('p');
+    sourceLine.className = 'data-source-line';
+    const label = dataSourceLabel(data);
+    if (data.source_url_used) {
+      sourceLine.innerHTML = `Source used: <strong>${escapeHtml(label)}</strong> &middot; <a href="${escapeHtml(data.source_url_used)}" target="_blank" rel="noopener noreferrer">Open source</a>`;
+    } else {
+      sourceLine.innerHTML = `Source used: <strong>${escapeHtml(label)}</strong>`;
+    }
+    block.appendChild(sourceLine);
   }
-  block.appendChild(sourceLine);
   chatBox.appendChild(block);
   scrollToElement(block);
 }
@@ -977,12 +975,6 @@ async function handleSend(questionOverride = '') {
   userInput.value = '';
   addUserMessage(question);
 
-  if (!isAdmissionRelated(question)) {
-    addSystemMessage(BLOCKED_MESSAGE, 'error');
-    setBusy(false);
-    return;
-  }
-
   const intent = detectIntent(question);
   if (intent === 'greeting') {
     addGreetingReply(studentProfile.name);
@@ -1001,6 +993,8 @@ async function handleSend(questionOverride = '') {
         body: JSON.stringify({
           profile: studentProfile,
           question,
+          university_id: activeSelectedUniversityId(),
+          recent_context: Boolean(lastRecommendationData || selectedUniversity),
         }),
       });
       hideTyping();
@@ -1031,6 +1025,12 @@ async function handleSend(questionOverride = '') {
       if (!response.ok) throw new Error(`Backend returned HTTP ${response.status}`);
       const data = await response.json();
       backendOnline = true;
+      if (data.answer && !hasStructuredRecommendations(data)) {
+        setBackendStatus('online', 'Backend connected', 'Question checked before counselling.');
+        addSummaryOnlyMessage(data);
+        setBusy(false);
+        return;
+      }
       lastRecommendationData = data;
       setBackendStatus('online', 'Backend connected', 'Data recommendations are ready. Writing a short AI summary.');
       const summaryHandle = addRecommendationTurn(data);
@@ -1078,6 +1078,12 @@ async function handleSend(questionOverride = '') {
       if (!response.ok) throw new Error(`Backend returned HTTP ${response.status}`);
       const data = await response.json();
       backendOnline = true;
+      if (data.answer && !hasStructuredRecommendations(data)) {
+        setBackendStatus('online', 'Backend connected', 'Question checked before counselling.');
+        addSummaryOnlyMessage(data);
+        setBusy(false);
+        return;
+      }
       lastRecommendationData = data;
       const summaryHandle = addRecommendationTurn(data);
       setBusy(false);
@@ -1148,8 +1154,12 @@ chatForm.addEventListener('submit', (event) => {
 
 document.querySelectorAll('.sample-btn').forEach((button) => {
   button.addEventListener('click', () => {
-    userInput.value = button.dataset.q || '';
+    const question = button.dataset.q || '';
+    userInput.value = question;
     userInput.focus();
+    if (studentProfile && !isBusy) {
+      handleSend(question);
+    }
   });
 });
 

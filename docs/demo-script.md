@@ -20,6 +20,8 @@
 >
 > The backend uses Chroma (a local vector database) for storing and searching university data, and Ollama (running locally) as the AI engine."
 
+> "Before answering, the backend also checks whether the question is actually about CS/SE admissions in Pakistan. Valid follow-ups like safe options or next steps are allowed, while unrelated questions are refused before RAG or AI answer generation."
+
 ## 5. Sample Profile
 
 Use this profile during the demo:
@@ -39,8 +41,9 @@ Use this profile during the demo:
 Ask these questions one at a time during the demo:
 
 **Question 1:** *"Which universities are best for me?"*
-- The AI will show a Short Summary, then Best Match, Safe Options, and Difficult Options.
-- Point out how the answer mentions specific universities with reasons.
+- Recommendation cards appear first from structured RAG/scoring.
+- The short local AI summary appears separately after the cards.
+- Point out Best Match, Safe Options, Difficult Options, official links, and sources.
 
 **Question 2:** *"Which universities offer CS in Lahore?"*
 - Shows universities filtered by city — FAST, LUMS, ITU, Punjab University.
@@ -50,15 +53,23 @@ Ask these questions one at a time during the demo:
 - The AI checks the profile against FAST's requirements.
 - Point out how the answer includes next steps like "prepare for the entry test".
 
+**Follow-up:** *"What are safe options for me?"*
+- This must be allowed because the student has profile/recommendation context.
+- Point out that DigiCounsellor behaves like a counselling flow, not a one-shot answer box.
+
+**Off-topic check:** *"teach me c++"*
+- The backend refuses politely before RAG and before AI answer generation.
+
 ## 7. Key Features to Point Out
 
 | When | What to show |
 |---|---|
 | After saving profile | The status dot turns green and chat input enables |
-| While waiting | The "Thinking..." typing indicator |
-| When answer appears | Sources shown as green cards below the answer |
-| In chat header | Provider badge shows "ollama" or "lm_studio" |
-| In sidebar | The RAG explanation and disclaimer box |
+| While waiting | Rotating status lines show data search, profile check, ranking, and short AI summary |
+| When cards appear | Recommendations show before the AI summary, so the demo does not feel stuck |
+| In chat header | Provider badge shows "Local AI connected" when Ollama responds |
+| Follow-up buttons | Selecting a university keeps the conversation focused on that university |
+| Relevance check | Admission follow-ups pass; unrelated questions get a scoped refusal |
 
 ## 8. Closing Line (30 seconds)
 

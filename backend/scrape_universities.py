@@ -12,9 +12,9 @@ Usage:
   python backend/scrape_universities.py
 """
 
+import asyncio
 import json
 import os
-import time
 import traceback
 from datetime import datetime
 
@@ -34,6 +34,14 @@ SCRAPING_LOG_PATH = os.path.join(PROCESSED_DIR, "scraping_log.json")
 
 # Delay between page loads (seconds)
 REQUEST_DELAY = 2.0
+DISALLOWED_URL_MARKERS = (
+    "login",
+    "signin",
+    "sign-in",
+    "captcha",
+    "account",
+    "auth",
+)
 
 
 def load_json(path):
@@ -59,6 +67,12 @@ def save_raw_file(university_id, category, content, ext=".txt"):
     with open(path, "w", encoding="utf-8") as f:
         f.write(content)
     return path
+
+
+def should_skip_url(url):
+    """Avoid private, login, captcha, or account pages."""
+    lower = url.lower()
+    return any(marker in lower for marker in DISALLOWED_URL_MARKERS)
 
 
 def build_admission_record(uni_meta, categories_text, university_id, source_urls):
@@ -155,6 +169,10 @@ async def run_scraper():
                 if not url or "TODO" in url:
                     print(f"  [SKIP] {category}: no valid URL")
                     continue
+                if should_skip_url(url):
+                    print(f"  [SKIP] {category}: login/captcha/private URL")
+                    categories_text[category] = "Needs official verification"
+                    continue
 
                 # Skip categories that point to the same general homepage
                 # to avoid duplicate content
@@ -162,15 +180,15 @@ async def run_scraper():
                 scraping_log["summary"]["pages_attempted"] += 1
                 fetched_urls.append(url)
 
-                time.sleep(REQUEST_DELAY)
+                await asyncio.sleep(REQUEST_DELAY)
 
+                page = None
                 try:
                     page = await context.new_page()
                     await page.goto(url, wait_until="domcontentloaded", timeout=30000)
                     # Wait a bit for JS to render
                     await page.wait_for_timeout(3000)
                     html = await page.content()
-                    await page.close()
 
                     # Save raw HTML
                     save_raw_file(uid, category, html, ext=".html")
@@ -189,6 +207,9 @@ async def run_scraper():
                     pages_fail += 1
                     categories_text[category] = "Needs official verification"
                     continue
+                finally:
+                    if page and not page.is_closed():
+                        await page.close()
 
             # Build structured record
             record = build_admission_record(
@@ -241,6 +262,4 @@ async def run_scraper():
 
 
 if __name__ == "__main__":
-    import asyncio
-
     asyncio.run(run_scraper())

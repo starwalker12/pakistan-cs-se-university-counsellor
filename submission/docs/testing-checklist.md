@@ -1,8 +1,8 @@
 # DigiCounsellor — Testing Checklist
 
-## 1. Irrelevant question blocking (frontend)
+## 1. AI relevance routing
 
-Broad phrases like "how to", "tell me about", "what should I" are not enough by themselves — the question must contain an admission keyword, university name, or greeting.
+The backend checks relevance before RAG search or answer generation. The frontend no longer blocks questions with a keyword wall, so valid follow-ups like "safe options" can use the saved profile and recent recommendation context.
 
 | Test | Expected | Result |
 |------|----------|--------|
@@ -21,12 +21,19 @@ Broad phrases like "how to", "tell me about", "what should I" are not enough by 
 **Exact blocked message:**
 > I can only help with Computer Science and Software Engineering university admissions in Pakistan. Please ask about universities, eligibility, fees, merit, deadlines, entry tests, or admission steps.
 
+Backend expectation: blocked requests return before Chroma/RAG and before `/ai-summary` answer generation.
+
 ## 2. Valid admission questions (frontend → backend)
 
-"how to apply" is allowed (contains "apply"). "tell me about FAST" is allowed (contains "fast" — university name).
+Admission questions, university names, and contextual follow-ups are allowed. "What are safe options for me?" must not be blocked.
 
 | Test | Expected | Result |
 |------|----------|--------|
+| Type "What are safe options for me?" | Recommendation or follow-up response | |
+| Type "Show safe options" | Recommendation or follow-up response | |
+| Type "Best matches" | Recommendation or follow-up response | |
+| Type "Compare options" | Recommendation or follow-up response | |
+| Type "What should I do next?" | Next-step guidance | |
 | Type "How to apply?" | Counselling response | |
 | Type "How can I get admission?" | Counselling response | |
 | Type "Tell me about FAST" | Info about FAST | |
@@ -80,5 +87,5 @@ Broad phrases like "how to", "tell me about", "what should I" are not enough by 
 | Workflow file exists | `.github/workflows/scheduled-scrape.yml` | |
 | Weekly schedule | cron `0 6 * * 0` runs Sunday 6 AM UTC | |
 | Manual trigger | workflow_dispatch button in GitHub UI | |
-| Playwright install | Installs chromium browser | |
+| Playwright install | Installs chromium browser and browser dependencies | |
 | Commit on changes | Only commits if data files changed | |

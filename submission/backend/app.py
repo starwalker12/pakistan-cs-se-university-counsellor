@@ -70,6 +70,7 @@ CACHE_MAX_ITEMS = env_int("COUNSEL_CACHE_MAX_ITEMS", 80)
 COUNSEL_CACHE: dict[str, dict] = {}
 RECOMMEND_CACHE: dict[str, dict] = {}
 AI_SUMMARY_CACHE: dict[str, dict] = {}
+RELEVANCE_CACHE: dict[str, dict] = {}
 LIVE_LOOKUP_CACHE: dict[str, str] = {}
 
 # ──────────────────────────────────────────────
@@ -178,6 +179,7 @@ class CounselRequest(BaseModel):
     profile: Profile
     question: str
     selected_university: str | None = ""
+    recent_context: bool = False
 
 class SourceItem(BaseModel):
     university_name: str = ""
@@ -214,6 +216,13 @@ class TimingInfo(BaseModel):
     llm_seconds: float = 0.0
     cached: bool = False
 
+class RelevanceResult(BaseModel):
+    allowed: bool = False
+    intent: str = "irrelevant"
+    reason: str = ""
+    safe_reply: str = ""
+    provider_used: str = "fallback"
+
 class CounselResponse(BaseModel):
     answer: str
     sources: list[SourceItem] = Field(default_factory=list)
@@ -228,8 +237,10 @@ class CounselResponse(BaseModel):
     selected_model: str = ""
     selected_university: str = ""
     timing: TimingInfo | None = None
+    relevance: RelevanceResult | None = None
 
 class RecommendResponse(BaseModel):
+    answer: str = ""
     sources: list[SourceItem] = Field(default_factory=list)
     recommended_universities: list[RecommendationItem] = Field(default_factory=list)
     safe_options: list[RecommendationItem] = Field(default_factory=list)
@@ -245,11 +256,13 @@ class RecommendResponse(BaseModel):
     eligible_universities_count: int = 0
     not_eligible_count: int = 0
     timing: TimingInfo | None = None
+    relevance: RelevanceResult | None = None
 
 class AISummaryRequest(BaseModel):
     profile: Profile
     question: str
     selected_university: str | None = ""
+    recent_context: bool = False
     recommended_universities: list[RecommendationItem] = Field(default_factory=list)
     safe_options: list[RecommendationItem] = Field(default_factory=list)
     difficult_options: list[RecommendationItem] = Field(default_factory=list)
@@ -261,12 +274,14 @@ class AISummaryResponse(BaseModel):
     provider_used: str = ""
     selected_model: str = ""
     timing: TimingInfo | None = None
+    relevance: RelevanceResult | None = None
 
 class UniversityInfoRequest(BaseModel):
     profile: Profile
     question: str
     university_id: str | None = None
     info_type: str | None = None
+    recent_context: bool = False
 
 class UniversityInfoResponse(BaseModel):
     answer: str
@@ -277,6 +292,7 @@ class UniversityInfoResponse(BaseModel):
     has_exact_data: bool = False
     data_source: str = "missing"
     source_url_used: str = ""
+    relevance: RelevanceResult | None = None
 
 GREETING_WORDS = frozenset({
     "hey", "hello", "hi", "salam", "assalam", "alaikum",
@@ -302,19 +318,38 @@ ADMISSION_KEYWORDS = [
     "admission", "admissions", "university", "universities", "eligibility", "eligible",
     "fee", "fees", "merit", "deadline", "scholarship", "hostel", "campus",
     "entry test", "nts", "nat", "ecat", "net", "admission test",
+    "requirement", "requirements", "criteria", "application", "portal",
     "computer science", "software engineering", "cs", "se",
-    "apply", "application", "recommend", "suggest",
+    "apply", "how can i apply", "recommend", "suggest",
     "lahore", "islamabad", "karachi", "pakistan",
     "program", "degree", "bs", "bachelor",
     "matric", "intermediate", "a level", "o level",
     "percentage", "marks", "score",
+    "safe option", "safe options", "best match", "best matches",
+    "difficult option", "backup option", "not eligible", "next step", "next steps",
+    "compare", "shortlist",
 ]
 
 BLOCKED_TOPICS = [
     "cook", "recipe", "weather", "elon musk", "joke", "poem",
     "love poem", "teach me", "programming", "coding", "python",
     "c++", "javascript", "oop", "loop", "variables", "calculator",
+    "wear", "outfit",
 ]
+
+CONTEXTUAL_FOLLOW_UP_PHRASES = [
+    "safe option", "safe options", "show safe", "best match", "best matches",
+    "compare option", "compare options", "compare universities", "what should i do next",
+    "what next", "next step", "next steps", "tell me more", "admission requirements",
+    "requirements", "show requirements", "fee info", "fees", "admission link",
+    "official link", "how can i apply", "how to apply", "difficult options",
+    "not eligible", "backup options",
+]
+
+RELEVANCE_INTENTS = {
+    "greeting", "recommendation", "follow_up", "university_info",
+    "eligibility", "admission_link", "irrelevant",
+}
 
 UNIVERSITY_NAME_ALIASES = [
     "fast", "nuces", "nust", "comsats", "lums", "giki",
@@ -325,23 +360,98 @@ UNIVERSITY_NAME_ALIASES = [
     "beaconhouse",
 ]
 
-def is_admission_related(text: str) -> bool:
-    if not text:
+def has_profile_context(profile: Profile | None) -> bool:
+    if not profile:
         return False
+    context_fields = [
+        profile.preferred_field,
+        profile.city_preference,
+        profile.matric_percentage,
+        profile.intermediate_percentage,
+        profile.matric_marks,
+        profile.inter_marks,
+        profile.o_level_equivalence,
+        profile.a_level_equivalence,
+        profile.budget,
+        profile.entry_test,
+    ]
+    return any(bool(str(value).strip()) for value in context_fields)
+
+def fallback_relevance_guard(text: str, profile: Profile | None = None,
+                             recent_context: bool = False) -> RelevanceResult:
+    if not text or not text.strip():
+        return RelevanceResult(
+            allowed=False,
+            intent="irrelevant",
+            reason="Empty question",
+            safe_reply="Please ask a question about CS or Software Engineering admissions in Pakistan.",
+            provider_used="fallback",
+        )
+
     lower = text.strip().lower()
     cleaned = lower.rstrip(".!?, ")
+    profile_context = has_profile_context(profile)
+    contextual = recent_context or profile_context
+
     if cleaned in GREETING_WORDS:
-        return True
-    for keyword in ADMISSION_KEYWORDS:
-        if keyword in lower:
-            return True
-    for alias in UNIVERSITY_NAME_ALIASES:
-        if alias in lower:
-            return True
-    for topic in BLOCKED_TOPICS:
-        if topic in lower:
-            return False
-    return False
+        return RelevanceResult(
+            allowed=True,
+            intent="greeting",
+            reason="Greeting",
+            provider_used="fallback",
+        )
+
+    if any(alias in lower for alias in UNIVERSITY_NAME_ALIASES):
+        intent = "eligibility" if any(word in lower for word in ("eligible", "eligibility")) else "university_info"
+        if any(word in lower for word in ("apply", "link", "portal", "admission page")):
+            intent = "admission_link"
+        return RelevanceResult(
+            allowed=True,
+            intent=intent,
+            reason="Known university reference",
+            provider_used="fallback",
+        )
+
+    if any(phrase in lower for phrase in CONTEXTUAL_FOLLOW_UP_PHRASES):
+        return RelevanceResult(
+            allowed=True,
+            intent="follow_up" if contextual else "recommendation",
+            reason="Admission follow-up phrase",
+            provider_used="fallback",
+        )
+
+    if any(keyword in lower for keyword in ADMISSION_KEYWORDS):
+        intent = "recommendation"
+        if any(word in lower for word in ("eligible", "eligibility", "requirement", "requirements", "criteria")):
+            intent = "eligibility"
+        elif any(word in lower for word in ("apply", "link", "portal", "application")):
+            intent = "admission_link"
+        return RelevanceResult(
+            allowed=True,
+            intent=intent,
+            reason="Admission-related wording",
+            provider_used="fallback",
+        )
+
+    if any(topic in lower for topic in BLOCKED_TOPICS):
+        return RelevanceResult(
+            allowed=False,
+            intent="irrelevant",
+            reason="Obvious unrelated topic",
+            safe_reply=BLOCKED_REPLY,
+            provider_used="fallback",
+        )
+
+    return RelevanceResult(
+        allowed=False,
+        intent="irrelevant",
+        reason="No admission context detected",
+        safe_reply=BLOCKED_REPLY,
+        provider_used="fallback",
+    )
+
+def is_admission_related(text: str) -> bool:
+    return fallback_relevance_guard(text, Profile(), False).allowed
 
 def model_dict(model: BaseModel) -> dict:
     if hasattr(model, "model_dump"):
@@ -392,6 +502,148 @@ def cache_store(cache: dict[str, dict], cache_key: str, response: BaseModel) -> 
     while len(cache) > CACHE_MAX_ITEMS:
         oldest_key = next(iter(cache))
         cache.pop(oldest_key, None)
+
+def parse_json_object(text: str | None) -> dict | None:
+    if not text:
+        return None
+    cleaned = text.strip()
+    if cleaned.startswith("```"):
+        cleaned = cleaned.strip("`")
+        if cleaned.lower().startswith("json"):
+            cleaned = cleaned[4:].strip()
+    start = cleaned.find("{")
+    end = cleaned.rfind("}")
+    if start == -1 or end == -1 or end <= start:
+        return None
+    try:
+        return json.loads(cleaned[start:end + 1])
+    except json.JSONDecodeError:
+        return None
+
+def relevance_cache_key(question: str, profile: Profile, recent_context: bool,
+                        selected_university: str | None = "") -> str:
+    payload = {
+        "question": (question or "").strip().lower(),
+        "profile_context": has_profile_context(profile),
+        "preferred_field": (profile.preferred_field or "").strip().lower(),
+        "city": (profile.city_preference or "").strip().lower(),
+        "selected_university": (selected_university or "").strip().lower(),
+        "recent_context": recent_context,
+        "model": OLLAMA_MODEL,
+    }
+    return json.dumps(payload, sort_keys=True, separators=(",", ":"))
+
+def normalize_relevance_result(raw: dict, provider_used: str) -> RelevanceResult | None:
+    if not isinstance(raw, dict) or "allowed" not in raw:
+        return None
+    intent = str(raw.get("intent") or "irrelevant").strip().lower()
+    invalid_intent = intent not in RELEVANCE_INTENTS
+    raw_allowed = raw.get("allowed")
+    if isinstance(raw_allowed, bool):
+        allowed = raw_allowed
+    else:
+        allowed = str(raw_allowed).strip().lower() in ("1", "true", "yes", "allowed")
+    if invalid_intent:
+        intent = "irrelevant" if not allowed else "follow_up"
+    safe_reply = str(raw.get("safe_reply") or "").strip()
+    if allowed:
+        safe_reply = ""
+    if not allowed and not safe_reply:
+        safe_reply = BLOCKED_REPLY
+    return RelevanceResult(
+        allowed=allowed,
+        intent=intent,
+        reason=str(raw.get("reason") or "").strip()[:180],
+        safe_reply=safe_reply[:500],
+        provider_used=provider_used,
+    )
+
+def relevance_selected_model(provider_used: str) -> str:
+    if provider_used == "ollama":
+        return OLLAMA_MODEL
+    if provider_used == "lm_studio":
+        return LM_STUDIO_MODEL
+    return "fallback relevance guard"
+
+async def classify_question_relevance(user_message: str, profile: Profile,
+                                      recent_context: bool = False,
+                                      selected_university: str | None = "") -> RelevanceResult:
+    """Classify scope before any RAG or answer generation is attempted."""
+    selected_id = resolve_selected_id(selected_university)
+    context_flag = bool(recent_context or selected_id or has_profile_context(profile))
+    cache_key = relevance_cache_key(user_message, profile, context_flag, selected_id)
+    cached = cache_get(RELEVANCE_CACHE, cache_key, RelevanceResult)
+    if cached:
+        return cached
+
+    fallback = fallback_relevance_guard(user_message, profile, context_flag)
+    prompt = f"""
+You are a relevance checker for DigiCounsellor.
+DigiCounsellor only helps with Computer Science and Software Engineering university admissions in Pakistan.
+Allowed topics include admissions, eligibility, fees, merit, deadlines, entry tests, official links, universities, profile-based recommendations, best matches, safe options, difficult options, not eligible options, and next steps.
+Contextual follow-up questions are allowed if they refer to previous recommendation results.
+Examples of allowed follow-ups:
+safe options
+best matches
+compare options
+what should I do next
+tell me more
+admission requirements
+Examples of not allowed:
+teach me c++
+teach me python
+cook biryani
+weather
+Elon Musk
+jokes
+love poem
+coding tutorial
+
+Return only valid JSON using this exact shape:
+{{"allowed": true, "intent": "recommendation", "reason": "short reason", "safe_reply": ""}}
+
+Intent must be one of: greeting, recommendation, follow_up, university_info, eligibility, admission_link, irrelevant.
+Do not answer the user question.
+Do not include chain of thought.
+
+Recent recommendation context exists: {str(context_flag).lower()}
+Selected university id: {selected_id or "none"}
+Profile field: {profile.preferred_field or "not provided"}
+Profile city: {profile.city_preference or "not provided"}
+User question: {user_message.strip()[:500]}
+""".strip()
+
+    result: RelevanceResult | None = None
+    for provider in PROVIDER_ORDER:
+        provider = provider.strip()
+        if provider == "ollama":
+            raw_text = await call_ollama(prompt, num_predict=220)
+            result = normalize_relevance_result(parse_json_object(raw_text), "ollama")
+            if result:
+                break
+        elif provider == "lm_studio":
+            raw_text = await call_lm_studio(prompt, max_tokens=220)
+            result = normalize_relevance_result(parse_json_object(raw_text), "lm_studio")
+            if result:
+                break
+
+    if not result:
+        result = fallback
+
+    # Keep the showcase flow forgiving for contextual admission follow-ups and
+    # strict for obvious unrelated examples if the classifier is ambiguous.
+    if not result.allowed and fallback.allowed:
+        result = fallback
+        result.reason = "Fallback allowed a contextual admission follow-up"
+    elif result.allowed and not fallback.allowed and fallback.reason == "Obvious unrelated topic":
+        result = fallback
+        result.reason = "Fallback blocked an obvious unrelated topic"
+
+    if not result.allowed and not result.safe_reply:
+        result.safe_reply = BLOCKED_REPLY
+
+    cache_store(RELEVANCE_CACHE, cache_key, result)
+    return result
 
 # ──────────────────────────────────────────────
 # Academic profile normalisation
@@ -1550,9 +1802,25 @@ async def generate_ai_summary(profile: Profile, question: str, selected_id: str,
 @app.post("/recommend")
 async def recommend(request: CounselRequest):
     total_start = time.perf_counter()
-    if not is_admission_related(request.question):
+    relevance = await classify_question_relevance(
+        request.question,
+        request.profile,
+        request.recent_context,
+        request.selected_university,
+    )
+    if relevance.intent == "greeting":
+        total_seconds = time.perf_counter() - total_start
         return RecommendResponse(
-            answer=BLOCKED_REPLY,
+            answer=greeting_answer(request.profile),
+            provider_used="fallback",
+            selected_model="rule-based greeting",
+            timing=TimingInfo(total_seconds=round(total_seconds, 3), cached=False),
+            relevance=relevance,
+        )
+    if not relevance.allowed:
+        total_seconds = time.perf_counter() - total_start
+        return RecommendResponse(
+            answer=relevance.safe_reply or BLOCKED_REPLY,
             recommended_universities=[],
             safe_options=[],
             difficult_options=[],
@@ -1561,13 +1829,14 @@ async def recommend(request: CounselRequest):
             admission_links=[],
             sources=[],
             retrieved_count=0,
-            provider_used="fallback",
-            selected_model="rule-based guidance",
+            provider_used=relevance.provider_used,
+            selected_model=relevance_selected_model(relevance.provider_used),
             selected_university="",
             checked_universities_count=0,
             eligible_universities_count=0,
             not_eligible_count=0,
-            timing=TimingInfo(total_seconds=0.0, cached=False),
+            timing=TimingInfo(total_seconds=round(total_seconds, 3), cached=False),
+            relevance=relevance,
         )
     selected_id = resolve_selected_id(request.selected_university)
     cache_key = recommend_cache_key(request.profile, request.question, selected_id)
@@ -1580,6 +1849,7 @@ async def recommend(request: CounselRequest):
 
     result = build_recommendation_result(request.profile, request.question, selected_id)
     response = result["response"]
+    response.relevance = relevance
     cache_store(RECOMMEND_CACHE, cache_key, response)
     timing = response.timing or TimingInfo()
     print(
@@ -1596,12 +1866,37 @@ async def recommend(request: CounselRequest):
 @app.post("/ai-summary")
 async def ai_summary(request: AISummaryRequest):
     total_start = time.perf_counter()
-    if not is_admission_related(request.question):
+    has_recommendation_context = bool(
+        request.recent_context
+        or request.selected_university
+        or request.recommended_universities
+        or request.safe_options
+        or request.difficult_options
+        or request.not_eligible_options
+        or request.sources
+    )
+    relevance = await classify_question_relevance(
+        request.question,
+        request.profile,
+        has_recommendation_context,
+        request.selected_university,
+    )
+    if relevance.intent == "greeting":
+        total_seconds = time.perf_counter() - total_start
         return AISummaryResponse(
-            answer=BLOCKED_REPLY,
+            answer=greeting_answer(request.profile),
             provider_used="fallback",
-            selected_model="rule-based guidance",
+            selected_model="rule-based greeting",
+            timing=TimingInfo(total_seconds=round(total_seconds, 3), cached=False),
+            relevance=relevance,
+        )
+    if not relevance.allowed:
+        return AISummaryResponse(
+            answer=relevance.safe_reply or BLOCKED_REPLY,
+            provider_used=relevance.provider_used,
+            selected_model=relevance_selected_model(relevance.provider_used),
             timing=TimingInfo(total_seconds=round(time.perf_counter() - total_start, 3), cached=False),
+            relevance=relevance,
         )
     selected_id = resolve_selected_id(request.selected_university)
     cache_key = ai_summary_cache_key(request, selected_id)
@@ -1651,6 +1946,7 @@ async def ai_summary(request: AISummaryRequest):
             llm_seconds=round(llm_seconds, 3),
             cached=False,
         ),
+        relevance=relevance,
     )
     cache_store(AI_SUMMARY_CACHE, cache_key, response)
     print(
@@ -1666,21 +1962,29 @@ async def ai_summary(request: AISummaryRequest):
 @app.post("/counsel")
 async def counsel(request: CounselRequest):
     total_start = time.perf_counter()
-    if is_greeting(request.question):
+    relevance = await classify_question_relevance(
+        request.question,
+        request.profile,
+        request.recent_context,
+        request.selected_university,
+    )
+    if relevance.intent == "greeting":
         total_seconds = time.perf_counter() - total_start
         return CounselResponse(
             answer=greeting_answer(request.profile),
             provider_used="fallback",
-            selected_model="rule-based guidance",
+            selected_model="rule-based greeting",
             timing=TimingInfo(total_seconds=round(total_seconds, 3), cached=False),
+            relevance=relevance,
         )
-    if not is_admission_related(request.question):
+    if not relevance.allowed:
         total_seconds = time.perf_counter() - total_start
         return CounselResponse(
-            answer=BLOCKED_REPLY,
-            provider_used="fallback",
-            selected_model="rule-based guidance",
+            answer=relevance.safe_reply or BLOCKED_REPLY,
+            provider_used=relevance.provider_used,
+            selected_model=relevance_selected_model(relevance.provider_used),
             timing=TimingInfo(total_seconds=round(total_seconds, 3), cached=False),
+            relevance=relevance,
         )
     selected_id = resolve_selected_id(request.selected_university)
     cache_key = counsel_cache_key(request.profile, request.question, selected_id)
@@ -1722,6 +2026,7 @@ async def counsel(request: CounselRequest):
             llm_seconds=round(llm_seconds, 3),
             cached=False,
         ),
+        relevance=relevance,
     )
     cache_store(COUNSEL_CACHE, cache_key, response)
     print(
@@ -2081,8 +2386,24 @@ async def university_info(request: UniversityInfoRequest):
     question = request.question
     profile = request.profile
 
-    if not is_admission_related(question):
-        return UniversityInfoResponse(answer=BLOCKED_REPLY)
+    relevance = await classify_question_relevance(
+        question,
+        profile,
+        bool(request.recent_context or request.university_id),
+        request.university_id,
+    )
+    if relevance.intent == "greeting":
+        return UniversityInfoResponse(
+            answer=greeting_answer(profile),
+            data_source="relevance",
+            relevance=relevance,
+        )
+    if not relevance.allowed:
+        return UniversityInfoResponse(
+            answer=relevance.safe_reply or BLOCKED_REPLY,
+            data_source="relevance",
+            relevance=relevance,
+        )
 
     uni_id = request.university_id or detect_university_in_question(question)
     if not uni_id:
@@ -2094,4 +2415,6 @@ async def university_info(request: UniversityInfoRequest):
     if not info_type:
         info_type = "general"
 
-    return await build_university_info_answer(question, profile, uni_id, info_type)
+    response = await build_university_info_answer(question, profile, uni_id, info_type)
+    response.relevance = relevance
+    return response

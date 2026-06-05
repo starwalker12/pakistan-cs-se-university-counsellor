@@ -8,12 +8,13 @@ DigiCounsellor is a polished RAG-based student counselling web app for Pakistani
 
 1. Student saves a profile with academic system, marks/equivalence, preferred field, city, budget, entry test, and university type
 2. Student asks a question or chooses a guided follow-up
-3. The backend retrieves relevant university admission information from a local Chroma vector database
-4. Ranking, eligibility, city, field, type, and budget logic produce structured recommendation cards
-5. In split response mode, `/recommend` returns cards first without waiting for the local LLM
-6. `/ai-summary` then asks Ollama or LM Studio for a short counselling summary while the cards stay usable
-7. `/counsel` remains available as the older combined response endpoint
-8. On follow-up questions (eligibility, fees, next steps), the frontend skips `/recommend` and calls `/ai-summary` directly with the stored recommendation data — cards do not repeat for every message
+3. The backend runs an AI relevance check before retrieval or answer generation
+4. Valid admission questions retrieve university information from the local Chroma vector database
+5. Ranking, eligibility, city, field, type, and budget logic produce structured recommendation cards
+6. In split response mode, `/recommend` returns cards first without waiting for the local LLM summary
+7. `/ai-summary` then asks Ollama or LM Studio for a short counselling summary while the cards stay usable
+8. `/counsel` remains available as the older combined response endpoint
+9. On follow-up questions (eligibility, fees, next steps), the frontend uses stored recommendation context so cards do not repeat for every message
 
 ## Project Structure
 
@@ -314,7 +315,7 @@ The RAG system answers admission questions using data that ultimately comes from
 
 ## Phase 5 Official Data Collection
 
-Admission data comes from official university `.edu.pk` websites where available. The scraper (`scrape_universities.py`) reads `universities.json` and `source_links.json`, then fetches each page using httpx and extracts text with BeautifulSoup.
+Admission data comes from official university `.edu.pk` websites where available. The scraper (`scrape_universities.py`) reads `backend/data/source_links.json`, opens official pages with Playwright headless Chromium, extracts text with BeautifulSoup, and skips login/captcha/private URLs.
 
 ### Summary (latest run)
 
@@ -467,11 +468,13 @@ curl -X POST http://localhost:8000/counsel \
 
 ## Relevance Guard
 
-The chatbot blocks questions that are not about CS/SE admissions in Pakistan.
+The backend is the final relevance authority. `classify_question_relevance()` in `backend/app.py` asks the local AI provider for a JSON routing decision before RAG search or answer generation.
 
-- **Frontend**: `isAdmissionRelated()` in `frontend/script.js` checks every question before any API call. A question is allowed only if it is a greeting, mentions a university name, or contains an admission-specific keyword (admission, eligibility, fee, merit, deadline, entry test, etc.). Broader phrases like "how to" or "tell me about" are not accepted alone — the question must have an admission topic.
-- **Blocked topics**: cooking, weather, jokes, poems, Elon Musk, programming tutoring, coding, Python, C++, JavaScript, OOP, loops, variables, calculators — these are rejected unless the question also contains an admission keyword.
-- **Backend**: `is_admission_related()` in `backend/app.py` applies the same checks on `/counsel`, `/recommend`, `/ai-summary`, and `/university-info` endpoints, so direct API calls are also protected.
+- **Allowed scope**: CS/SE admissions in Pakistan, including recommendations, eligibility, fees, merit, deadlines, entry tests, official links, safe/difficult options, and next steps.
+- **Contextual follow-ups**: Short questions like "safe options", "best matches", "compare options", "tell me more", and "what should I do next" are allowed when the user has a saved profile or recent recommendation context.
+- **Blocked topics**: cooking, weather, jokes, poems, Elon Musk, programming tutoring, Python, C++, OOP, loops, calculators, and general unrelated questions are refused before Chroma/RAG and before the AI summary generator.
+- **Fallback guard**: If the local AI classifier is unavailable, a simple fallback guard allows greetings, university names, admission terms, and contextual follow-ups while blocking obvious unrelated topics.
+- **Frontend role**: `frontend/script.js` only handles UI routing and greetings. It does not make the final relevance decision.
 - **Blocked reply**: "I can only help with Computer Science and Software Engineering university admissions in Pakistan. Please ask about universities, eligibility, fees, merit, deadlines, entry tests, or admission steps."
 
 ## Playwright Scraper
@@ -485,7 +488,7 @@ The chatbot blocks questions that are not about CS/SE admissions in Pakistan.
 5. Extracts clean text per category (eligibility, fee, entry test, deadline, merit) using BeautifulSoup
 6. Outputs structured data to `backend/data/processed/university_admission_data.json`
 7. Saves a scraping log to `backend/data/processed/scraping_log.json`
-8. 2-second delay between pages; continues if a site fails
+8. Uses a polite 2-second delay, skips login/captcha/private URLs, and continues if a site fails
 
 Usage:
 ```bash
@@ -498,7 +501,7 @@ python backend/scrape_universities.py
 
 `.github/workflows/scheduled-scrape.yml` runs automatically every Sunday at 6:00 AM UTC.
 
-- Installs Python, Playwright, and all dependencies
+- Installs Python, Playwright, Chromium, and browser dependencies
 - Runs `python backend/scrape_universities.py` to fetch the latest admission data
 - Runs `python backend/build_vector_db.py` to rebuild the Chroma vector database
 - Commits any changed data files back to the repository automatically
@@ -532,7 +535,7 @@ python backend/scrape_universities.py
 | 22 | Correct link categories — buttons only show when their URL matches the type (fee_structure opens a real fee page, eligibility opens a real eligibility page, etc.); is_category_url_valid() ensures no mislabeled links; live official data lookup via httpx+BeautifulSoup when stored text is missing; /data-status adds valid_links_count and possibly_wrong_links for auditing | Complete |
 | 23 | Topic-aware live lookup — matches_topic() checks extracted page text for topic keywords before accepting live fetch results; LUMS fee no longer returns generic admissions text | Complete |
 | 24 | Logo branding — DigiCounsellor logo, Poppins/Inter typography, updated favicon | Complete |
-| 25 | Relevance guard — frontend and backend block off-topic questions (programming, weather, cooking, jokes, etc.); only admission questions pass | Complete |
+| 25 | AI relevance routing — backend classifies admission scope before RAG/LLM and frontend no longer blocks valid follow-ups | Complete |
 | 26 | Screen scroll fix — page does not scroll; only profile panel and chat messages scroll inside their containers | Complete |
 | 27 | Playwright scraper — headless Chromium scraping for JS-rendered pages replaces httpx-only approach | Complete |
 | 28 | Weekly GitHub Actions schedule — automated scrape + vector DB rebuild every Sunday | Complete |
@@ -552,7 +555,7 @@ python backend/scrape_universities.py
 - **All 20 universities checked** — every /recommend call scores all universities from the project data (universities.json, rankings, eligibility rules). Response includes `checked_universities_count` to prove full coverage
 - **Link validation everywhere** — `isValidLink()` on frontend and `is_valid_url()` on backend filter out empty, "TODO", placeholder, "#", and non-http/https URLs from admission links and source URLs. Source link data files have all TODO-noted URLs replaced with verified admissions pages or official university homepages
 - **Source-first specific answers** — when a user asks a specific question about a named university (fee, eligibility, entry test, deadline, admission links), the frontend detects this intent and calls `/university-info`. The backend returns exact stored data if available, or an honest "I do not have exact stored data for this yet" with the official link. No guessing, no invented fees, no recommendation card duplication
-- **Relevance guard** — frontend `isAdmissionRelated()` and backend `is_admission_related()` block programming questions, cooking, weather, jokes, and other off-topic queries. Only admission questions about Pakistani CS/SE universities pass through. Greetings and university name mentions are always allowed
+- **AI relevance routing** — backend `classify_question_relevance()` checks every chat API request before RAG or answer generation. Valid follow-ups like "safe options" pass with recent profile/recommendation context, while programming tutorials, cooking, weather, jokes, and general off-topic questions are refused politely
 - **Data coverage report** — `GET /data-status` returns a per-university breakdown of which links and scraped text fields (eligibility, fee, entry test, deadline) exist across all 20 universities. This proves the app checks each university's available data before answering
 - **20 universities with source links** — every university has at minimum an official website link. Source link files have had all TODO/unverified URLs replaced
 - **Category-validated link buttons** — each link button only shows if its URL matches the button type. Fee buttons open fee pages, eligibility buttons open eligibility pages, etc. `is_category_url_valid()` checks URL content against the category label so a "Fee structure" button never opens a general admissions page
